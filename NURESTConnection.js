@@ -60,12 +60,7 @@ export default class NURESTConnection extends NUObject {
 
                 if (response.status === 300 && this._onMultipleChoices) {
                     return this._onMultipleChoices(data)
-                        .then((c) => {
-                            // TODO: The server will ask confirmation again when responseChoice=0
-                            // this needs to be fixed on the backend.
-                            if (!c) return Promise.reject(result);
-                            return this.makeRequest(requestURL, verb, headers, body, c);
-                        });
+                        .then(c => this.makeRequest(requestURL, verb, headers, body, c));
                 }
 
                 if (response.ok) {
