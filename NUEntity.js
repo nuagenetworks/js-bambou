@@ -45,6 +45,19 @@ export default class NUEntity extends NUObject {
             isEditable: false }),
     }
 
+    static getSearchableAttributes() {
+        if (!this.searchableAttributes) {
+            this.searchableAttributes = Object
+                .entries(this.attributeDescriptors)
+                .reduce((acc, attr) => {
+                    const [key, value] = attr;
+                    if (value.canSearch) return { ...acc, [key]: value };
+                    return acc;
+                }, {});
+        }
+        return this.searchableAttributes;
+    }
+
     constructor() {
         super();
         this.defineProperties({
