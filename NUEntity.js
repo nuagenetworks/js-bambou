@@ -116,7 +116,10 @@ export default class NUEntity extends NUObject {
         const obj = {};
         const attributeDescriptors = this.constructor.attributeDescriptors;
         Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
-            obj[attributeObj.remoteName] = this[localName];
+            const value = this[localName];
+            obj[attributeObj.remoteName] =
+            (value && attributeObj.attributeType === NUAttribute.ATTR_TYPE_ENUM) ?
+                value.name : value;
         });
         return obj;
     }
