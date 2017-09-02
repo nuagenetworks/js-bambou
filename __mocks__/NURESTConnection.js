@@ -7,7 +7,7 @@ export default class NURESTConnection {
     makeRequest(URL, verb, headers, body) {
         const response = {};
         const responseHeaders = {};
-        headers.forEach(([key, value]) => {
+        headers.forEach((value, key) => {
             if (key) {
                 responseHeaders[key.toLowerCase()] = value;
             }
