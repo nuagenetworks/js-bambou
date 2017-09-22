@@ -39,6 +39,7 @@ export default class NUAttribute extends NUObject {
             maxLength: obj.maxLength || -1,
             minLength: obj.minLength || -1,
             remoteName: remName,
+            userlabel: obj.userlabel,
         });
     }
 
