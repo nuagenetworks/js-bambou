@@ -1,7 +1,12 @@
 import NUAttribute from './NUAttribute';
 import NUEntity from './NUEntity';
 import NUValidator from './NUValidator';
+import { Enum } from 'enumify';
 
+
+class NUAddressRangeIPTypeEnum extends Enum {}
+NUAddressRangeIPTypeEnum.initEnum(['DUALSTACK', 'IPV4', 'IPV6']);
+    
 class CustomValidator1 extends NUValidator {
     validate() {
         if (this.attr5 && !this.attr4) {
@@ -13,8 +18,8 @@ class CustomValidator1 extends NUValidator {
 
 class CustomValidator2 extends NUValidator {
     validate() {
-        if (this.attr5 && this.attr3 !== 'C') {
-            return 'attr3 must be C when attr5 is true';
+        if (this.attr5 && this.attr3 !== 'DUALSTACK') {
+            return 'attr3 must be DUALSTACK when attr5 is true';
         }
         return undefined;
     }
@@ -37,7 +42,7 @@ class MyEntity extends NUEntity {
         ...NUEntity.attributeDescriptors,
         attr1: new NUAttribute({ localName: 'attr1', remoteName: 'ATTR1', attributeType: NUAttribute.ATTR_TYPE_STRING }),
         attr2: new NUAttribute({ localName: 'attr2', attributeType: NUAttribute.ATTR_TYPE_STRING }),
-        attr3: new NUAttribute({ localName: 'attr3', remoteName: 'ATTR3', attributeType: NUAttribute.ATTR_TYPE_ENUM, isRequired: true, choices: ['A', 'B', 'C'] }),
+        attr3: new NUAttribute({ localName: 'attr3', remoteName: 'ATTR3', attributeType: NUAttribute.ATTR_TYPE_ENUM, isRequired: true, choices: [NUAddressRangeIPTypeEnum.DUALSTACK, NUAddressRangeIPTypeEnum.IPV4, NUAddressRangeIPTypeEnum.IPV6] }),
         attr4: new NUAttribute({ localName: 'attr4', attributeType: NUAttribute.ATTR_TYPE_STRING, minLength: 3, maxLength: 6 }),
         attr5: new NUAttribute({ localName: 'attr5', attributeType: NUAttribute.ATTR_TYPE_BOOLEAN }),
         attr6: new NUAttribute({ localName: 'attr6', attributeType: NUAttribute.ATTR_TYPE_NUMBER }),
@@ -65,14 +70,14 @@ it('attribute validations', () => {
     const errors = myEntity.validationErrors;
     expect(isValid).toEqual(false);
     expect(errors.get('attr3').description).toEqual('This value is mandatory');
-    myEntity.attr3 = 'Z';
+    myEntity.attr3 = 'IPV7';
     isValid = myEntity.isValid();
     expect(isValid).toEqual(false);
-    expect(errors.get('attr3').description).toEqual('Allowed values are A,B,C, but value provided is Z');
-    myEntity.attr3 = 'B';
+    expect(errors.get('attr3').description).toEqual('Allowed values are DUALSTACK,IPV4,IPV6, but value provided is IPV7');
+    myEntity.attr3 = 'IPV6';
     isValid = myEntity.isValid();
-    expect(isValid).toEqual(true);
     expect(errors.get('attr3')).toEqual(undefined);
+    expect(isValid).toEqual(true);
     myEntity.attr4 = 'ab';
     isValid = myEntity.isValid();
     expect(isValid).toEqual(false);
@@ -95,16 +100,16 @@ it('attribute validations', () => {
 it('custom validations', () => {
     const myEntity = new MyEntity();
     myEntity.ID = 'xyz123';
-    myEntity.attr3 = 'B';
+    myEntity.attr3 = 'IPV4';
     let isValid = myEntity.isValid();
     myEntity.attr5 = true;
     isValid = myEntity.isValid();
     const errors = myEntity.validationErrors;
     expect(isValid).toEqual(false);
     expect(errors.get('customValidator1')).toEqual('attr4 must be set when attr5 is true');
-    expect(errors.get('customValidator2')).toEqual('attr3 must be C when attr5 is true');
+    expect(errors.get('customValidator2')).toEqual('attr3 must be DUALSTACK when attr5 is true');
     myEntity.attr4 = 'value4';
-    myEntity.attr3 = 'C';
+    myEntity.attr3 = 'DUALSTACK';
     isValid = myEntity.isValid();
     expect(isValid).toEqual(true);
     const thatEntity1 = new MyEntity();

@@ -90,10 +90,13 @@ export default class NUAttribute extends NUObject {
     }
 
     validateEnumValue(attrValue, attrObj) {
-        if (attrObj.choices && attrObj.choices.indexOf(attrValue) === -1) {
-            return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
-                'Invalid input',
-                `Allowed values are ${attrObj.choices}, but value provided is ${attrValue}`);
+        if (attrObj.choices) {
+            var choiceValues = attrObj.choices.map(function(choice) { return choice.name; });
+            if (choiceValues.indexOf(attrValue) === -1) {
+                return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+                    'Invalid input',
+                    `Allowed values are ${choiceValues}, but value provided is ${attrValue}`);
+            }
         }
         return null;
     }
