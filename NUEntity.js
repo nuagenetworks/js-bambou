@@ -9,7 +9,7 @@ export default class NUEntity extends NUObject {
     static attributeDescriptors = {
         creationDate: new NUAttribute({
             localName: 'creationDate',
-            attributeType: NUAttribute.ATTR_TYPE_NUMBER,
+            attributeType: NUAttribute.ATTR_TYPE_STRING,
             isEditable: false }),
         entityScope: new NUAttribute({
             localName: 'entityScope',
@@ -29,7 +29,7 @@ export default class NUEntity extends NUObject {
             isEditable: false }),
         lastUpdatedDate: new NUAttribute({
             localName: 'lastUpdatedDate',
-            attributeType: NUAttribute.ATTR_TYPE_NUMBER,
+            attributeType: NUAttribute.ATTR_TYPE_STRING,
             isEditable: false }),
         owner: new NUAttribute({
             localName: 'owner',
@@ -95,7 +95,7 @@ export default class NUEntity extends NUObject {
         const attributeDescriptors = this.constructor.attributeDescriptors;
         Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
             if (attributeObj.remoteName in JSONObject) {
-                if (attributeObj.attributeType == NUAttribute.ATTR_TYPE_NUMBER) {
+                if (attributeObj.attributeType == NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType == NUAttribute.ATTR_TYPE_FLOAT) {
                     this[localName] = Number(JSONObject[attributeObj.remoteName]);
                 }
                 else
