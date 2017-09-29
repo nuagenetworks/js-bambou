@@ -10,6 +10,7 @@ export default class NUEntity extends NUObject {
         creationDate: new NUAttribute({
             localName: 'creationDate',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
+            isReadOnly: true,
             isEditable: false }),
         entityScope: new NUAttribute({
             localName: 'entityScope',
@@ -30,6 +31,7 @@ export default class NUEntity extends NUObject {
         lastUpdatedDate: new NUAttribute({
             localName: 'lastUpdatedDate',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
+            isReadOnly: true,
             isEditable: false }),
         owner: new NUAttribute({
             localName: 'owner',
