@@ -9,8 +9,11 @@ import NUException from './NUException';
 export default class NUAttribute extends NUObject {
     static ATTR_TYPE_BOOLEAN = 'boolean';
     static ATTR_TYPE_ENUM = 'enum';
-    static ATTR_TYPE_NUMBER = 'number';
+    static ATTR_TYPE_FLOAT = 'float';
+    static ATTR_TYPE_INTEGER = 'integer';
+    static ATTR_TYPE_LIST = 'list';
     static ATTR_TYPE_STRING = 'string';
+
 
     constructor(obj) {
         super();
@@ -39,6 +42,7 @@ export default class NUAttribute extends NUObject {
             maxLength: obj.maxLength || -1,
             minLength: obj.minLength || -1,
             remoteName: remName,
+            subType: obj.subType,
             userlabel: obj.userlabel,
         });
     }
@@ -59,7 +63,8 @@ export default class NUAttribute extends NUObject {
         if (attrValue) {
             if (
                 attrObj.attributeType !== NUAttribute.ATTR_TYPE_ENUM &&
-                typeof attrValue !== attrObj.attributeType
+                typeof attrValue !== attrObj.attributeType &&
+                !((attrObj.attributeType == NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType == NUAttribute.ATTR_TYPE_FLOAT) && typeof attrValue !== Number)
             ) {
                 return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                     'Invalid data type',

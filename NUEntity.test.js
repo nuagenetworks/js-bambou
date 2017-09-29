@@ -45,7 +45,8 @@ class MyEntity extends NUEntity {
         attr3: new NUAttribute({ localName: 'attr3', remoteName: 'ATTR3', attributeType: NUAttribute.ATTR_TYPE_ENUM, isRequired: true, choices: [NUAddressRangeIPTypeEnum.DUALSTACK, NUAddressRangeIPTypeEnum.IPV4, NUAddressRangeIPTypeEnum.IPV6] }),
         attr4: new NUAttribute({ localName: 'attr4', attributeType: NUAttribute.ATTR_TYPE_STRING, minLength: 3, maxLength: 6 }),
         attr5: new NUAttribute({ localName: 'attr5', attributeType: NUAttribute.ATTR_TYPE_BOOLEAN }),
-        attr6: new NUAttribute({ localName: 'attr6', attributeType: NUAttribute.ATTR_TYPE_NUMBER }),
+        attr6: new NUAttribute({ localName: 'attr6', attributeType: NUAttribute.ATTR_TYPE_INTEGER }),
+        attr7: new NUAttribute({ localName: 'attr7', attributeType: NUAttribute.ATTR_TYPE_FLOAT }),
     }
     constructor() {
         super();
@@ -101,6 +102,7 @@ it('custom validations', () => {
     const myEntity = new MyEntity();
     myEntity.ID = 'xyz123';
     myEntity.attr3 = 'IPV4';
+    myEntity.attr7 = 123.45;
     let isValid = myEntity.isValid();
     myEntity.attr5 = true;
     isValid = myEntity.isValid();
