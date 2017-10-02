@@ -47,6 +47,8 @@ class MyEntity extends NUEntity {
         attr5: new NUAttribute({ localName: 'attr5', attributeType: NUAttribute.ATTR_TYPE_BOOLEAN }),
         attr6: new NUAttribute({ localName: 'attr6', attributeType: NUAttribute.ATTR_TYPE_INTEGER }),
         attr7: new NUAttribute({ localName: 'attr7', attributeType: NUAttribute.ATTR_TYPE_FLOAT }),
+        attr8: new NUAttribute({ localName: 'attr8', attributeType: NUAttribute.ATTR_TYPE_LIST, subType: NUAttribute.ATTR_TYPE_ENUM, choices: [NUAddressRangeIPTypeEnum.DUALSTACK, NUAddressRangeIPTypeEnum.IPV4, NUAddressRangeIPTypeEnum.IPV6] }),
+        attr9: new NUAttribute({ localName: 'attr9', attributeType: NUAttribute.ATTR_TYPE_LIST, subType: NUAttribute.ATTR_TYPE_FLOAT }),
     }
     constructor() {
         super();
@@ -95,6 +97,25 @@ it('attribute validations', () => {
     isValid = myEntity.isValid();
     expect(isValid).toEqual(true);
     expect(errors.get('attr4')).toEqual(undefined);
+    
+    myEntity.attr8 = [1, 2, 3];
+    isValid = myEntity.isValid();
+    expect(isValid).toEqual(false);
+    expect(errors.get('attr8').description).toEqual('Allowed values are DUALSTACK,IPV4,IPV6, but value provided is 1');
+    myEntity.attr8 = [NUAddressRangeIPTypeEnum.DUALSTACK.name , NUAddressRangeIPTypeEnum.IPV4.name];
+    isValid = myEntity.isValid();
+    expect(isValid).toEqual(true);
+    expect(errors.get('attr8')).toEqual(undefined);
+
+    myEntity.attr9 = ["abc", "def"];
+    isValid = myEntity.isValid();
+    expect(isValid).toEqual(false);
+    expect(errors.get('attr9').description).toEqual('Data type should be float, but is string');
+    myEntity.attr9 = [1, 2.22, 3.56, 4];
+    isValid = myEntity.isValid();
+    expect(isValid).toEqual(true);
+    expect(errors.get('attr9')).toEqual(undefined);
+    expect(isValid).toEqual(true);
 });
 
 
