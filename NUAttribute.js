@@ -61,24 +61,61 @@ export default class NUAttribute extends NUObject {
         }
 
         if (attrValue) {
-            if (
-                attrObj.attributeType !== NUAttribute.ATTR_TYPE_ENUM &&
-                typeof attrValue !== attrObj.attributeType &&
-                !((attrObj.attributeType == NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType == NUAttribute.ATTR_TYPE_FLOAT) && typeof attrValue !== Number)
-            ) {
+            var dataTypeMismatch = false;
+
+            if (attrObj.attributeType == NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType == NUAttribute.ATTR_TYPE_FLOAT) {
+                dataTypeMismatch = (typeof attrValue !== 'number');
+            } else if (attrObj.attributeType == NUAttribute.ATTR_TYPE_LIST) {
+                 dataTypeMismatch = (typeof attrValue !== 'object');
+            } else if (attrObj.attributeType !== NUAttribute.ATTR_TYPE_ENUM && typeof attrValue !== attrObj.attributeType) {
+                dataTypeMismatch = true;
+            }
+            
+            if (dataTypeMismatch) {
                 return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                     'Invalid data type',
                     `Data type should be ${attrObj.attributeType}, but is ${typeof attrValue}`);
             }
+            
             if (attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING) {
                 return attrObj.validateStringValue(attrValue, attrObj);
             } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_ENUM) {
                 return attrObj.validateEnumValue(attrValue, attrObj);
+            } else if (attrObj.attributeType == NUAttribute.ATTR_TYPE_LIST) {
+                return attrObj.validateListValues(attrValue, attrObj);
             }
         }
         return null;
     }
 
+    validateListValues(listValues, attrObj) {
+        for (var i = 0; i < listValues.length; i++) {
+            var listElementValue = listValues[i],
+                dataTypeMismatch = false;
+            
+            if (attrObj.subType == NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType == NUAttribute.ATTR_TYPE_FLOAT) {
+                dataTypeMismatch = (typeof listElementValue !== 'number');
+            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue !== attrObj.subType) {
+                dataTypeMismatch = true;
+            }
+            
+            if (dataTypeMismatch){
+                return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+                    'Invalid data type',
+                    `Data type should be ${attrObj.subType}, but is ${typeof listElementValue}`);
+            }
+            
+            if (attrObj.subType === NUAttribute.ATTR_TYPE_STRING) {
+                return attrObj.validateStringValue(listElementValue, attrObj);
+            } else if (attrObj.subType === NUAttribute.ATTR_TYPE_ENUM) {
+                return attrObj.validateEnumValue(listElementValue, attrObj);
+            } else if (attrObj.subType == NUAttribute.ATTR_TYPE_LIST) {
+                return attrObj.validateListValues(listElementValue, attrObj);
+            }
+        }
+        return null;
+    }
+    
     validateStringValue(attrValue, attrObj) {
         if (attrObj.minLength > -1 && attrValue.length < attrObj.minLength) {
             return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
