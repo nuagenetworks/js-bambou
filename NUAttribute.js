@@ -103,9 +103,7 @@ export default class NUAttribute extends NUObject {
                 return attrObj.validateStringValue(listElementValue, attrObj);
             } else if (attrObj.subType === NUAttribute.ATTR_TYPE_ENUM) {
                 return attrObj.validateEnumValue(listElementValue, attrObj);
-            } else if (attrObj.subType == NUAttribute.ATTR_TYPE_LIST) {
-                return attrObj.validateListValues(listElementValue, attrObj);
-            }
+            } 
         }
         return null;
     }
