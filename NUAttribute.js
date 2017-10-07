@@ -28,6 +28,7 @@ export default class NUAttribute extends NUObject {
             canOrder: !!obj.canOrder,
             canSearch: !!obj.canSearch,
             choices: obj.choices || null,
+            description: obj.description,
             displayName: (!obj.displayName) ? obj.localName : obj.displayName,
             hasChoices: !(obj.choices === null),
             isEditable: (!obj.isEditable) ? true : obj.isEditable,

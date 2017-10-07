@@ -96,14 +96,14 @@ export default class NUService extends NUObject {
         return `XREST ${btoa(`${this.userName}:${(this.APIKey || this.password)}`)}`;
     }
 
-    buildURL(entity, RESTName, parentEntity) {
+    buildURL(entity, RESTResourceName, parentEntity) {
         let url = `${this.rootURL}/`;
 
         if (!entity) {
-            const EntityClass = ServiceClassRegistry.entityClassForRESTName(RESTName);
+            const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
             const resourceName = new EntityClass().resourceName;
             url += (!(parentEntity && parentEntity.ID)) ?
-                RESTName :
+                RESTResourceName :
                 `${parentEntity.resourceName}/${parentEntity.ID}/${resourceName}`;
         } else {
             url += ((!parentEntity) ? '' : `${parentEntity.resourceName}/${parentEntity.ID}/`) +
@@ -151,10 +151,10 @@ export default class NUService extends NUObject {
       Returns an object {data: an array of NUEntity objects,
       headers: an object with properties page, pageSize, filter, orderBy, and count}
     */
-    fetchAll(RESTName, parentEntity, page = 0, filter = null, orderBy = null) {
-        const EntityClass = ServiceClassRegistry.entityClassForRESTName(RESTName);
+    fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null) {
+        const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
         return this.invokeRequest(
-            'GET', this.buildURL(null, RESTName, parentEntity), this.computeHeaders(page, filter, orderBy)).then((response) => {
+            'GET', this.buildURL(null, RESTResourceName, parentEntity), this.computeHeaders(page, filter, orderBy)).then((response) => {
                 let data = [];
 
                 if (response.data) {
@@ -209,9 +209,9 @@ export default class NUService extends NUObject {
     /*
       Issues a HEAD request, processes response, and resolves the count of entities
     */
-    count(RESTName, parentEntity, page, filter, orderBy) {
+    count(RESTResourceName, parentEntity, page, filter, orderBy) {
         return this.invokeRequest(
-            'HEAD', this.buildURL(null, RESTName, parentEntity), this.computeHeaders(page, filter, orderBy)).then(
+            'HEAD', this.buildURL(null, RESTResourceName, parentEntity), this.computeHeaders(page, filter, orderBy)).then(
                 response => Number(response.headers[this.headerCount.toLowerCase()],
             ),
         );
