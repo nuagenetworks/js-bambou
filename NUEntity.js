@@ -132,34 +132,6 @@ export default class NUEntity extends NUObject {
         return obj;
     }
 
-    get resourceName() {
-        return this.pluralize(this.RESTName);
-    }
-
-    pluralize(aName) {
-        let name = aName;
-        switch (name.slice(-1)) {
-            case 's':
-                break;
-
-            case 'y': {
-                const endsWith = name.slice(-2);
-                if (endsWith === 'ry' || endsWith === 'cy' || endsWith === 'ty' || endsWith === 'ny') {
-                    name = name.substr(0, name.length - 1);
-                    name += 'ies';
-                } else {
-                    name += 's';
-                }
-                break;
-            }
-
-            default:
-                name += 's';
-        }
-
-        return name;
-    }
-
     isValid() {
         this.validationErrors.clear();
         this.checkErrors();

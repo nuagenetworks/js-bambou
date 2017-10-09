@@ -1,20 +1,20 @@
 
 /*
-  This class holds a mapping of 'RESTName of NUEntity' to 'corresponding NUEntity class'
+  This class holds a mapping of 'resourceName of NUEntity' to 'corresponding NUEntity class'
 */
 export default class ServiceClassRegistry {
 
-    static RESTNameClassMap = new Map();
+    static RESTResourceNameClassMap = new Map();
 
     static register(EntityClass) {
         if (EntityClass !== null) {
-            ServiceClassRegistry.RESTNameClassMap.set(new EntityClass().RESTName, EntityClass);
+            ServiceClassRegistry.RESTResourceNameClassMap.set(new EntityClass().resourceName, EntityClass);
         }
     }
 
-    static entityClassForRESTName(RESTName) {
-        if (RESTName !== null) {
-            return ServiceClassRegistry.RESTNameClassMap.get(RESTName);
+    static entityClassForResourceName(RESTResourceName) {
+        if (RESTResourceName !== null) {
+            return ServiceClassRegistry.RESTResourceNameClassMap.get(RESTResourceName);
         }
         return null;
     }

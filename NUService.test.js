@@ -46,6 +46,10 @@ class Parent extends NUEntity {
     get RESTName() {
         return 'parententity';
     }
+    
+    get resourceName() {
+        return 'parententities';
+    }
 }
 
 class Child extends NUEntity {
@@ -66,6 +70,10 @@ class Child extends NUEntity {
 
     get RESTName() {
         return 'childentity';
+    }
+    
+    get resourceName() {
+        return 'childentities';
     }
 }
 
@@ -107,7 +115,7 @@ it('fetch', () => {
 it('fetchall', () => {
     const parent = new Parent();
     parent.ID = 'd8cf28fa-e6d5-4779-8229-e45192ef763b';
-    return VSDService.fetchAll('childentity', parent).then((response) => {
+    return VSDService.fetchAll(new Child().resourceName, parent).then((response) => {
         expect(response.data[1].ID).toEqual('xyz456');
         expect(response.data[1].attr1).toEqual('AC0098766');
         expect(response.data[1].attr2).toEqual('1485302226000');
@@ -118,7 +126,7 @@ it('fetchall', () => {
 it('fetchall by page, filter, and orderBy', () => {
     const parent = new Parent();
     parent.ID = 'd8cf28fa-e6d5-4779-8229-e45192ef763b';
-    return VSDService.fetchAll('childentity', parent, 3, 'value < 100', 'value ASC').then((response) => {
+    return VSDService.fetchAll(new Child().resourceName, parent, 3, 'value < 100', 'value ASC').then((response) => {
         expect(response.data[2].ID).toEqual('aad333');
         expect(response.data[2].attr1).toEqual('AAC098333');
         expect(response.data[2].attr2).toEqual('1485303336333');
@@ -167,7 +175,7 @@ it('delete', () => {
 it('count', () => {
     const parent = new Parent();
     parent.ID = 'parent123';
-    return VSDService.count('childentity', parent, null, 'value < 123').then((response) => {
+    return VSDService.count(new Child().resourceName, parent, null, 'value < 123').then((response) => {
         expect(response).toEqual(30);
     });
 });
