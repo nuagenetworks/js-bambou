@@ -31,7 +31,7 @@ export default class NUAttribute extends NUObject {
             description: obj.description,
             displayName: (!obj.displayName) ? obj.localName : obj.displayName,
             hasChoices: !(obj.choices === null),
-            isEditable: !obj.isReadOnly,
+            isEditable: (!obj.isEditable) ? false : obj.isEditable,
             isEmail: !!obj.isEmail,
             isIdentifier: !!obj.isIdentifier,
             isLogin: !!obj.isLogin,
