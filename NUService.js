@@ -188,6 +188,15 @@ export default class NUService extends NUObject {
     }
 
     /*
+      Issues a PUT request on the entity to update that entity's associatedEntities on server
+    */
+    updateAssociatedEntities(entity) {
+        if (entity && entity.associatedEntitiesResourceName && entity.associatedEntities.length > 0)
+        return this.invokeRequest(
+            'PUT', this.buildURL(null, entity.associatedEntitiesResourceName, entity), this.computeHeaders(), entity.buildJSON());
+    }
+
+    /*
       Issues a POST request for the entity passed
     */
     create(entity, parentEntity) {
