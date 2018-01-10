@@ -183,7 +183,7 @@ export default class NUService extends NUObject {
       Issues a PUT request on the entity to update that entity on server
     */
     update(entity) {
-        return this.invok Promise.reject(error);eRequest(
+        return this.invokeRequest(
             'PUT', this.buildURL(entity), this.computeHeaders(), entity.buildJSON());
     }
 
