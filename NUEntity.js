@@ -45,6 +45,14 @@ export default class NUEntity extends NUObject {
             localName: 'parentType',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
             isEditable: false }),
+        associatedEntities: new NUAttribute({
+          localName: 'associatedEntities',
+          attributeType: NUAttribute.ATTR_TYPE_LIST,
+          isEditable: true }),
+        associatedEntitiesResourceName: new NUAttribute({
+          localName: 'associatedEntitiesResourceName',
+          attributeType: NUAttribute.ATTR_TYPE_STRING,
+          isEditable: true }),
     }
 
     static getSearchableAttributes() {
@@ -73,6 +81,8 @@ export default class NUEntity extends NUObject {
             parentID: null,
             parentObject: null,
             parentType: null,
+            associatedEntities: [],
+            associatedEntitiesResourceName: null,
         });
         this._validationErrors = new Map();
         this._validators = new Map();
@@ -121,8 +131,12 @@ export default class NUEntity extends NUObject {
     }
 
     toObject() {
-        const obj = {};
         const attributeDescriptors = this.constructor.attributeDescriptors;
+        const assocEntities = this[attributeDescriptors.associatedEntities.localName];
+        if (assocEntities && assocEntities.length > 0) {
+          return assocEntities.map(item => item.ID);
+        }
+        const obj =  {};
         Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
             const value = this[localName];
             obj[attributeObj.remoteName] =
