@@ -183,7 +183,7 @@ export default class NUService extends NUObject {
       Issues a PUT request on the entity to update that entity on server
     */
     update(entity) {
-        return this.invokeRequest(
+        return this.invok Promise.reject(error);eRequest(
             'PUT', this.buildURL(entity), this.computeHeaders(), entity.buildJSON());
     }
 
@@ -191,9 +191,13 @@ export default class NUService extends NUObject {
       Issues a PUT request on the entity to update that entity's associatedEntities on server
     */
     updateAssociatedEntities(entity) {
-        if (entity && entity.associatedEntitiesResourceName && entity.associatedEntities.length > 0)
-        return this.invokeRequest(
-            'PUT', this.buildURL(null, entity.associatedEntitiesResourceName, entity), this.computeHeaders(), entity.buildJSON());
+        if (entity && entity.associatedEntitiesResourceName && entity.associatedEntities.length > 0) {
+            return this.invokeRequest(
+              'PUT', this.buildURL(null, entity.associatedEntitiesResourceName, entity), this.computeHeaders(), entity.buildJSON());
+        }
+        else {
+          return Promise.reject("Associated entities and associated entity resource is required");
+        }
     }
 
     /*
