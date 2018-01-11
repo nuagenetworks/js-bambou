@@ -132,7 +132,7 @@ export default class NUEntity extends NUObject {
 
     toObject() {
         const attributeDescriptors = this.constructor.attributeDescriptors;
-        const assocEntities = this[attributeDescriptors.associatedEntities.localName];
+        const assocEntities = this[attributeDescriptors.associatedEntities.name];
         if (assocEntities && assocEntities.length > 0) {
           return assocEntities.map(item => item.ID);
         }
