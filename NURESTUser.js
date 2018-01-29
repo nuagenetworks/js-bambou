@@ -1,5 +1,6 @@
 import NUAttribute from './NUAttribute';
 import NURootEntity from './NURootEntity';
+import UserRole from "./UserRole";
 
 const NUPermissionLevelAdmin = 'ORGADMIN';
 const NUPermissionLevelAdminOperator = 'ADMINOPERATOR';
@@ -125,5 +126,25 @@ export default class NURESTUser extends NURootEntity {
             default:
                 return `${this.fullName.toLowerCase()} (${this.userName.toLowerCase()}) - ${this.roleName.toLowerCase()} ${this.enterpriseName.toLowerCase()}`;
         }
+    }
+
+    _getUserRole() {
+        return this.role ? UserRole.enumValueOf(this.role) : UserRole.UNKNOWN;
+    }
+
+    isCSPRoot() {
+        return this._getUserRole().hasRoot();
+    }
+
+    isAdmin() {
+        return this._getUserRole().hasAdmin();
+    }
+
+    isSecurityAdmin() {
+        return this._getUserRole().hasSecurityAdmin();
+    }
+
+    isEncryptionEnabled () {
+        return !!this.licenseCapabilities.find(item => item === 'ENCRYPTION_ENABLED');
     }
 }
