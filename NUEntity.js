@@ -178,12 +178,9 @@ export default class NUEntity extends NUObject {
     }
     
     getDefaults() {
-        const obj = {};
-        Object.entries(this).forEach(([key, value]) => {
-            if (value && key !== '_validationErrors' && key !== '_validators' && key !== '_associatedEntities') {
-                obj[key.substring(1)] = value;
-            }
-        });
-        return obj;
+        return Object.entries(this).reduce((acc, [key, value]) => {
+            return (value && key !== '_validationErrors' && key !== '_validators' && key !== '_associatedEntities') 
+                ? { ...acc, [key.substring(1)]: value } : acc;
+        }, {});
     }
 }
