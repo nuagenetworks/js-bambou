@@ -176,4 +176,14 @@ export default class NUEntity extends NUObject {
     registerValidator(...args) {
         this._validators.set(args[0], [].splice.call(args, 1));
     }
+    
+    getDefaults() {
+        const obj = {};
+        Object.entries(this).forEach(([key, value]) => {
+            if (value && key !== '_validationErrors' && key !== '_validators' && key !== '_associatedEntities') {
+                obj[key.substring(1)] = value;
+            }
+        });
+        return obj;
+    }
 }
