@@ -83,6 +83,7 @@ export default class NUEntity extends NUObject {
             parentType: null,
             associatedEntities: [],
             associatedEntitiesResourceName: null,
+            entityDefaults: null,
         });
         this._validationErrors = new Map();
         this._validators = new Map();
@@ -178,9 +179,12 @@ export default class NUEntity extends NUObject {
     }
     
     getDefaults() {
-        return Object.entries(this).reduce((acc, [key, value]) => {
-            return (value && key !== '_validationErrors' && key !== '_validators' && key !== '_associatedEntities') 
-                ? { ...acc, [key.substring(1)]: value } : acc;
-        }, {});
+        if (!this.entityDefaults) {
+            this.entityDefaults = Object.entries(this).reduce((acc, [key, value]) => {
+                return (value && key !== '_validationErrors' && key !== '_validators' && key !== '_associatedEntities') 
+                    ? { ...acc, [key.substring(1)]: value } : acc;
+            }, {});
+        }
+        return this.entityDefaults;
     }
 }
