@@ -183,4 +183,8 @@ export default class NUEntity extends NUObject {
                 ? { ...acc, [key.substring(1)]: value } : acc;
         }, {});
     }
+    
+    isFromTemplate() {
+        return this.hasOwnProperty('templateID') && this.templateID;
+    }
 }
