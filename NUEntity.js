@@ -187,4 +187,8 @@ export default class NUEntity extends NUObject {
     isFromTemplate() {
         return this.hasOwnProperty('templateID') && this.templateID;
     }
+    
+    isScopeGlobal() {
+        return this.entityScope === 'GLOBAL';
+    }
 }
