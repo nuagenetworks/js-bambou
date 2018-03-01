@@ -59,7 +59,7 @@ export default class NUAttribute extends NUObject {
     validate(...args) {
         const attrObj = args[0];
         const attrValue = this[attrObj.name];
-        if (attrObj.isRequired && !attrValue) {
+        if (attrObj.isRequired && attrValue == null) {
             return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                 'Invalid input', 'This value is mandatory');
         }
