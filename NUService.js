@@ -191,9 +191,10 @@ export default class NUService extends NUObject {
       Issues a PUT request on the entity to update that entity's associatedEntities on server
     */
     updateAssociatedEntities(entity) {
-        if (entity && entity.associatedEntitiesResourceName && entity.associatedEntities.length > 0) {
+        if (entity && entity.associatedEntitiesResourceName) {
             return this.invokeRequest(
-              'PUT', this.buildURL(null, entity.associatedEntitiesResourceName, entity), this.computeHeaders(), entity.buildJSON());
+              'PUT', this.buildURL(null, entity.associatedEntitiesResourceName, entity), this.computeHeaders(), 
+              entity.associatedEntities.length ? entity.buildJSON() : '[]');
         }
         else {
           return Promise.reject("Associated entities and associated entity resource is required");
