@@ -29,6 +29,10 @@ class UserRole extends Enum {
     hasSystem() {
         return this._hasRole(UserRole.SYSTEM);
     }
+
+    hasOrguser() {
+        return this._hasRole(UserRole.ORGUSER);
+    }
 }
 UserRole.initEnum([
     'SYSTEM',
