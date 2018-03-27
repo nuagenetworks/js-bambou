@@ -59,6 +59,7 @@ export default class NUAttribute extends NUObject {
     validate(...args) {
         const attrObj = args[0];
         const attrValue = this[attrObj.name];
+        //if STRING use !attrValue to check if value provided. For all other attribute types use !undefined and !null
         if (attrObj.isRequired && ((attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING && !attrValue) ||
             (attrObj.attributeType !== NUAttribute.ATTR_TYPE_STRING && (attrValue === undefined || attrValue === null)))) {
             return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
