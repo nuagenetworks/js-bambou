@@ -16,6 +16,7 @@ export default class NUService extends NUObject {
         headerPage = 'X-Nuage-Page',
         headerPageSize = 'X-Nuage-PageSize',
         headerFilter = 'X-Nuage-Filter',
+        headerFilterType = 'X-Nuage-FilterType',
         headerOrderBy = 'X-Nuage-OrderBy',
         headerCount = 'X-Nuage-Count',
         headerMessage = 'X-Nuage-Message',
@@ -26,6 +27,7 @@ export default class NUService extends NUObject {
             headerAuthorization,
             headerCount,
             headerFilter,
+            headerFilterType,
             headerMessage,
             headerOrderBy,
             headerPage,
@@ -67,7 +69,7 @@ export default class NUService extends NUObject {
         this.customHeaders[customHeader] = value;
     }
 
-    computeHeaders(page, filter, orderBy) {
+    computeHeaders(page, filter, orderBy, filterType = 'predicate') {
         const headers = new Headers(this.customHeaders);
         headers.set(this.headerAuthorization, this.getAuthorization());
         headers.set('Content-Type', 'application/json');
@@ -84,6 +86,7 @@ export default class NUService extends NUObject {
 
         if (filter) {
             headers.set(this.headerFilter, filter);
+            headers.set(this.headerFilterType, filterType);
         }
 
         if (orderBy) {
@@ -151,10 +154,10 @@ export default class NUService extends NUObject {
       Returns an object {data: an array of NUEntity objects,
       headers: an object with properties page, pageSize, filter, orderBy, and count}
     */
-    fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null) {
+    fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null, filterType = undefined) {
         const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
         return this.invokeRequest(
-            'GET', this.buildURL(null, RESTResourceName, parentEntity), this.computeHeaders(page, filter, orderBy)).then((response) => {
+            'GET', this.buildURL(null, RESTResourceName, parentEntity), this.computeHeaders(page, filter, orderBy, filterType)).then((response) => {
                 let data = [];
 
                 if (response.data) {
@@ -171,6 +174,7 @@ export default class NUService extends NUObject {
         headers.page = Number(responseHeaders.get(this.headerPage));
         headers.pageSize = Number(responseHeaders.get(this.headerPageSize));
         headers.filter = responseHeaders.get(this.headerFilter);
+        header.filterType = responseHeaders.get(this.headerFilterType);
         headers.orderBy = responseHeaders.get(this.headerOrderBy);
 
         if (responseHeaders[this.headerMessage]) {
@@ -193,7 +197,7 @@ export default class NUService extends NUObject {
     updateAssociatedEntities(entity) {
         if (entity && entity.associatedEntitiesResourceName) {
             return this.invokeRequest(
-              'PUT', this.buildURL(null, entity.associatedEntitiesResourceName, entity), this.computeHeaders(), 
+              'PUT', this.buildURL(null, entity.associatedEntitiesResourceName, entity), this.computeHeaders(),
               entity.associatedEntities.length ? entity.buildJSON() : '[]');
         }
         else {
@@ -296,6 +300,7 @@ export default class NUService extends NUObject {
         newService._headerAuthorization = this._headerAuthorization;
         newService._headerCount = this._headerCount;
         newService._headerFilter = this._headerFilter;
+        newService._headerFilterType = this._headerFilterType;
         newService._headerMessage = this._headerMessage;
         newService._headerOrderBy = this._headerOrderBy;
         newService._headerPage = this._headerPage;
