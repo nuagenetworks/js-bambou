@@ -25,6 +25,7 @@ export default class NURootEntity extends NUEntity {
             localName: 'password',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
             isPassword: true,
+            isRequired: true,
         }),
         passwordConfirm: new NUAttribute({
             localName: 'passwordConfirm',

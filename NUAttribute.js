@@ -59,16 +59,17 @@ export default class NUAttribute extends NUObject {
     validate(...args) {
         const attrObj = args[0];
         const attrValue = this[attrObj.name];
-        if (attrObj.isRequired && attrValue == null) {
+        if (attrObj.isRequired && ((attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING && !attrValue) ||
+            (attrObj.attributeType !== NUAttribute.ATTR_TYPE_STRING && (attrValue === undefined || attrValue === null)))) {
             return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                 'Invalid input', 'This value is mandatory');
         }
 
         if (attrValue) {
             var dataTypeMismatch = false;
-            if (attrObj.attributeType == NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType == NUAttribute.ATTR_TYPE_FLOAT) {
+            if (attrObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
                 dataTypeMismatch = (typeof attrValue !== 'number');
-            } else if (attrObj.attributeType == NUAttribute.ATTR_TYPE_LIST) {
+            } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
                 dataTypeMismatch = (typeof attrValue !== 'object');
             } else if (attrObj.attributeType !== NUAttribute.ATTR_TYPE_ENUM && typeof attrValue !== attrObj.attributeType) {
                 dataTypeMismatch = true;
@@ -82,7 +83,7 @@ export default class NUAttribute extends NUObject {
                 return attrObj.validateStringValue(attrValue, attrObj);
             } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_ENUM) {
                 return attrObj.validateEnumValue(attrValue, attrObj);
-            } else if (attrObj.attributeType == NUAttribute.ATTR_TYPE_LIST) {
+            } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
                 return attrObj.validateListValues(attrValue, attrObj);
             }
         }
@@ -93,7 +94,7 @@ export default class NUAttribute extends NUObject {
         for (var i = 0; i < listValues.length; i++) {
             var listElementValue = listValues[i],
                 dataTypeMismatch = false;        
-            if (attrObj.subType == NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType == NUAttribute.ATTR_TYPE_FLOAT) {
+            if (attrObj.subType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType === NUAttribute.ATTR_TYPE_FLOAT) {
                 dataTypeMismatch = (typeof listElementValue !== 'number');
             } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue !== attrObj.subType) {
                 dataTypeMismatch = true;
