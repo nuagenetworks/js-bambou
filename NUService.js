@@ -174,7 +174,7 @@ export default class NUService extends NUObject {
         headers.page = Number(responseHeaders.get(this.headerPage));
         headers.pageSize = Number(responseHeaders.get(this.headerPageSize));
         headers.filter = responseHeaders.get(this.headerFilter);
-        header.filterType = responseHeaders.get(this.headerFilterType);
+        headers.filterType = responseHeaders.get(this.headerFilterType);
         headers.orderBy = responseHeaders.get(this.headerOrderBy);
 
         if (responseHeaders[this.headerMessage]) {
