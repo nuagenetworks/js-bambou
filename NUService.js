@@ -227,9 +227,9 @@ export default class NUService extends NUObject {
     /*
       Issues a HEAD request, processes response, and resolves the count of entities
     */
-    count(RESTResourceName, parentEntity, page, filter, orderBy) {
+    count(RESTResourceName, parentEntity, page, filter, orderBy, filterType) {
         return this.invokeRequest(
-            'HEAD', this.buildURL(null, RESTResourceName, parentEntity), this.computeHeaders(page, filter, orderBy)).then(
+            'HEAD', this.buildURL(null, RESTResourceName, parentEntity), this.computeHeaders(page, filter, orderBy, filterType)).then(
                 response => Number(response.headers[this.headerCount.toLowerCase()],
             ),
         );
