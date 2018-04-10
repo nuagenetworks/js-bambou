@@ -68,7 +68,7 @@ export default class NUAttribute extends NUObject {
 
         if (attrValue) {
             var dataTypeMismatch = false;
-            if (attrObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
+            if (attrObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT || attrObj.attributeType === NUAttribute.ATTR_TYPE_LONG) {
                 dataTypeMismatch = (typeof attrValue !== 'number');
             } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
                 dataTypeMismatch = (typeof attrValue !== 'object');
