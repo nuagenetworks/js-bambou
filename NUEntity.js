@@ -84,8 +84,8 @@ export default class NUEntity extends NUObject {
     }
     
     static hasMandatoryAttributesSet(JSONObject) {
-        for (const [attr, descr] of Object.entries(this.attributeDescriptors)) {
-            if (descr.isRequired && !JSONObject[attr]) {
+        for (const attr of this.getMandatoryAttributes()) {
+            if (!JSONObject[attr]) {
                 return false;
             }
         }
