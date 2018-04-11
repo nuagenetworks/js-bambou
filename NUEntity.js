@@ -68,6 +68,30 @@ export default class NUEntity extends NUObject {
         return this.searchableAttributes;
     }
 
+    static getMandatoryAttributes() {
+        if (!this.mandatoryAttributes) {
+            this.mandatoryAttributes = Object
+                .entries(this.attributeDescriptors)
+                .reduce((acc, attr) => {
+                    const [key, value] = attr;
+                    if (value.isRequired) {
+                        acc.push(key)
+                    };
+                    return acc;
+                }, []);
+        }
+        return this.mandatoryAttributes;
+    }
+    
+    static hasMandatoryAttributesSet(JSONObject) {
+        for (const [attr, descr] of Object.entries(this.attributeDescriptors)) {
+            if (descr.isRequired && !JSONObject[attr]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     constructor() {
         super();
         this.defineProperties({
