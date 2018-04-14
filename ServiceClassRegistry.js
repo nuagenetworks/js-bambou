@@ -5,10 +5,12 @@
 export default class ServiceClassRegistry {
 
     static RESTResourceNameClassMap = new Map();
+    static RESTNameClassMap = new Map();
 
     static register(EntityClass) {
         if (EntityClass !== null) {
             ServiceClassRegistry.RESTResourceNameClassMap.set(new EntityClass().resourceName, EntityClass);
+            ServiceClassRegistry.RESTNameClassMap.set(new EntityClass().RESTName, EntityClass);
         }
     }
 
@@ -19,4 +21,10 @@ export default class ServiceClassRegistry {
         return null;
     }
 
+    static entityClassForRESTName(RESTName) {
+        if (RESTName !== null) {
+            return ServiceClassRegistry.RESTNameClassMap.get(RESTName);
+        }
+        return null;
+    }
 }
