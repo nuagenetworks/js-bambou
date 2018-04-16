@@ -25,6 +25,9 @@ export default class NURESTConnection extends NUObject {
         this.defineProperties({
             onMultipleChoices: null,
             interceptor: new NUInterceptor(),
+            RESTConnectionTimeout: 0,
+            RESTConnectionLastActionTimer: null,
+            ignoreRequestIdle: false,
         });
     }
 
@@ -41,7 +44,9 @@ export default class NURESTConnection extends NUObject {
         } else {
             finalURL = requestURL;
         }
-
+        if (!this.ignoreRequestIdle) {
+            this._resetIdleTimeout();
+        }
         return fetch(finalURL, { method: verb, body, headers })
             .then(response => Promise.all([
                 response,
@@ -73,6 +78,27 @@ export default class NURESTConnection extends NUObject {
                 this.interceptor.fail(result);
                 return Promise.reject(result);
             });
+    }
+    /*
+      Allow connection to the server to timeout
+    */
+    _resetIdleTimeout() {
+        if (this.RESTConnectionLastActionTimer) {
+            clearTimeout(this.RESTConnectionLastActionTimer);
+        }
+
+        if (!this.RESTConnectionTimeout) {
+            return;
+        }
+
+        const interceptor = this.interceptor;
+        const timeout = this.RESTConnectionTimeout;
+        this.RESTConnectionLastActionTimer = setTimeout(() => {
+            if (!timeout) {
+                return;
+            }
+            interceptor.onTimeout();
+        }, timeout);
     }
 
     /*

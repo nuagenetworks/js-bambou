@@ -19,4 +19,9 @@ export default class NUInterceptor {
     fail(data) {
         this._errorCallbacks.forEach(cb => cb(data));
     }
+
+    /**
+    * Do nothing. This should be overwriten by the App
+    */
+    onTimeout() {}
 }

@@ -10,35 +10,34 @@ import ServiceClassRegistry from './ServiceClassRegistry';
 */
 
 export default class NUService extends NUObject {
-    constructor(
-        rootURL,
-        headerAuthorization = 'Authorization',
-        headerPage = 'X-Nuage-Page',
-        headerPageSize = 'X-Nuage-PageSize',
-        headerFilter = 'X-Nuage-Filter',
-        headerFilterType = 'X-Nuage-FilterType',
-        headerOrderBy = 'X-Nuage-OrderBy',
-        headerCount = 'X-Nuage-Count',
-        headerMessage = 'X-Nuage-Message',
-    ) {
-        super();
-        this.defineProperties({
-            APIKey: null,
-            headerAuthorization,
-            headerCount,
-            headerFilter,
-            headerFilterType,
-            headerMessage,
-            headerOrderBy,
-            headerPage,
-            headerPageSize,
-            password: null,
-            rootURL,
-            userName: null,
-            pageSize: 50,
-        });
-        this._customHeaders = {};
-        this._connection = new NURESTConnection();
+    constructor(rootURL, headers = {
+          headerAuthorization: 'Authorization',
+          headerPage: 'X-Nuage-Page',
+          headerPageSize: 'X-Nuage-PageSize',
+          headerFilter: 'X-Nuage-Filter',
+          headerFilterType: 'X-Nuage-FilterType',
+          headerOrderBy: 'X-Nuage-OrderBy',
+          headerCount: 'X-Nuage-Count',
+          headerMessage:'X-Nuage-Message',
+    }) {
+          super();
+          this.defineProperties({
+                APIKey: null,
+                headerAuthorization: headers.headerAuthorization,
+                headerCount: headers.headerCount,
+                headerFilter: headers.headerFilter,
+                headerFilterType: headers.headerFilterType,
+                headerMessage: headers.headerMessage,
+                headerOrderBy: headers.headerOrderBy,
+                headerPage: headers.headerPage,
+                headerPageSize: headers.headerPageSize,
+                password: null,
+                rootURL,
+                userName: null,
+                pageSize: 50,
+          });
+          this._customHeaders = {};
+          this._connection = new NURESTConnection();
     }
 
     get onMultipleChoices() {
@@ -59,6 +58,10 @@ export default class NUService extends NUObject {
 
     set interceptor(value) {
         this._connection.interceptor = value;
+    }
+
+    setRESTConectionTimeout(value) {
+        this._connection.RESTConnectionTimeout = value;
     }
 
     get customHeaders() {
@@ -238,8 +241,9 @@ export default class NUService extends NUObject {
     /*
       Issues request on server. In case of authentication issue, retries once.
     */
-    invokeRequest(verb, URL, headers, requestData) {
+    invokeRequest(verb, URL, headers, requestData, ignoreRequestIdle = false) {
         const svcObj = this;
+        this._connection.ignoreRequestIdle = ignoreRequestIdle;
         return this.invokeRequestOnConnection(verb, URL, headers, requestData).then(
                 (response) => {
                     if (response.authFailure) {
