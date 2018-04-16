@@ -46,7 +46,7 @@ class Parent extends NUEntity {
     get RESTName() {
         return 'parententity';
     }
-    
+
     get resourceName() {
         return 'parententities';
     }
@@ -71,7 +71,7 @@ class Child extends NUEntity {
     get RESTName() {
         return 'childentity';
     }
-    
+
     get resourceName() {
         return 'childentities';
     }
@@ -80,9 +80,18 @@ class Child extends NUEntity {
 ServiceClassRegistry.register(Parent);
 ServiceClassRegistry.register(Child);
 
-const VSDService = new NUService('https://135.227.177.144:8443/nuage/api/v4_0',
-      'Authorization', 'Page', 'PageSize', 'Filter', 'FilterType',
-      'OrderBy', 'Count', 'Message');
+const VSDService = new NUService(
+    'https://135.227.177.144:8443/nuage/api/v4_0',
+    headers = {
+        headerAuthorization: 'Authorization',
+        headerPage: 'Page',
+        headerPageSize: 'PageSize',
+        headerFilter: 'Filter',
+        headerFilterType: 'FilterType',
+        headerOrderBy: 'OrderBy',
+        headerCount: 'Count',
+        headerMessage:'Message'
+});
 VSDService.addCustomHeader('X-Nuage-Organization', 'csp');
 VSDService.addCustomHeader('Content-type', 'application/json');
 VSDService.pageSize = 3;
