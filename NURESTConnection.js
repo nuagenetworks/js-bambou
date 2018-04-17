@@ -41,7 +41,6 @@ export default class NURESTConnection extends NUObject {
             return JSON.stringify(string, null, 4);
         }
         catch (e) {
-            console.error(`ERROR: `, e, ` body `, body);
             return body;
         }
     }
