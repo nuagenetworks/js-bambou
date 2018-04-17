@@ -1,5 +1,6 @@
 import NUObject from './NUObject';
 import NUInterceptor from './NUInterceptor';
+import { getLogger } from './Logger';
 
 /*
   This class implements the HTTP actions invoked on the server
@@ -31,6 +32,20 @@ export default class NURESTConnection extends NUObject {
         });
     }
 
+    static _stringyfyBody = (body) => {
+        if (!body) {
+            return "";
+        }
+        try {
+            const string = typeof body === 'string' ? JSON.parse(body) : body;
+            return JSON.stringify(string, null, 4);
+        }
+        catch (e) {
+            console.error(`ERROR: `, e, ` body `, body);
+            return body;
+        }
+    }
+
     /*
       Generic method for invoking HTTP/REST requests on the server
     */
@@ -47,12 +62,16 @@ export default class NURESTConnection extends NUObject {
         if (!this.ignoreRequestIdle) {
             this._resetIdleTimeout();
         }
+
+        getLogger().log(`>>>> Sending\n\n${verb} ${requestURL}:\n\n${NURESTConnection._stringyfyBody(body)}`);
+
         return fetch(finalURL, { method: verb, body, headers })
             .then(response => Promise.all([
                 response,
                 (NURESTConnection.isJSONResponse(response)) ? response.json() : null,
             ]))
             .then(([response, data]) => {
+                getLogger().log(`<<<< Response for \n\n${verb} ${requestURL} (${response.status}):\n\n${NURESTConnection._stringyfyBody(data)}`);
                 const respHeaders = {};
                 const authFailure = !response.ok && response.status === 401;
 
