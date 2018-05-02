@@ -95,18 +95,18 @@ export default class NUEntity extends NUObject {
     constructor() {
         super();
         this.defineProperties({
-            creationDate: null,
-            entityScope: null,
-            externalID: null,
+            creationDate: undefined,
+            entityScope: undefined,
+            externalID: undefined,
             ID: null,
-            lastUpdatedBy: null,
-            lastUpdatedDate: null,
-            owner: null,
-            parentID: null,
-            parentObject: null,
-            parentType: null,
+            lastUpdatedBy: undefined,
+            lastUpdatedDate: undefined,
+            owner: undefined,
+            parentID: undefined,
+            parentObject: undefined,
+            parentType: undefined,
             associatedEntities: [],
-            associatedEntitiesResourceName: null,
+            associatedEntitiesResourceName: undefined,
         });
         this._validationErrors = new Map();
         this._validators = new Map();
