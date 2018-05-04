@@ -18,6 +18,10 @@ class UserRole extends Enum {
         return this._hasRole(UserRole.ADMINOPERATOR);
     }
 
+    hasNetworkDesigner() {
+        return this._hasRole(UserRole.ORGNETWORKDESIGNER);
+    }
+
     hasOperator() {
         return this._hasRole(UserRole.CSPOPERATOR);
     }
