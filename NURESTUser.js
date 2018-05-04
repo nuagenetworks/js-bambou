@@ -152,6 +152,10 @@ export default class NURESTUser extends NURootEntity {
         return this._getUserRole().hasOperator();
     }
     
+    isNetworkDesigner() {
+        return this._getUserRole().hasOrgNetworkDesigner();
+    }
+    
     isEncryptionEnabled () {
         return !!this.licenseCapabilities.find(item => item === 'ENCRYPTION_ENABLED');
     }
