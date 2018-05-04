@@ -33,6 +33,10 @@ class UserRole extends Enum {
     hasOrguser() {
         return this._hasRole(UserRole.ORGUSER);
     }
+    
+    hasOrgNetworkDesigner() {
+        return this._hasRole(UserRole.ORGNETWORKDESIGNER);
+    }
 }
 UserRole.initEnum([
     'SYSTEM',
