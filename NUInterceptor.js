@@ -24,4 +24,9 @@ export default class NUInterceptor {
     * Do nothing. This should be overwriten by the App
     */
     onTimeout() {}
+
+    /**
+     * Do nothing. This should be overwriten by the App
+     */
+    onAuthenticationFailure(response) {}
 }

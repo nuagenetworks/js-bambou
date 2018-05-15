@@ -91,6 +91,10 @@ export default class NURESTConnection extends NUObject {
                     return result;
                 } else if (authFailure) {
                     return result;
+                } else if (response.status === 403) {
+                    getLogger().error(`<<<< Authentication Failure: ${response.status}`);
+                    this.interceptor.onAuthenticationFailure({response, result});
+                    return result;
                 }
 
                 this.interceptor.fail(result);
