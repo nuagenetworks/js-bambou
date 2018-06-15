@@ -233,9 +233,11 @@ export default class NUService extends NUObject {
     count(RESTResourceName, parentEntity, page, filter, orderBy, filterType) {
         return this.invokeRequest(
             'HEAD', this.buildURL(null, RESTResourceName, parentEntity), this.computeHeaders(page, filter, orderBy, filterType)).then(
-                response => Number(response.headers[this.headerCount.toLowerCase()],
-            ),
-        );
+                response => {
+                    const count = Number(response.headers[this.headerCount.toLowerCase()]);
+                    return count || 0;
+                }
+            );
     }
 
     /*
