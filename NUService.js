@@ -152,6 +152,25 @@ export default class NUService extends NUObject {
     }
 
     /*
+    *  Fetching stats for a specific entity.
+    *  Stats APIs have query parameters that can be passed
+    */
+    fetchStats(statsResourceName, parentEntity, queryStringParams) {
+        const queryString = Object.entries(queryStringParams).map( ([key, value]) => (`${key}=${value}`)).join('&');
+        const url = `${this.buildURL(null, statsResourceName, parentEntity)}/?${queryString}`
+        return this.invokeRequest(
+            'GET', url, this.computeHeaders()).then((response) => {
+            const EntityClass = ServiceClassRegistry.entityClassForResourceName(statsResourceName);
+            if (EntityClass) {
+                const statsEntity = new EntityClass();
+                statsEntity.buildFromJSON(response.data[0]);
+                return statsEntity;
+            }
+            return response.data[0];
+        });
+    }
+
+    /*
       Issues a GET request, processes the received Array of JSONObjects response,
       and builds corresponding Array of NUEntity objects
       Returns an object {data: an array of NUEntity objects,
