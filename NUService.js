@@ -139,6 +139,21 @@ export default class NUService extends NUObject {
                 });
     }
 
+    updatePassword(entity) {
+        this.userName = entity.userName;
+        this.password = entity.password;
+        
+        let requestPayLoad = entity.buildJSON();
+        requestPayLoad = JSON.parse(requestPayLoad,'');
+        delete requestPayLoad['APIKeyExpiry'];
+        requestPayLoad.password = entity.newPassword;
+        requestPayLoad.passwordConfirm = entity.newPassword;
+        requestPayLoad = JSON.stringify(requestPayLoad);
+        this.APIKey = null;
+        
+        return this.invokeRequest('PUT', this.buildURL(entity), this.computeHeaders(), requestPayLoad);
+    }
+
     /*
       Issues a GET request, processes JSONObject response,
       and builds corresponding NUEntity object
