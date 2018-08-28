@@ -7,53 +7,28 @@ const SCROLL_TIME = '3m';
 
 export default class ESService {
 
-    constructor() {
-        this._connection = new ESRESTConnection();
+    constructor(host = null) {
+        this._connection = new ESRESTConnection(host);
     }
 
     fetch(query, scroll = false) {
         try {
-            const client = this._connection.getClient();
-
-            if (!client) {
-                return Promise.reject('Unable to connect to ElasticSearch server');
-            }
-
             return new Promise((resolve, reject) => {
-                let esRequest;
 
-                //if data comes from scroll (if `scroll: true` in query config)
-                if (query && query.nextPage) {
-                    esRequest = this.getScrollData({ client, query: query.nextPage })
-                } else {
-                    esRequest = this.getSearchData({ client, query, scroll })
-                }
-
-                esRequest
+                this._connection.makeRequest(query, scroll)
                     .then(response => resolve(this.parseResponse(response)))
                     .catch(error => {
                         if (!error.body) {
-                            reject("Unable to connect to ElasticSearch datastore. Please check to ensure ElasticSearch datastore can be reached");
+                            return reject(error);
                         } else {
                             getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
-                            reject(ERROR_MESSAGE);
+                            return reject(ERROR_MESSAGE);
                         }
                     });
             });
         } catch (error) {
             return Promise.reject(error);
         }
-    }
-
-    //get scroll data from ES
-    getScrollData({ client, query }) {
-        return client.scroll(query);
-    }
-
-    // get search data from ES
-    getSearchData({ client, query, scroll = false }) {
-        const updatedQuery = scroll ? { ...query, scroll: SCROLL_TIME } : query;
-        return client.search(updatedQuery);
     }
 
     // process response for scroll & search response
@@ -77,7 +52,6 @@ export default class ESService {
                 response: tabify.process(response),
             };
         }
-
         return results;
     }
 }

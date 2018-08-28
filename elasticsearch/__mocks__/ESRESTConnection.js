@@ -1,0 +1,132 @@
+import elasticsearch from 'elasticsearch';
+import _ from 'lodash';
+
+import NUObject from '../../NUObject';
+
+/*
+  This class implements the HTTP actions invoked on the server
+*/
+export default class ESRESTConnection extends NUObject {
+
+    constructor(host = null) {
+        super();
+
+        this.defineProperties({
+            log: 'trace',
+            apiVersion: '2.2',
+            host: host || process.env.REACT_APP_ELASTICSEARCH_HOST || 'http://localhost:9200',
+            client: null
+        });
+
+        this.setClient()
+    }
+
+    setClient() {
+        this.client = new elasticsearch.Client({
+            log: this.log,
+            apiVersion: this.apiVersion,
+            host: this.host
+        });
+    }
+
+    getClient() {
+        if (!this.client) {
+            this.setClient();
+
+            this.client.ping({
+                // ping usually has a 3000ms timeout
+                requestTimeout: Infinity,
+            }, (error) => {
+                if (error) {
+                    return null;
+                }
+            });
+        }
+
+        return this.client;
+    }
+
+    makeRequest(query, scroll = false) {
+        if (!this.getClient()) {
+            return Promise.reject('Unable to connect to ElasticSearch server');
+        }
+
+        // check query to execute is empty or not.
+        if(_.isEmpty(query)) {
+            return Promise.reject('Invalid query');
+        }
+
+        //if data comes from scroll (if `scroll: true` in query config)
+        if (query && query.nextPage) {
+            return this.getScrollData(query.nextPage);
+        }
+
+        return this.getSearchData(query, scroll);
+    }
+
+
+    //get scroll data from ES
+    getScrollData(query) {
+        return this.getResponse();
+    }
+
+    // get search data from ES
+    getSearchData(query, scroll) {
+        return this.getResponse(scroll);
+    }
+
+    getResponse(scroll = false) {
+        return new Promise((resolve) => {
+
+            if (scroll) {
+                resolve(
+                    {
+                        "_scroll_id": "cXVlcnlUaGVuRmV0Y2g7NTsxMzI6MUdvVlRMdl==",
+                        "took": 290,
+                        "timed_out": false,
+                        "_shards": {
+                            "total": 5,
+                            "successful": 5,
+                            "failed": 0
+                        },
+                        "hits": {
+                            "total": 2843120,
+                            "max_score": null,
+                            "hits": [
+                                {
+                                    "_index": "nuage_flow",
+                                    "_type": "nuage_doc_type",
+                                    "_id": "AWVG54Si5W9dBjWuAIKA",
+                                    "_score": null,
+                                    "_source": {
+                                        "sourcemac": "DE:AD:BE:EF:00:03",
+                                        "protocol": "TCP",
+                                        "packets": 770,
+                                        "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 5, "SYN-ACK": 1, "RST": 1, "NULL": 1, "FIN": 1 }, "sourceip": "10.10.0.3", "destinationip": "10.10.0.5", "bytes": 15862, "tcpstate": "INIT", "nuage_metadata": { "outport": 2, "service": "HTTPS", "aclId": "74ced7df-5460-43a3-ad74-21641af326ba", "domainName": "chord_domain-1", "acl_source_name": "PG1", "zoneName": "chord_domain-1-zone", "serviceGroup": "Web", "inport": 4, "destinationvport": "97bd760f-2541-4ea3-b409-2d3434ac62f9", "flowid": 10649, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "74ced7df-5460-43a3-ad74-21641af326ba", "acl_destination_type": "pg", "acl_destination_name": "PG2", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Atlassian" }, "destinationport": 5, "timestamp": 1534492842000, "sourceport": 3, "type": "ALLOW", "destinationmac": "DE:AD:BE:EF:00:05"
+                                    }, "sort": [1534492842000]
+                                }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG54CM5W9dBjWuAHdA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:05", "protocol": "UDP", "packets": 905, "messageType": 2, "tcpflags": { "FIN-ACK": 2, "SYN": 1, "SYN-ACK": 1, "RST": 2, "NULL": 3, "FIN": 1 }, "sourceip": "10.10.0.5", "destinationip": "10.10.0.4", "bytes": 14186, "tcpstate": "INIT", "nuage_metadata": { "outport": 4, "service": "FTP", "aclId": "54b9366f-4e50-4885-8ae2-f7234115eac9", "domainName": "chord_domain-1", "acl_source_name": "PG5", "zoneName": "chord_domain-1-zone", "serviceGroup": "File Transfer", "inport": 2, "destinationvport": "de58ecf5-1619-478d-abf3-fc4ce647e7bf", "flowid": 12907, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "54b9366f-4e50-4885-8ae2-f7234115eac9", "acl_destination_type": "pg", "acl_destination_name": "PG1", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Citrix" }, "destinationport": 4, "timestamp": 1534492841000, "sourceport": 5, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:04" }, "sort": [1534492841000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG54KZ5W9dBjWuAHzg", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:01", "protocol": "TCP", "packets": 506, "messageType": 2, "tcpflags": { "FIN-ACK": 3, "SYN": 2, "SYN-ACK": 3, "RST": 3, "NULL": 2, "FIN": 2 }, "sourceip": "10.10.0.1", "destinationip": "10.10.0.3", "bytes": 12582, "tcpstate": "INIT", "nuage_metadata": { "outport": 4, "service": "Kerberos", "aclId": "7d5e5dd8-073b-492d-abc4-d54422773fb9", "domainName": "chord_domain-1", "acl_source_name": "PG2", "zoneName": "chord_domain-1-zone", "serviceGroup": "Security", "inport": 1, "destinationvport": "896e3938-343e-4fea-aa72-7d5c26820291", "flowid": 11415, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "7d5e5dd8-073b-492d-abc4-d54422773fb9", "acl_destination_type": "pg", "acl_destination_name": "PG4", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Microsoft Outlook" }, "destinationport": 3, "timestamp": 1534492841000, "sourceport": 1, "type": "DENY", "destinationmac": "DE:AD:BE:EF:00:03" }, "sort": [1534492841000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG536E5W9dBjWuAHGg", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:03", "protocol": "ICMP", "packets": 620, "messageType": 2, "tcpflags": { "FIN-ACK": 3, "SYN": 3, "SYN-ACK": 1, "RST": 3, "NULL": 2, "FIN": 2 }, "sourceip": "10.10.0.3", "destinationip": "10.10.0.4", "bytes": 13225, "tcpstate": "INIT", "nuage_metadata": { "outport": 3, "service": "HTTP", "aclId": "6f208ecb-a90e-4751-8893-4b9bf2415df3", "domainName": "chord_domain-1", "acl_source_name": "PG2", "zoneName": "chord_domain-1-zone", "serviceGroup": "Web", "inport": 4, "destinationvport": "1df1505e-2f18-4202-b1a3-cd41fa1c568c", "flowid": 10372, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "6f208ecb-a90e-4751-8893-4b9bf2415df3", "acl_destination_type": "pg", "acl_destination_name": "PG1", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Atlassian" }, "destinationport": 4, "timestamp": 1534492840000, "sourceport": 3, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:04" }, "sort": [1534492840000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53yN5W9dBjWuAGwA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:01", "protocol": "ICMP", "packets": 802, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 1, "SYN-ACK": 2, "RST": 3, "NULL": 3, "FIN": 2 }, "sourceip": "10.10.0.1", "destinationip": "10.10.0.4", "bytes": 19558, "tcpstate": "INIT", "nuage_metadata": { "outport": 2, "service": "TACACS", "aclId": "e476fc9c-3307-4bc5-b0c3-fb18cb9f2a4f", "domainName": "chord_domain-1", "acl_source_name": "PG5", "zoneName": "chord_domain-1-zone", "serviceGroup": "Security", "inport": 2, "destinationvport": "d59fdd58-d0cb-4d67-ab09-a413ba418e24", "flowid": 11973, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "e476fc9c-3307-4bc5-b0c3-fb18cb9f2a4f", "acl_destination_type": "pg", "acl_destination_name": "PG5", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Atlassian" }, "destinationport": 4, "timestamp": 1534492840000, "sourceport": 1, "type": "ALLOW", "destinationmac": "DE:AD:BE:EF:00:04" }, "sort": [1534492840000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53id5W9dBjWuAGDA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:02", "protocol": "TCP", "packets": 807, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 3, "SYN-ACK": 5, "RST": 1, "NULL": 3, "FIN": 1 }, "sourceip": "10.10.0.2", "destinationip": "10.10.0.1", "bytes": 19138, "tcpstate": "INIT", "nuage_metadata": { "outport": 1, "service": "HTTPS", "aclId": "42602984-da83-44a6-a139-066e864782fd", "domainName": "chord_domain-1", "acl_source_name": "PG4", "zoneName": "chord_domain-1-zone", "serviceGroup": "Web", "inport": 4, "destinationvport": "b8042f42-92a8-40e7-9c85-b69c19f6af7b", "flowid": 10360, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "42602984-da83-44a6-a139-066e864782fd", "acl_destination_type": "pg", "acl_destination_name": "PG5", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Microsoft Outlook" }, "destinationport": 1, "timestamp": 1534492839000, "sourceport": 2, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:01" }, "sort": [1534492839000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53qd5W9dBjWuAGZg", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:05", "protocol": "UDP", "packets": 551, "messageType": 2, "tcpflags": { "FIN-ACK": 2, "SYN": 2, "SYN-ACK": 3, "RST": 2, "NULL": 1, "FIN": 1 }, "sourceip": "10.10.0.5", "destinationip": "10.10.0.3", "bytes": 10105, "tcpstate": "INIT", "nuage_metadata": { "outport": 2, "service": "TFTP", "aclId": "fb2bc4a4-7d41-4e40-b6d9-24ee8af367d0", "domainName": "chord_domain-1", "acl_source_name": "PG3", "zoneName": "chord_domain-1-zone", "serviceGroup": "File Transfer", "inport": 1, "destinationvport": "cfb82e23-9b37-48b2-a9d5-74b8339201b1", "flowid": 12407, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "fb2bc4a4-7d41-4e40-b6d9-24ee8af367d0", "acl_destination_type": "pg", "acl_destination_name": "PG4", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Microsoft Outlook" }, "destinationport": 3, "timestamp": 1534492839000, "sourceport": 5, "type": "DENY", "destinationmac": "DE:AD:BE:EF:00:03" }, "sort": [1534492839000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53aF5W9dBjWuAFsg", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:01", "protocol": "ICMP", "packets": 863, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 2, "SYN-ACK": 3, "RST": 1, "NULL": 3, "FIN": 1 }, "sourceip": "10.10.0.1", "destinationip": "10.10.0.2", "bytes": 17492, "tcpstate": "INIT", "nuage_metadata": { "outport": 3, "service": "TACACS", "aclId": "b59aa3a5-5106-4248-8a18-430c292d2f89", "domainName": "chord_domain-1", "acl_source_name": "PG3", "zoneName": "chord_domain-1-zone", "serviceGroup": "Security", "inport": 5, "destinationvport": "35445a63-2174-4adb-a0b6-578d34797705", "flowid": 14927, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "b59aa3a5-5106-4248-8a18-430c292d2f89", "acl_destination_type": "pg", "acl_destination_name": "PG2", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Citrix" }, "destinationport": 2, "timestamp": 1534492838000, "sourceport": 1, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:02" }, "sort": [1534492838000] }, {
+                                    "_index": "nuage_flow",
+                                    "_type": "nuage_doc_type",
+                                    "_id": "AWVG53Rq5W9dBjWuAFWA",
+                                    "_score": null,
+                                    "_source": {
+                                        "sourcemac": "DE:AD:BE:EF:00:03", "protocol": "TCP", "packets": 629, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 1, "SYN-ACK": 3, "RST": 1, "NULL": 3, "FIN": 3 }, "sourceip": "10.10.0.3", "destinationip": "10.10.0.1", "bytes": 14189, "tcpstate": "INIT", "nuage_metadata": {
+                                            "outport": 2, "service": "TFTP", "aclId": "8b1eecc3-3204-4423-ba95-60941ff87fbc", "domainName": "chord_domain-1", "acl_source_name": "PG5", "zoneName": "chord_domain-1-zone", "serviceGroup": "File Transfer", "inport": 1, "destinationvport": "cefc0b28-efc5-45f0-b438-6d24a2b81328", "flowid": 13728,
+                                            "enterpriseName": "chord_enterprise",
+                                            "acl_source_type": "pg", "sourcevport": "8b1eecc3-3204-4423-ba95-60941ff87fbc", "acl_destination_type": "pg", "acl_destination_name": "PG1", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Microsoft Outlook"
+                                        }, "destinationport": 1, "timestamp": 1534492837000, "sourceport": 3, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:01"
+                                    }, "sort": [1534492837000]
+                                }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG522O5W9dBjWuAEpA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:05", "protocol": "ICMP", "packets": 790, "messageType": 2, "tcpflags": { "FIN-ACK": 2, "SYN": 5, "SYN-ACK": 3, "RST": 1, "NULL": 2, "FIN": 2 }, "sourceip": "10.10.0.5", "destinationip": "10.10.0.4", "bytes": 18840, "tcpstate": "INIT", "nuage_metadata": { "outport": 5, "service": "SSH", "aclId": "86bcddd0-ef61-4751-91bd-ecec70aabf40", "domainName": "chord_domain-1", "acl_source_name": "PG5", "zoneName": "chord_domain-1-zone", "serviceGroup": "Security", "inport": 1, "destinationvport": "1df1505e-2f18-4202-b1a3-cd41fa1c568c", "flowid": 14215, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "86bcddd0-ef61-4751-91bd-ecec70aabf40", "acl_destination_type": "pg", "acl_destination_name": "PG1", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Atlassian" }, "destinationport": 4, "timestamp": 1534492836000, "sourceport": 5, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:04" }, "sort": [1534492836000] }]
+                        }
+                    }
+                )
+            }
+
+            resolve({
+                "took": 106, "timed_out": false,
+                "_shards": { "total": 5, "successful": 5, "failed": 0 },
+                "hits": { "total": 2843120, "max_score": null, "hits": [{ "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG54Si5W9dBjWuAIKA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:03", "protocol": "TCP", "packets": 770, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 5, "SYN-ACK": 1, "RST": 1, "NULL": 1, "FIN": 1 }, "sourceip": "10.10.0.3", "destinationip": "10.10.0.5", "bytes": 15862, "tcpstate": "INIT", "nuage_metadata": { "outport": 2, "service": "HTTPS", "aclId": "74ced7df-5460-43a3-ad74-21641af326ba", "domainName": "chord_domain-1", "acl_source_name": "PG1", "zoneName": "chord_domain-1-zone", "serviceGroup": "Web", "inport": 4, "destinationvport": "97bd760f-2541-4ea3-b409-2d3434ac62f9", "flowid": 10649, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "74ced7df-5460-43a3-ad74-21641af326ba", "acl_destination_type": "pg", "acl_destination_name": "PG2", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Atlassian" }, "destinationport": 5, "timestamp": 1534492842000, "sourceport": 3, "type": "ALLOW", "destinationmac": "DE:AD:BE:EF:00:05" }, "sort": [1534492842000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG54CM5W9dBjWuAHdA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:05", "protocol": "UDP", "packets": 905, "messageType": 2, "tcpflags": { "FIN-ACK": 2, "SYN": 1, "SYN-ACK": 1, "RST": 2, "NULL": 3, "FIN": 1 }, "sourceip": "10.10.0.5", "destinationip": "10.10.0.4", "bytes": 14186, "tcpstate": "INIT", "nuage_metadata": { "outport": 4, "service": "FTP", "aclId": "54b9366f-4e50-4885-8ae2-f7234115eac9", "domainName": "chord_domain-1", "acl_source_name": "PG5", "zoneName": "chord_domain-1-zone", "serviceGroup": "File Transfer", "inport": 2, "destinationvport": "de58ecf5-1619-478d-abf3-fc4ce647e7bf", "flowid": 12907, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "54b9366f-4e50-4885-8ae2-f7234115eac9", "acl_destination_type": "pg", "acl_destination_name": "PG1", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Citrix" }, "destinationport": 4, "timestamp": 1534492841000, "sourceport": 5, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:04" }, "sort": [1534492841000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG54KZ5W9dBjWuAHzg", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:01", "protocol": "TCP", "packets": 506, "messageType": 2, "tcpflags": { "FIN-ACK": 3, "SYN": 2, "SYN-ACK": 3, "RST": 3, "NULL": 2, "FIN": 2 }, "sourceip": "10.10.0.1", "destinationip": "10.10.0.3", "bytes": 12582, "tcpstate": "INIT", "nuage_metadata": { "outport": 4, "service": "Kerberos", "aclId": "7d5e5dd8-073b-492d-abc4-d54422773fb9", "domainName": "chord_domain-1", "acl_source_name": "PG2", "zoneName": "chord_domain-1-zone", "serviceGroup": "Security", "inport": 1, "destinationvport": "896e3938-343e-4fea-aa72-7d5c26820291", "flowid": 11415, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "7d5e5dd8-073b-492d-abc4-d54422773fb9", "acl_destination_type": "pg", "acl_destination_name": "PG4", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Microsoft Outlook" }, "destinationport": 3, "timestamp": 1534492841000, "sourceport": 1, "type": "DENY", "destinationmac": "DE:AD:BE:EF:00:03" }, "sort": [1534492841000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG536E5W9dBjWuAHGg", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:03", "protocol": "ICMP", "packets": 620, "messageType": 2, "tcpflags": { "FIN-ACK": 3, "SYN": 3, "SYN-ACK": 1, "RST": 3, "NULL": 2, "FIN": 2 }, "sourceip": "10.10.0.3", "destinationip": "10.10.0.4", "bytes": 13225, "tcpstate": "INIT", "nuage_metadata": { "outport": 3, "service": "HTTP", "aclId": "6f208ecb-a90e-4751-8893-4b9bf2415df3", "domainName": "chord_domain-1", "acl_source_name": "PG2", "zoneName": "chord_domain-1-zone", "serviceGroup": "Web", "inport": 4, "destinationvport": "1df1505e-2f18-4202-b1a3-cd41fa1c568c", "flowid": 10372, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "6f208ecb-a90e-4751-8893-4b9bf2415df3", "acl_destination_type": "pg", "acl_destination_name": "PG1", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Atlassian" }, "destinationport": 4, "timestamp": 1534492840000, "sourceport": 3, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:04" }, "sort": [1534492840000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53yN5W9dBjWuAGwA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:01", "protocol": "ICMP", "packets": 802, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 1, "SYN-ACK": 2, "RST": 3, "NULL": 3, "FIN": 2 }, "sourceip": "10.10.0.1", "destinationip": "10.10.0.4", "bytes": 19558, "tcpstate": "INIT", "nuage_metadata": { "outport": 2, "service": "TACACS", "aclId": "e476fc9c-3307-4bc5-b0c3-fb18cb9f2a4f", "domainName": "chord_domain-1", "acl_source_name": "PG5", "zoneName": "chord_domain-1-zone", "serviceGroup": "Security", "inport": 2, "destinationvport": "d59fdd58-d0cb-4d67-ab09-a413ba418e24", "flowid": 11973, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "e476fc9c-3307-4bc5-b0c3-fb18cb9f2a4f", "acl_destination_type": "pg", "acl_destination_name": "PG5", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Atlassian" }, "destinationport": 4, "timestamp": 1534492840000, "sourceport": 1, "type": "ALLOW", "destinationmac": "DE:AD:BE:EF:00:04" }, "sort": [1534492840000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53id5W9dBjWuAGDA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:02", "protocol": "TCP", "packets": 807, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 3, "SYN-ACK": 5, "RST": 1, "NULL": 3, "FIN": 1 }, "sourceip": "10.10.0.2", "destinationip": "10.10.0.1", "bytes": 19138, "tcpstate": "INIT", "nuage_metadata": { "outport": 1, "service": "HTTPS", "aclId": "42602984-da83-44a6-a139-066e864782fd", "domainName": "chord_domain-1", "acl_source_name": "PG4", "zoneName": "chord_domain-1-zone", "serviceGroup": "Web", "inport": 4, "destinationvport": "b8042f42-92a8-40e7-9c85-b69c19f6af7b", "flowid": 10360, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "42602984-da83-44a6-a139-066e864782fd", "acl_destination_type": "pg", "acl_destination_name": "PG5", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Microsoft Outlook" }, "destinationport": 1, "timestamp": 1534492839000, "sourceport": 2, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:01" }, "sort": [1534492839000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53qd5W9dBjWuAGZg", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:05", "protocol": "UDP", "packets": 551, "messageType": 2, "tcpflags": { "FIN-ACK": 2, "SYN": 2, "SYN-ACK": 3, "RST": 2, "NULL": 1, "FIN": 1 }, "sourceip": "10.10.0.5", "destinationip": "10.10.0.3", "bytes": 10105, "tcpstate": "INIT", "nuage_metadata": { "outport": 2, "service": "TFTP", "aclId": "fb2bc4a4-7d41-4e40-b6d9-24ee8af367d0", "domainName": "chord_domain-1", "acl_source_name": "PG3", "zoneName": "chord_domain-1-zone", "serviceGroup": "File Transfer", "inport": 1, "destinationvport": "cfb82e23-9b37-48b2-a9d5-74b8339201b1", "flowid": 12407, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "fb2bc4a4-7d41-4e40-b6d9-24ee8af367d0", "acl_destination_type": "pg", "acl_destination_name": "PG4", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Microsoft Outlook" }, "destinationport": 3, "timestamp": 1534492839000, "sourceport": 5, "type": "DENY", "destinationmac": "DE:AD:BE:EF:00:03" }, "sort": [1534492839000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53aF5W9dBjWuAFsg", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:01", "protocol": "ICMP", "packets": 863, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 2, "SYN-ACK": 3, "RST": 1, "NULL": 3, "FIN": 1 }, "sourceip": "10.10.0.1", "destinationip": "10.10.0.2", "bytes": 17492, "tcpstate": "INIT", "nuage_metadata": { "outport": 3, "service": "TACACS", "aclId": "b59aa3a5-5106-4248-8a18-430c292d2f89", "domainName": "chord_domain-1", "acl_source_name": "PG3", "zoneName": "chord_domain-1-zone", "serviceGroup": "Security", "inport": 5, "destinationvport": "35445a63-2174-4adb-a0b6-578d34797705", "flowid": 14927, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "b59aa3a5-5106-4248-8a18-430c292d2f89", "acl_destination_type": "pg", "acl_destination_name": "PG2", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Citrix" }, "destinationport": 2, "timestamp": 1534492838000, "sourceport": 1, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:02" }, "sort": [1534492838000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG53Rq5W9dBjWuAFWA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:03", "protocol": "TCP", "packets": 629, "messageType": 2, "tcpflags": { "FIN-ACK": 1, "SYN": 1, "SYN-ACK": 3, "RST": 1, "NULL": 3, "FIN": 3 }, "sourceip": "10.10.0.3", "destinationip": "10.10.0.1", "bytes": 14189, "tcpstate": "INIT", "nuage_metadata": { "outport": 2, "service": "TFTP", "aclId": "8b1eecc3-3204-4423-ba95-60941ff87fbc", "domainName": "chord_domain-1", "acl_source_name": "PG5", "zoneName": "chord_domain-1-zone", "serviceGroup": "File Transfer", "inport": 1, "destinationvport": "cefc0b28-efc5-45f0-b438-6d24a2b81328", "flowid": 13728, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "8b1eecc3-3204-4423-ba95-60941ff87fbc", "acl_destination_type": "pg", "acl_destination_name": "PG1", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Microsoft Outlook" }, "destinationport": 1, "timestamp": 1534492837000, "sourceport": 3, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:01" }, "sort": [1534492837000] }, { "_index": "nuage_flow", "_type": "nuage_doc_type", "_id": "AWVG522O5W9dBjWuAEpA", "_score": null, "_source": { "sourcemac": "DE:AD:BE:EF:00:05", "protocol": "ICMP", "packets": 790, "messageType": 2, "tcpflags": { "FIN-ACK": 2, "SYN": 5, "SYN-ACK": 3, "RST": 1, "NULL": 2, "FIN": 2 }, "sourceip": "10.10.0.5", "destinationip": "10.10.0.4", "bytes": 18840, "tcpstate": "INIT", "nuage_metadata": { "outport": 5, "service": "SSH", "aclId": "86bcddd0-ef61-4751-91bd-ecec70aabf40", "domainName": "chord_domain-1", "acl_source_name": "PG5", "zoneName": "chord_domain-1-zone", "serviceGroup": "Security", "inport": 1, "destinationvport": "1df1505e-2f18-4202-b1a3-cd41fa1c568c", "flowid": 14215, "enterpriseName": "chord_enterprise", "acl_source_type": "pg", "sourcevport": "86bcddd0-ef61-4751-91bd-ecec70aabf40", "acl_destination_type": "pg", "acl_destination_name": "PG1", "l2domainName": "chord_domain-1-l2", "subnetName": "chord_domain-1-sub", "l7ApplicationName": "Atlassian" }, "destinationport": 4, "timestamp": 1534492836000, "sourceport": 5, "type": "OTHER", "destinationmac": "DE:AD:BE:EF:00:04" }, "sort": [1534492836000] }] }
+            })
+        })
+    }
+}

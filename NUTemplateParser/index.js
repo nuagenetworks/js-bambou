@@ -35,6 +35,7 @@ export default class NUTemplateParser {
             True if the context matches all parameters
     */
     static shouldParameterizedContext(parameters, context) {
+
         return parameters.every((parameter) => {
             return "defaultValue" in parameter || parameter.key in context;
         });
@@ -54,7 +55,6 @@ export default class NUTemplateParser {
         }
 
         const template = NUParser(configuration);
-
         const isContextOK = NUTemplateParser.shouldParameterizedContext(template.parameters, context);
 
         if (isContextOK) {
@@ -74,7 +74,7 @@ export default class NUTemplateParser {
         An object that gives all parameters
     */
     static getUsedParameters(configuration, context) {
-        const parameters = NUParser.parse(configuration).parameters;
+        const parameters = NUParser(configuration).parameters;
         const queryParams = {};
 
         for (let i in parameters) {
@@ -95,7 +95,7 @@ export default class NUTemplateParser {
     }
 
     static contextualize(data, context) {
-        const template = NUParser.parse(data);
+        const template = NUParser(data);
         return template(NUTemplateParser.evaluateContext(context, template.parameters));
     }
 }
