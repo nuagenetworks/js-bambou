@@ -113,7 +113,7 @@ export default class NUService extends NUObject {
                 `${parentEntity.resourceName}/${parentEntity.ID}/${resourceName}`;
         } else {
             url += ((!parentEntity) ? '' : `${parentEntity.resourceName}/${parentEntity.ID}/`) +
-                entity.resourceName + ((entity.ID !== null) ? (`/${entity.ID}`) : '');
+                entity.resourceName + (entity.resourceName === 'me' ? '' : ((entity.ID !== null) ? (`/${entity.ID}`) : ''));
         }
 
         return url;
