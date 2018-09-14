@@ -199,7 +199,7 @@ export default class NUEntity extends NUObject {
         Register custom validator
     */
     registerValidator(...args) {
-        this._validators.set(args[0], [].splice.call(args, 1));
+        this._validators.set(args[0].name, args[0]);
     }
 
     getDefaults() {
