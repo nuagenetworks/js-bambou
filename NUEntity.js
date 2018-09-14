@@ -177,24 +177,21 @@ export default class NUEntity extends NUObject {
 
     checkErrors(formValues) {
         const entity = this;
-        entity._validators.forEach((value, key) => {
-            const validator = value && value[0];
-            if (validator) {
-                const validationError = validator.validate.call(entity, key, formValues);
-                if (validationError) {
-                    entity.validationErrors.set(validator.name, validationError);
-                }
+        entity._validators.forEach((validator, attributeName) => {
+            const attrObj = this.constructor.attributeDescriptors[attributeName];
+            const validationError = validator.validate.call(entity, attrObj, formValues);
+            if (validationError) {
+                entity.validationErrors.set(validator.name, validationError);
             }
         });
     }
-
 
     /*
         Register each NUAttribute as validator
     */
     registerAttributeValidators() {
         Object.values(this.constructor.attributeDescriptors).forEach((attributeObj) => {
-            this._validators.set(attributeObj, [attributeObj]);
+            this._validators.set(attributeObj.name, attributeObj);
         });
     }
 
