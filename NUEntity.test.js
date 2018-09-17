@@ -3,7 +3,6 @@ import NUEntity from './NUEntity';
 import NUValidator from './NUValidator';
 import { Enum } from 'enumify';
 
-
 class NUAddressRangeIPTypeEnum extends Enum {}
 NUAddressRangeIPTypeEnum.initEnum(['DUALSTACK', 'IPV4', 'IPV6']);
     

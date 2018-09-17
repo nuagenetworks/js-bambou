@@ -177,8 +177,9 @@ export default class NUEntity extends NUObject {
 
     checkErrors(formValues) {
         const entity = this;
-        entity._validators.forEach((args, validator) => {
-            const validationError = validator.validate.call(entity, ...args, formValues);
+        entity._validators.forEach((validator, attributeName) => {
+            const attrObj = this.constructor.attributeDescriptors[attributeName];
+            const validationError = validator.validate.call(entity, attrObj, formValues);
             if (validationError) {
                 entity.validationErrors.set(validator.name, validationError);
             }
@@ -190,7 +191,7 @@ export default class NUEntity extends NUObject {
     */
     registerAttributeValidators() {
         Object.values(this.constructor.attributeDescriptors).forEach((attributeObj) => {
-            this._validators.set(attributeObj, [attributeObj]);
+            this._validators.set(attributeObj.name, attributeObj);
         });
     }
 
@@ -198,7 +199,7 @@ export default class NUEntity extends NUObject {
         Register custom validator
     */
     registerValidator(...args) {
-        this._validators.set(args[0], [].splice.call(args, 1));
+        this._validators.set(args[0].name, args[0]);
     }
 
     getDefaults() {
