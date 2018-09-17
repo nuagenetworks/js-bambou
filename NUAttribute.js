@@ -50,7 +50,6 @@ export default class NUAttribute extends NUObject {
             userlabel: obj.userlabel,
         });
     }
-
     /*
         Invoked from NUEntity.
         'this' would correspond to the NUEntity object being validated.
