@@ -3,7 +3,6 @@ import NUEntity from './NUEntity';
 import NUValidator from './NUValidator';
 import { Enum } from 'enumify';
 
-
 class NUAddressRangeIPTypeEnum extends Enum {}
 NUAddressRangeIPTypeEnum.initEnum(['DUALSTACK', 'IPV4', 'IPV6']);
     
@@ -20,18 +19,6 @@ class CustomValidator2 extends NUValidator {
     validate() {
         if (this.attr5 && this.attr3 !== 'DUALSTACK') {
             return 'attr3 must be DUALSTACK when attr5 is true';
-        }
-        return undefined;
-    }
-}
-
-class CustomValidator3 extends NUValidator {
-    validate(...args) {
-        if (this.attr6 !== args[0].attr6) {
-            return `thatEntity1 attr6 match failed, ${this.attr6} != ${args[0].attr6}`;
-        }
-        if (this.attr6 !== args[1].attr6) {
-            return `thatEntity2 attr6 match failed, ${this.attr6} != ${args[1].attr6}`;
         }
         return undefined;
     }
@@ -135,22 +122,6 @@ it('custom validations', () => {
     expect(errors.get('customValidator2')).toEqual('attr3 must be DUALSTACK when attr5 is true');
     myEntity.attr4 = 'value4';
     myEntity.attr3 = 'DUALSTACK';
-    isValid = myEntity.isValid();
-    expect(isValid).toEqual(true);
-    const thatEntity1 = new MyEntity();
-    thatEntity1.attr6 = 111;
-    const thatEntity2 = new MyEntity();
-    thatEntity2.attr6 = 222;
-    myEntity.attr6 = 333;
-    myEntity.registerValidator(new CustomValidator3('customValidator3'), thatEntity1, thatEntity2);
-    isValid = myEntity.isValid();
-    expect(isValid).toEqual(false);
-    expect(errors.get('customValidator3')).toEqual('thatEntity1 attr6 match failed, 333 != 111');
-    thatEntity1.attr6 = 333;
-    isValid = myEntity.isValid();
-    expect(isValid).toEqual(false);
-    expect(errors.get('customValidator3')).toEqual('thatEntity2 attr6 match failed, 333 != 222');
-    thatEntity2.attr6 = 333;
     isValid = myEntity.isValid();
     expect(isValid).toEqual(true);
     expect(myEntity.constructor.attributeDescriptors.attr1.isCreateOnly).toEqual(true);
