@@ -1,8 +1,8 @@
 import NUParser from './NUParser';
-import NUTranslator from '../NUTranslator';
 
 export default class NUTemplateParser {
     /**
+     *  TODO - Will look it later.
         This will update the context by calling the respective translator
     Arguments:
         * parameters: parameters of the query that have been parsed.
@@ -11,19 +11,19 @@ export default class NUTemplateParser {
             context: updated context by calling respective translators
     */
     static evaluateContext(context, parameters) {
-        const updatedContext = Object.assign({}, context);
+        // const updatedContext = Object.assign({}, context);
 
-        for (let i in parameters) {
+        // for (let i in parameters) {
 
-            if (!parameters.hasOwnProperty(i)) continue;
+        //     if (!parameters.hasOwnProperty(i)) continue;
 
-            const parameter = parameters[i];
-            if (parameter.evaluate) {
-                updatedContext[parameter.key] = NUTranslator.translate(parameter.evaluate, context[parameter.key]);
-            }
-        }
+        //     const parameter = parameters[i];
+        //     if (parameter.evaluate) {
+        //         updatedContext[parameter.key] = NUTranslator.translate(parameter.evaluate, context[parameter.key]);
+        //     }
+        // }
 
-        return updatedContext;
+        return context;
     }
 
     /*

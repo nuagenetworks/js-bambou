@@ -1,6 +1,8 @@
 import ESRESTConnection from './ESRESTConnection';
 import ESTabify from './ESTabify';
 import { getLogger } from '../Logger';
+import NUTemplateParser from "../NUTemplateParser";
+
 
 const ERROR_MESSAGE = 'unable to fetch data.'
 const SCROLL_TIME = '3m';
@@ -53,5 +55,25 @@ export default class ESService {
             };
         }
         return results;
+    }
+
+    getRequestID(configuration, context = {}) {
+        const tmpConfiguration = NUTemplateParser.parameterizedConfiguration(configuration, context);
+
+        if (!tmpConfiguration)
+            return;
+
+        const parameters = NUTemplateParser.getUsedParameters(configuration, context);
+
+        if (Object.keys(parameters).length === 0)
+            return configuration.id;
+
+        return `${configuration.vizID}-${configuration.id}[${JSON.stringify(parameters)}]`;
+
+    }
+
+    tabify(data) {
+        const tabify = new ESTabify();
+        return tabify.process(data);
     }
 }

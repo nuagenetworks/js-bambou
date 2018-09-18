@@ -1,4 +1,4 @@
-import NUObject from './NUObject';
+import NUObject from 'service/NUObject';
 import dateformat from 'dateformat';
 
 const LogLevels = ["fatal", "error", "warn", "info", "debug", "trace"];

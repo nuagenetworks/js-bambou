@@ -22,7 +22,9 @@ export default class ESTabify {
             table = response;
 
         } else {
-            throw new Error("Tabify() invoked with invalid result set. Result set must have either 'aggregations' or 'hits' defined.");
+            const errorMessage = "Tabify() invoked with invalid result set. Result set must have either 'aggregations' or 'hits' defined.";
+            getLogger().error(errorMessage);
+            throw new Error(errorMessage);
         }
 
         return this.flatArray(table);
@@ -47,6 +49,10 @@ export default class ESTabify {
         const keys = Object.keys(data);
         for (let i = 0; i < keys.length; i++) {
             if (Array.isArray(data[keys[i]])) {
+                if (data[keys[i]].length === 0) {
+                    data[keys[i]].push({});
+                }
+
                 data[keys[i]].forEach(item => {
                     final.push({ ...data, [keys[i]]: item })
                 });
@@ -132,8 +138,8 @@ export default class ESTabify {
     }
 
     extractTree(buckets, stack) {
-        return buckets.map((bucket) => {
-            return Object.keys(bucket).reduce(function (tree, key) {
+        return buckets.map( bucket => {
+            return Object.keys(bucket).reduce((tree, key) => {
                 let value = bucket[key];
 
                 if (typeof value === "object") {
@@ -178,7 +184,12 @@ export default class ESTabify {
                         if (Array.isArray(value)) {
 
                             if (value.length) {
-                                return value;
+                                return value.map(item => {
+                                    if (item[key]) {
+                                        return item;
+                                    }
+                                    return {[key]: item};
+                                });
                             }
 
                             node[key] = null;
