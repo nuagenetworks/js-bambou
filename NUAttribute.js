@@ -59,7 +59,7 @@ export default class NUAttribute extends NUObject {
     validate(entity, attrObj, formValues) {
         
         if (attrObj) {
-            const attrValue =  formValues && formValues[attrObj.name];
+            const attrValue =  (entity && entity[attrObj.name]) || (formValues && formValues[attrObj.name]);
             //if STRING use !attrValue to check if value provided. For all other attribute types use !undefined and !null
             if (attrObj.isRequired && ((attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING && !attrValue) ||
                 (attrObj.attributeType !== NUAttribute.ATTR_TYPE_STRING && (attrValue === undefined || attrValue === null)))) {
