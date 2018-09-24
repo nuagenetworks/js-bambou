@@ -7,7 +7,7 @@ class NUAddressRangeIPTypeEnum extends Enum {}
 NUAddressRangeIPTypeEnum.initEnum(['DUALSTACK', 'IPV4', 'IPV6']);
     
 class CustomValidator1 extends NUValidator {
-    validate(attrObj, formValues) {
+    validate(entity, attrObj, formValues) {
         const { attr5, attr4 } = formValues;
         if (attr5 && !attr4) {
             return 'attr4 must be set when attr5 is true';
@@ -17,7 +17,7 @@ class CustomValidator1 extends NUValidator {
 }
 
 class CustomValidator2 extends NUValidator {
-    validate(attrObj, formValues) {
+    validate(entity, attrObj, formValues) {
         const { attr3, attr5 } = formValues;
         if (attr5 && attr3 !== 'DUALSTACK') {
             return 'attr3 must be DUALSTACK when attr5 is true';

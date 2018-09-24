@@ -56,35 +56,38 @@ export default class NUAttribute extends NUObject {
         'this' would correspond to the NUEntity object being validated.
         NUAttribute object on which the validation needs to be executed is passed as args[0].
     */
-    validate(attrObj, formValues) {
-        const attrValue = formValues[attrObj.name];
-        //if STRING use !attrValue to check if value provided. For all other attribute types use !undefined and !null
-        if (attrObj.isRequired && ((attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING && !attrValue) ||
-            (attrObj.attributeType !== NUAttribute.ATTR_TYPE_STRING && (attrValue === undefined || attrValue === null)))) {
-            return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
-                'Invalid input', 'This value is mandatory');
-        }
-
-        if (attrValue) {
-            var dataTypeMismatch = false;
-            if (attrObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT || attrObj.attributeType === NUAttribute.ATTR_TYPE_LONG) {
-                dataTypeMismatch = (typeof attrValue !== 'number');
-            } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
-                dataTypeMismatch = (typeof attrValue !== 'object');
-            } else if (attrObj.attributeType !== NUAttribute.ATTR_TYPE_ENUM && typeof attrValue !== attrObj.attributeType) {
-                dataTypeMismatch = true;
-            }
-            if (dataTypeMismatch) {
+    validate(entity, attrObj, formValues) {
+        
+        if (attrObj) {
+            const attrValue =  formValues && formValues[attrObj.name];
+            //if STRING use !attrValue to check if value provided. For all other attribute types use !undefined and !null
+            if (attrObj.isRequired && ((attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING && !attrValue) ||
+                (attrObj.attributeType !== NUAttribute.ATTR_TYPE_STRING && (attrValue === undefined || attrValue === null)))) {
                 return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
-                    'Invalid data type',
-                    `Data type should be ${attrObj.attributeType}, but is ${typeof attrValue}`);
+                    'Invalid input', 'This value is mandatory');
             }
-            if (attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING) {
-                return attrObj.validateStringValue(attrValue, attrObj);
-            } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_ENUM) {
-                return attrObj.validateEnumValue(attrValue, attrObj);
-            } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
-                return attrObj.validateListValues(attrValue, attrObj);
+
+            if (attrValue) {
+                var dataTypeMismatch = false;
+                if (attrObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT || attrObj.attributeType === NUAttribute.ATTR_TYPE_LONG) {
+                    dataTypeMismatch = (typeof attrValue !== 'number');
+                } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
+                    dataTypeMismatch = (typeof attrValue !== 'object');
+                } else if (attrObj.attributeType !== NUAttribute.ATTR_TYPE_ENUM && typeof attrValue !== attrObj.attributeType) {
+                    dataTypeMismatch = true;
+                }
+                if (dataTypeMismatch) {
+                    return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+                        'Invalid data type',
+                        `Data type should be ${attrObj.attributeType}, but is ${typeof attrValue}`);
+                }
+                if (attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING) {
+                    return attrObj.validateStringValue(attrValue, attrObj);
+                } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_ENUM) {
+                    return attrObj.validateEnumValue(attrValue, attrObj);
+                } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
+                    return attrObj.validateListValues(attrValue, attrObj);
+                }
             }
         }
         return null;

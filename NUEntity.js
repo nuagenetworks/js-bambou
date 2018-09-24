@@ -179,7 +179,7 @@ export default class NUEntity extends NUObject {
         const entity = this;
         entity._validators.forEach((validator, attributeName) => {
             const attrObj = this.constructor.attributeDescriptors[attributeName];
-            const validationError = validator.validate(attrObj, formValues);
+            const validationError = validator.validate(entity, attrObj, formValues);
             if (validationError) {
                 entity.validationErrors.set(validator.name, validationError);
             }
