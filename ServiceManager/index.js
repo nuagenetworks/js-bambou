@@ -1,11 +1,12 @@
 import ElasticSearchService from '../elasticsearch/ESService';
+import VSDService from '../VSDService';
 
 /*
     Stores all services.
 */
-let services = {
+const services = {
     elasticsearch: new ElasticSearchService(),
-    //VSD: VSDService,
+    VSD: new VSDService(),
 };
 
 /*
