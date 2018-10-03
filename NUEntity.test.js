@@ -38,7 +38,6 @@ class MyEntity extends NUEntity {
         attr7: new NUAttribute({ localName: 'attr7', attributeType: NUAttribute.ATTR_TYPE_FLOAT }),
         attr8: new NUAttribute({ localName: 'attr8', attributeType: NUAttribute.ATTR_TYPE_LIST, subType: NUAttribute.ATTR_TYPE_ENUM, choices: [NUAddressRangeIPTypeEnum.DUALSTACK, NUAddressRangeIPTypeEnum.IPV4, NUAddressRangeIPTypeEnum.IPV6] }),
         attr9: new NUAttribute({ localName: 'attr9', attributeType: NUAttribute.ATTR_TYPE_LIST, subType: NUAttribute.ATTR_TYPE_FLOAT }),
-        attr10: new NUAttribute({ localName: 'attr10', attributeType: NUAttribute.ATTR_TYPE_STRING, isTransient:true }),
         attr11: new NUAttribute({ localName: 'attr11', attributeType: NUAttribute.ATTR_TYPE_STRING, isReadOnly:true }),
     }
     constructor() {
@@ -129,8 +128,6 @@ it('custom validations', () => {
     expect(myEntity.constructor.attributeDescriptors.attr1.isCreateOnly).toEqual(true);
     expect(myEntity.constructor.attributeDescriptors.attr1.isEditable).toEqual(false);
     expect(myEntity.constructor.attributeDescriptors.attr2.isEditable).toEqual(true);
-    expect(myEntity.constructor.attributeDescriptors.attr10.isTransient).toEqual(true);
-    expect(myEntity.constructor.attributeDescriptors.attr10.isEditable).toEqual(false);
     expect(myEntity.constructor.attributeDescriptors.attr11.isReadOnly).toEqual(true);
     expect(myEntity.constructor.attributeDescriptors.attr11.isEditable).toEqual(false);
 });
