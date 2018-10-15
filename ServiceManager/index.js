@@ -51,8 +51,43 @@ const getRequestID = (configuration, context) => {
     }
 }
 
+const addSorting = function (queryConfiguration, sort) {
+
+    if(!queryConfiguration)
+        return null
+
+    if(!sort || sort.order === '')
+        return queryConfiguration;
+
+    try {
+        const service = getService(queryConfiguration.service);
+        return service.addSorting(queryConfiguration, sort);
+    } catch (error) {
+        return queryConfiguration;
+    }
+}
+
+
+const addSearching = function (queryConfiguration, search) {
+
+    if(!queryConfiguration)
+        return null;
+
+    if(!search)
+        return queryConfiguration;
+
+    try {
+        const service = getService(queryConfiguration.service);
+        return service.addSearching(queryConfiguration, search);
+    } catch (error) {
+        return queryConfiguration;
+    }
+}
+
 export default {
-    register: register,
-    getService: getService,
-    getRequestID: getRequestID,
+    register,
+    getService,
+    getRequestID,
+    addSearching,
+    addSorting
 }

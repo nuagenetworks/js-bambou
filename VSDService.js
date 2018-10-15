@@ -1,6 +1,8 @@
+import objectPath from 'object-path';
+
 import NUService from 'service/NUService';
 import NURESTUser from 'service/NURESTUser';
-import NUTemplateParser from "../NUTemplateParser";
+import NUTemplateParser from "service/NUTemplateParser";
 
 const ERROR_MESSAGE = `No VSD API endpoint specified`;
 
@@ -14,6 +16,22 @@ export default class VSDService extends NUService {
         this.APIKey = localStorage.getItem('API_KEY');
         this.organization = localStorage.getItem('ORGANIZATION');
         this.userJson = localStorage.getItem('USER_JSON');
+    }
+
+    VSDSearchConvertor = (expressions) => {
+        let expression = '';
+
+        expressions.forEach(e => {
+            if (e.operator) {
+                expression += ` ${e.operator} `;
+            } else if (e.bracket) {
+                expression += `${e.bracket}`;
+            } else {
+                expression += `${e.element.category} ${e.element.operator} "${e.element.value}"`;
+            }
+        });
+
+        return expression;
     }
 
     buildURL = (configuration) => {
@@ -73,5 +91,33 @@ export default class VSDService extends NUService {
             })
             ).catch(error => reject(error));
         });
+    }
+
+    // Add custom sorting into VSD query
+    addSorting = (queryConfiguration, sort) => {
+        queryConfiguration.query.sort = `${sort.column} ${sort.order}`
+        return queryConfiguration;
+    }
+
+    // Add custom searching from searchbox into VSD query
+    addSearching = (queryConfiguration, search) => {
+        if (search.length) {
+            let filter = objectPath.get(queryConfiguration, 'query.filter');
+            objectPath.push(queryConfiguration, 'query.filter', (filter ? `(${filter}) AND ` : '') + this.VSDSearchConvertor(search));
+        }
+
+        return queryConfiguration;
+    }
+
+    getPageSizePath = () => 'query.pageSize';
+    
+    updatePageSize = (queryConfiguration, pageSize) => {
+        objectPath.set(queryConfiguration, this.getPageSizePath(), pageSize);
+        return queryConfiguration;
+    }
+    
+    getNextPageQuery = (queryConfiguration, nextPage) => {
+        queryConfiguration.query.nextPage = nextPage;
+        return queryConfiguration;
     }
 }
