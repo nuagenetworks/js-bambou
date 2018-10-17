@@ -77,7 +77,7 @@ export default class VSDService extends NUService {
         const filter = configuration.filter || null,
             page = (configuration && configuration.nextPage) || 0,
             orderBy = configuration.sort || null,
-            api = `${this.url}/${this.buildURL(configuration)}`;
+            api = `${this.url}/${this.buildURL(configuration.query)}`;
 
         return new Promise((resolve, reject) => {
             this.invokeRequest(
