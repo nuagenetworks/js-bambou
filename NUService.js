@@ -190,7 +190,7 @@ export default class NUService extends NUObject {
     *  component: name of the server component whose status is requested
     */
     fetchHealthStatus = (healthURL, component) => {
-        const url = component ? `${healthURL}/?component=${component}` : healthURL;
+        const url = component ? `${healthURL}/?component=${component}&proxyRequest=false` : healthURL;
         return this.invokeRequest('GET', url).then((response) => {
             return response.data[0];
         });
