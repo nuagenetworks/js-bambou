@@ -186,6 +186,17 @@ export default class NUService extends NUObject {
     }
 
     /*
+    *  Fetch health status.
+    *  component: name of the server component whose status is requested
+    */
+    fetchHealthStatus = (healthURL, component) => {
+        const url = component ? `${healthURL}/?component=${component}` : healthURL;
+        return this.invokeRequest('GET', url).then((response) => {
+            return response.data[0];
+        });
+    }
+    
+    /*
       Issues a GET request, processes the received Array of JSONObjects response,
       and builds corresponding Array of NUEntity objects
       Returns an object {data: an array of NUEntity objects,
