@@ -197,7 +197,7 @@ export default class NUService extends NUObject {
             return response.data[0];
         });
     }
-    
+
     /*
       Issues a GET request, processes the received Array of JSONObjects response,
       and builds corresponding Array of NUEntity objects
