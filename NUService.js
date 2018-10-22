@@ -16,7 +16,7 @@ export default class NUService extends NUObject {
             hostname,
             port = '8443',
             RESTRoot = '/nuage',
-            APIVersion = '/api/v5_0',
+            RESTResource = '/api/v5_0',
         }, 
         headers = {
           headerAuthorization: 'Authorization',
@@ -40,15 +40,14 @@ export default class NUService extends NUObject {
                 headerPage: headers.headerPage,
                 headerPageSize: headers.headerPageSize,
                 password: null,
-                rootURL: rootURL ? rootURL : `${protocol}://${hostname}:${port}${RESTRoot}${APIVersion}`,
+                rootURL,
                 userName: null,
                 pageSize: 50,
                 protocol,
                 hostname,
                 port,
                 RESTRoot,
-                APIVersion,
-                healthURL: `${protocol}://${hostname}:${port}${RESTRoot}/health`
+                RESTResource,
           });
           this._customHeaders = {};
           this._connection = new NURESTConnection();
@@ -195,17 +194,6 @@ export default class NUService extends NUObject {
                 statsEntity.buildFromJSON(response.data[0]);
                 return statsEntity;
             }
-            return response.data[0];
-        });
-    }
-
-    /*
-    *  Fetch health status.
-    *  component: name of the server component whose status is requested
-    */
-    fetchHealthStatus = (component) => {
-        const url = component ? `${this.healthURL}/?component=${component}&proxyRequest=false` : this.healthURL;
-        return this.invokeRequest('GET', url).then((response) => {
             return response.data[0];
         });
     }
