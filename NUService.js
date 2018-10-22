@@ -40,7 +40,7 @@ export default class NUService extends NUObject {
                 headerPage: headers.headerPage,
                 headerPageSize: headers.headerPageSize,
                 password: null,
-                rootURL,
+                rootURL: rootURL ? rootURL : `${protocol}://${hostname}:${port}${RESTRoot}${APIVersion}`,
                 userName: null,
                 pageSize: 50,
                 protocol,
