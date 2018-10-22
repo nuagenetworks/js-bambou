@@ -40,9 +40,8 @@ export default class ESService {
         // if scrolling is enabled then update next query for fetching data via scrolling
         if (response.hits.hits.length && response._scroll_id) {
             results = {
-                response: tabify.process(response), 
+                response: tabify.process(response),
                 nextPage: {
-                    scroll: SCROLL_TIME,
                     scroll_id: response._scroll_id,
                 },
                 length: response.hits.total
@@ -79,6 +78,13 @@ export default class ESService {
 
     // Add custom sorting into ES query
     addSorting = (queryConfiguration, sort) => {
+
+        if (!queryConfiguration)
+            return null
+
+        if (!sort || sort.order === '')
+            return queryConfiguration;
+
         queryConfiguration.query.body.sort = {
             [sort.column]: {
                 order: sort.order
@@ -90,6 +96,13 @@ export default class ESService {
 
     // Add custom searching from searchbox into ES query
     addSearching = (queryConfiguration, search) => {
+
+        if (!queryConfiguration)
+            return null;
+
+        if (!search)
+            return queryConfiguration;
+
         if (search.length) {
             objectPath.push(queryConfiguration, 'query.body.query.bool.must', ESSearchConvertor(search));
         }
@@ -105,9 +118,11 @@ export default class ESService {
     }
 
     getNextPageQuery = (queryConfiguration, nextPage) => {
-        return Object.assign(queryConfiguration, { query: {
-            scroll: SCROLL_TIME,
-            scroll_id: nextPage
-        }})
+        return Object.assign(queryConfiguration, {
+            query: {
+                scroll: SCROLL_TIME,
+                scroll_id: nextPage.scroll_id
+            }
+        })
     }
 }
