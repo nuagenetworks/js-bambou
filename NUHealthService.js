@@ -10,8 +10,8 @@ export default class NUHealthService extends NUService {
     *  component: name of the server component whose status is requested
     */
     fetch = (component) => {
-        const healthURL = `${this.protocol}://${this.hostname}:${this.port}${this.RESTRoot}${this.RESTResource}`;
-        const url = component ? `${healthURL}/?component=${component}&proxyRequest=false` : healthURL;
+        const healthURL = `${this.protocol}://${this.hostname}:${this.port}${this.RESTRoot}${this.RESTResource}/?proxyRequest=false`;
+        const url = component ? `${healthURL}&component=${component}` : healthURL;
         return this.invokeRequest('GET', url).then((response) => {
             return response.data[0];
         });
