@@ -10,7 +10,15 @@ import ServiceClassRegistry from './ServiceClassRegistry';
 */
 
 export default class NUService extends NUObject {
-    constructor(rootURL, headers = {
+    constructor({
+            rootURL,
+            protocol = 'https',
+            hostname,
+            port = '8443',
+            RESTRoot = '/nuage',
+            RESTResource = '/api/v5_0',
+        }, 
+        headers = {
           headerAuthorization: 'Authorization',
           headerPage: 'X-Nuage-Page',
           headerPageSize: 'X-Nuage-PageSize',
@@ -35,6 +43,11 @@ export default class NUService extends NUObject {
                 rootURL,
                 userName: null,
                 pageSize: 50,
+                protocol,
+                hostname,
+                port,
+                RESTRoot,
+                RESTResource,
           });
           this._customHeaders = {};
           this._connection = new NURESTConnection();
