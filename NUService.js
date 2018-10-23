@@ -6,10 +6,15 @@ import ServiceClassRegistry from './ServiceClassRegistry';
 const getURLParams = (url) => {
     const anchor = document.createElement('a');
     anchor.href = url;
+    const pathname = anchor.pathname;
+    const RESTRoot = pathname.substring(0, pathname.indexOf('/', pathname.indexOf('/') + 1));
+    const RESTResource = pathname.substring(pathname.indexOf(RESTRoot) + RESTRoot.length);
     return { 
         hostname: anchor.hostname, 
         port: anchor.port, 
-        protocol: anchor.protocol && anchor.protocol.substring(0, anchor.protocol.indexOf(':'))
+        protocol: anchor.protocol && anchor.protocol.substring(0, anchor.protocol.indexOf(':')),
+        RESTRoot,
+        RESTResource
     };
 };
 
@@ -17,14 +22,12 @@ const getURLParams = (url) => {
   This class implements the specifics of REST operations.
   Methods in NURESTConnection are called to issue HTTP requests,
   and corresponding responses are processed
+  URL is an optional object { protocol, hostname, port, RESTRoot, RESTResource }
 */
 
 export default class NUService extends NUObject {
-    constructor({
-            rootURL,
-            RESTRoot = '/nuage',
-            RESTResource = '/api/v5_0',
-        }, 
+    constructor(
+        rootURL, 
         headers = {
           headerAuthorization: 'Authorization',
           headerPage: 'X-Nuage-Page',
@@ -34,9 +37,11 @@ export default class NUService extends NUObject {
           headerOrderBy: 'X-Nuage-OrderBy',
           headerCount: 'X-Nuage-Count',
           headerMessage:'X-Nuage-Message',
-    }) {
+      }, 
+      URL) {
           super();
-          const { protocol = 'https', hostname, port = '8443' } = getURLParams(rootURL);
+          const url = rootURL ? rootURL : `${URL.protocol}://${URL.hostname}:${URL.port}${URL.RESTRoot}${URL.RESTResource}`
+          const { protocol, hostname, port, RESTRoot, RESTResource } = getURLParams(url);
           this.defineProperties({
                 APIKey: null,
                 headerAuthorization: headers.headerAuthorization,
@@ -55,7 +60,7 @@ export default class NUService extends NUObject {
                 hostname,
                 port,
                 RESTRoot,
-                RESTResource,
+                RESTResource
           });
           this._customHeaders = {};
           this._connection = new NURESTConnection();

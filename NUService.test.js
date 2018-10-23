@@ -80,9 +80,9 @@ class Child extends NUEntity {
 ServiceClassRegistry.register(Parent);
 ServiceClassRegistry.register(Child);
 
-const VSDService = new NUService({
-        rootURL: 'https://135.227.177.144:8443/nuage/api/v4_0'
-    }, {
+const VSDService = new NUService(
+    'https://135.227.177.144:8443/nuage/api/v4_0',
+    {
         headerAuthorization: 'Authorization',
         headerPage: 'Page',
         headerPageSize: 'PageSize',
