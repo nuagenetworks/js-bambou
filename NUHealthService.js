@@ -2,7 +2,7 @@ import NUService from './NUService';
 
 export default class NUHealthService extends NUService {
     constructor(rootURL, headers, URL) {
-        super(rootURL, headers);
+        super(rootURL, headers, URL);
         this.RESTResource = URL && URL.RESTResource ? URL.RESTResource : '/health';
     }
     
