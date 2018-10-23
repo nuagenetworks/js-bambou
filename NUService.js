@@ -3,6 +3,16 @@ import NURESTConnection from './NURESTConnection';
 import NURESTUser from './NURESTUser';
 import ServiceClassRegistry from './ServiceClassRegistry';
 
+const getURLParams = (url) => {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    return { 
+        hostname: anchor.hostname, 
+        port: anchor.port, 
+        protocol: anchor.protocol && anchor.protocol.substring(0, anchor.protocol.indexOf(':'))
+    };
+};
+
 /*
   This class implements the specifics of REST operations.
   Methods in NURESTConnection are called to issue HTTP requests,
@@ -12,9 +22,6 @@ import ServiceClassRegistry from './ServiceClassRegistry';
 export default class NUService extends NUObject {
     constructor({
             rootURL,
-            protocol = 'https',
-            hostname,
-            port = '8443',
             RESTRoot = '/nuage',
             RESTResource = '/api/v5_0',
         }, 
@@ -29,6 +36,7 @@ export default class NUService extends NUObject {
           headerMessage:'X-Nuage-Message',
     }) {
           super();
+          const { protocol = 'https', hostname, port = '8443' } = getURLParams(rootURL);
           this.defineProperties({
                 APIKey: null,
                 headerAuthorization: headers.headerAuthorization,
