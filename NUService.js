@@ -20,7 +20,6 @@ const getURLParams = (rootURL) => {
   This class implements the specifics of REST operations.
   Methods in NURESTConnection are called to issue HTTP requests,
   and corresponding responses are processed
-  URL is an optional object { protocol, hostname, port, RESTRoot, RESTResource }
 */
 
 export default class NUService extends NUObject {
