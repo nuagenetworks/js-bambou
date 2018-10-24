@@ -92,7 +92,6 @@ export default class VSDService {
             api = this.service.buildURL(this.getEntity(configuration.query), null, this.getParentEntity(configuration.query)),
             pageSize = configuration.query.pageSize || this.service.pageSize;
 
-        console.error("api", api)
         return new Promise((resolve, reject) => {
             this.service.invokeRequest(
                 'GET',
