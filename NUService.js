@@ -85,7 +85,7 @@ export default class NUService extends NUObject {
         this.customHeaders[customHeader] = value;
     }
 
-    computeHeaders(page, filter, orderBy, filterType = 'predicate') {
+    computeHeaders(page, filter, orderBy, filterType = 'predicate', pageSize = null) {
         const headers = new Headers(this.customHeaders);
         headers.set(this.headerAuthorization, this.getAuthorization());
         headers.set('Content-Type', 'application/json');
@@ -97,7 +97,7 @@ export default class NUService extends NUObject {
         // optional headers
         if (Number.isInteger(page)) {
             headers.set(this.headerPage, page);
-            headers.set(this.headerPageSize, this.pageSize);
+            headers.set(this.headerPageSize, pageSize || this.pageSize);
         }
 
         if (filter) {

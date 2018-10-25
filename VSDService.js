@@ -1,77 +1,154 @@
-import NUService from 'service/NUService';
-import NURESTUser from 'service/NURESTUser';
-import NUTemplateParser from "../NUTemplateParser";
+import objectPath from 'object-path';
+
+import NUTemplateParser from "service/NUTemplateParser";
 
 const ERROR_MESSAGE = `No VSD API endpoint specified`;
 
-export default class VSDService extends NUService {
+export default class VSDService {
 
-    constructor() {
-        const url = localStorage.getItem('rootURL');
-        super(url);
-    
-        this.url = url;
-        this.APIKey = localStorage.getItem('API_KEY');
-        this.organization = localStorage.getItem('ORGANIZATION');
-        this.userJson = localStorage.getItem('USER_JSON');
+    constructor(service) {
+        this.service = service;
     }
 
-    buildURL = (configuration) => {
+    VSDSearchConvertor = (expressions) => {
+        let expression = '';
 
-        let url = configuration.parentResource;
+        expressions.forEach(e => {
+            if (e.operator) {
+                expression += ` ${e.operator} `;
+            } else if (e.bracket) {
+                expression += `${e.bracket}`;
+            } else {
+                expression += `${e.element.category} ${e.element.operator} "${e.element.value}"`;
+            }
+        });
 
-        if (configuration.hasOwnProperty("parentID"))
-            url += "/" + configuration.parentID;
+        return expression;
+    }
 
-        if (configuration.hasOwnProperty("resource"))
-            url += "/" + configuration.resource;
+    getParentEntity = (configuration) => {
+        const parentEntity = { resourceName: configuration.parentResource};
+        if (configuration.hasOwnProperty("parentID")) {
+            parentEntity.ID = configuration.parentID;
+        }
 
-        return url;
+        return parentEntity;
+    }
+
+    getEntity = (configuration) => {
+        const entity = {
+            ID: null
+        };
+
+        if (configuration.hasOwnProperty("resource")) {
+            entity.resourceName = configuration.resource;
+        }
+
+        return entity;
     }
 
     getRequestID = (configuration, context = {}) => {
         const tmpConfiguration = NUTemplateParser.parameterizedConfiguration(configuration, context);
         if (!tmpConfiguration)
             return;
-        let URL = this.buildURL(tmpConfiguration.query);
 
-        URL = configuration.id ? `${configuration.vizID}-${configuration.id}-${URL}` : URL;
+        let endPoint = this.getParentEntity(configuration.query);
+
+        if (configuration.query.hasOwnProperty("resource"))
+            endPoint += "/" + configuration.query.resource;
+
+        endPoint = configuration.id ? `${configuration.vizID}-${configuration.id}-${endPoint}` : endPoint;
         if (!tmpConfiguration.query.filter)
-            return URL;
+            return endPoint;
 
-        return URL + "-" + tmpConfiguration.query.filter;
+        return endPoint + "-" + tmpConfiguration.query.filter;
+    }
+
+    /**
+     *  check and update query for next request if sum of totolCaptured (already fetched data count)
+     *  and current data count (header.hits) is less than total count
+     *  and increased page by 1 for next request.
+     */
+    getNextRequest = (header, query, pageSize) => {
+        let nextQuery = {},
+            nextPage = 0;
+
+        if (((pageSize * (header.page + 1)) + header.hits) < header.count) {
+            nextPage = parseInt(header.page, 10) + 1
+            nextQuery = { ...query };
+
+            nextQuery.query.nextPage = nextPage;
+        }
+
+        return { ...nextQuery, "length": header.count }
     }
 
     // TODO - refactor later by using existing service
-    fetch = (configuration, scroll = false) => {
+    fetch = (configuration) => {
 
-        if (!this.APIKey || !this.userJson || !this.organization) {
-            return Promise.reject(ERROR_MESSAGE);
-        }
-
-        const user = new NURESTUser().buildFromJSON(JSON.parse(this.userJson));
-        if(user) {
-            this.userName = user.userName;
-        }
-
-        this.addCustomHeader('X-Nuage-Organization', this.organization);
-
-        const filter = configuration.filter || null,
-            page = (configuration && configuration.nextPage) || 0,
-            orderBy = configuration.sort || null,
-            api = `${this.url}/${this.buildURL(configuration)}`;
+        const filter = configuration.query.filter || null,
+            page = configuration.query.nextPage || 0,
+            orderBy = configuration.query.sort || null,
+            api = this.service.buildURL(this.getEntity(configuration.query), null, this.getParentEntity(configuration.query)),
+            pageSize = configuration.query.pageSize || this.service.pageSize;
 
         return new Promise((resolve, reject) => {
-            this.invokeRequest(
+            this.service.invokeRequest(
                 'GET',
                 api,
-                this.computeHeaders(page, filter, orderBy),
+                this.service.computeHeaders(page, filter, orderBy, null, pageSize),
                 undefined,
                 true,
-            ).then(response => resolve({
-                response: response.data,
-            })
+            ).then(response => {
+
+                const header = {
+                    page: response.headers['x-nuage-page'] || 0,
+                    count: parseInt(response.headers['x-nuage-count'], 10) || 0,
+                    hits: (response.data && response.data.length) || 0,
+                }
+                return resolve({
+                    response: response.data,
+                    nextQuery: this.getNextRequest(header, configuration, pageSize)
+                })
+            }
             ).catch(error => reject(error));
         });
+    }
+
+    // Add custom sorting into VSD query
+    addSorting = (queryConfiguration, sort) => {
+        if (!queryConfiguration)
+            return null
+
+        if (!sort || sort.order === '' || !sort.column)
+            return queryConfiguration;
+
+        queryConfiguration.query.sort = `${sort.column} ${sort.order}`
+        return queryConfiguration;
+    }
+
+    // Add custom searching from searchbox into VSD query
+    addSearching = (queryConfiguration, search) => {
+        if (!queryConfiguration)
+            return null;
+
+        if (search.length) {
+            let filter = objectPath.get(queryConfiguration, 'query.filter');
+            objectPath.push(queryConfiguration, 'query.filter', (filter ? `(${filter}) AND ` : '') + this.VSDSearchConvertor(search));
+        }
+
+        return queryConfiguration;
+    }
+
+    getPageSizePath = () => 'query.pageSize';
+
+    updatePageSize = (queryConfiguration, pageSize) => {
+        objectPath.set(queryConfiguration, this.getPageSizePath(), pageSize);
+        return queryConfiguration;
+    }
+
+    getNextPageQuery = (queryConfiguration, nextPage) => {
+        queryConfiguration.query.nextPage = nextPage;
+        return queryConfiguration;
     }
 }

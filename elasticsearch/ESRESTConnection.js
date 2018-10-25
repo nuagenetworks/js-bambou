@@ -2,6 +2,7 @@ import elasticsearch from 'elasticsearch';
 import _ from 'lodash';
 
 import NUObject from '../NUObject';
+import { SCROLL_TIME } from './ESService';
 
 /*
   This class implements the HTTP actions invoked on the server
@@ -47,6 +48,7 @@ export default class ESRESTConnection extends NUObject {
     }
 
     makeRequest(query, scroll = false) {
+
         if (!this.getClient()) {
             return Promise.reject('Unable to connect to ElasticSearch server');
         }
@@ -57,8 +59,8 @@ export default class ESRESTConnection extends NUObject {
         }
 
         //if data comes from scroll (if `scroll: true` in query config)
-        if (query && query.nextPage) {
-            return this.getScrollData(query.nextPage);
+        if (query && query.scroll_id) {
+            return this.getScrollData(query);
         }
 
         return this.getSearchData(query, scroll);

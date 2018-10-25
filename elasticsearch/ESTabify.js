@@ -154,6 +154,11 @@ export default class ESTabify {
                     key = stack[stack.length - 2]
                 }
 
+                if (typeof value === 'object') {
+                    if ("value" in value) {
+                        value = value.value;
+                    }
+                }
                 tree[key] = value;
 
                 return tree;
