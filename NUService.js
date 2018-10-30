@@ -42,7 +42,7 @@ export default class NUService extends NUObject {
           headerMessage:'X-Nuage-Message',
       }}) {
           super();
-          const url =rootURL ? rootURL : `${protocol}://${hostname}:${port}/${RESTRoot}/${RESTResource}${APIVersion ? '/' + APIVersion : ''}`;
+          const url =rootURL ? rootURL : `${protocol}://${hostname}${port ? ":" + port : ''}/${RESTRoot}/${RESTResource}${APIVersion ? '/' + APIVersion : ''}`;
           const URLParams =  getURLParams(url);
           this.defineProperties({
                 APIKey: null,
