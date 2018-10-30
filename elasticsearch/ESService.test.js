@@ -18,17 +18,17 @@ describe('ES Service', () => {
     });
 
     it('fetch with scroll', () => {
-        return eSService.fetch(mockQueryTemplate, true).then((results) => {
+        return eSService.fetch({ ...mockQueryTemplate, scroll: true }).then((results) => {
             expect(results.nextPage.scroll_id)
-            .toEqual("cXVlcnlUaGVuRmV0Y2g7NTsxMzI6MUdvVlRMdl==");
+                .toEqual("cXVlcnlUaGVuRmV0Y2g7NTsxMzI6MUdvVlRMdl==");
         });
     });
 
     it('fetch without config', () => {
         return eSService.fetch({})
-        .catch( error => {
-            return expect(error).toEqual("Invalid query");
-        });
+            .catch(error => {
+                return expect(error).toEqual("Invalid query");
+            });
     });
 
 });
