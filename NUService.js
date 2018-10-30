@@ -3,6 +3,19 @@ import NURESTConnection from './NURESTConnection';
 import NURESTUser from './NURESTUser';
 import ServiceClassRegistry from './ServiceClassRegistry';
 
+const getURLParams = (rootURL) => {
+    const url = new URL(rootURL)
+    const [ , RESTRoot, RESTResource, APIVersion ] = url.pathname.split('/');
+    return { 
+        hostname: url.hostname, 
+        port: url.port, 
+        protocol: url.protocol && url.protocol.substring(0, url.protocol.length -1),
+        RESTRoot,
+        RESTResource,
+        APIVersion
+    };
+};
+
 /*
   This class implements the specifics of REST operations.
   Methods in NURESTConnection are called to issue HTTP requests,
@@ -11,13 +24,13 @@ import ServiceClassRegistry from './ServiceClassRegistry';
 
 export default class NUService extends NUObject {
     constructor({
-            rootURL,
-            protocol = 'https',
-            hostname,
-            port = '8443',
-            RESTRoot = '/nuage',
-            RESTResource = '/api/v5_0',
-        }, 
+        rootURL,
+        protocol,
+        hostname,
+        port,
+        RESTRoot,
+        RESTResource,
+        APIVersion,
         headers = {
           headerAuthorization: 'Authorization',
           headerPage: 'X-Nuage-Page',
@@ -27,8 +40,10 @@ export default class NUService extends NUObject {
           headerOrderBy: 'X-Nuage-OrderBy',
           headerCount: 'X-Nuage-Count',
           headerMessage:'X-Nuage-Message',
-    }) {
+      }}) {
           super();
+          const url =rootURL ? rootURL : `${protocol}://${hostname}${port ? ":" + port : ''}/${RESTRoot}/${RESTResource}${APIVersion ? '/' + APIVersion : ''}`;
+          const URLParams =  getURLParams(url);
           this.defineProperties({
                 APIKey: null,
                 headerAuthorization: headers.headerAuthorization,
@@ -40,14 +55,15 @@ export default class NUService extends NUObject {
                 headerPage: headers.headerPage,
                 headerPageSize: headers.headerPageSize,
                 password: null,
-                rootURL,
+                rootURL: url,
                 userName: null,
                 pageSize: 50,
-                protocol,
-                hostname,
-                port,
-                RESTRoot,
-                RESTResource,
+                protocol: URLParams.protocol,
+                hostname: URLParams.hostname,
+                port: URLParams.port,
+                RESTRoot: URLParams.RESTRoot,
+                RESTResource: URLParams.RESTResource,
+                APIVersion: URLParams.APIVersion
           });
           this._customHeaders = {};
           this._connection = new NURESTConnection();

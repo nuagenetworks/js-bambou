@@ -81,8 +81,8 @@ ServiceClassRegistry.register(Parent);
 ServiceClassRegistry.register(Child);
 
 const VSDService = new NUService({
-        rootURL: 'https://135.227.177.144:8443/nuage/api/v4_0'
-    }, {
+    rootURL: 'https://135.227.177.144:8443/nuage/api/v4_0',
+    headers: {
         headerAuthorization: 'Authorization',
         headerPage: 'Page',
         headerPageSize: 'PageSize',
@@ -91,6 +91,7 @@ const VSDService = new NUService({
         headerOrderBy: 'OrderBy',
         headerCount: 'Count',
         headerMessage:'Message'
+    }
 });
 VSDService.addCustomHeader('X-Nuage-Organization', 'csp');
 VSDService.addCustomHeader('Content-type', 'application/json');
