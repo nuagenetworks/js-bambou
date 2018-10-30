@@ -9,7 +9,7 @@ const getURLParams = (rootURL) => {
     return { 
         hostname: url.hostname, 
         port: url.port, 
-        protocol: url.protocol && url.protocol.substring(0, url.protocol.indexOf(':')),
+        protocol: url.protocol && url.protocol.substring(0, url.protocol.length -1),
         RESTRoot,
         RESTResource,
         APIVersion
