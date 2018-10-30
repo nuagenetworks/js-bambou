@@ -23,7 +23,14 @@ const getURLParams = (rootURL) => {
 */
 
 export default class NUService extends NUObject {
-    constructor(rootURL, 
+    constructor({
+        rootURL,
+        protocol,
+        hostname,
+        port,
+        RESTRoot,
+        RESTResource,
+        APIVersion,
         headers = {
           headerAuthorization: 'Authorization',
           headerPage: 'X-Nuage-Page',
@@ -33,10 +40,10 @@ export default class NUService extends NUObject {
           headerOrderBy: 'X-Nuage-OrderBy',
           headerCount: 'X-Nuage-Count',
           headerMessage:'X-Nuage-Message',
-      }) {
+      }}) {
           super();
-          const url = typeof rootURL === 'string' ? rootURL : `${rootURL.protocol}://${rootURL.hostname}:${rootURL.port}/${rootURL.RESTRoot}/${rootURL.RESTResource}/${rootURL.APIVersion}`;
-          const { protocol, hostname, port, RESTRoot, RESTResource, APIVersion } = getURLParams(url);
+          const url =rootURL ? rootURL : `${protocol}://${hostname}:${port}/${RESTRoot}/${RESTResource}${APIVersion ? '/' + APIVersion : ''}`;
+          const URLParams =  getURLParams(url);
           this.defineProperties({
                 APIKey: null,
                 headerAuthorization: headers.headerAuthorization,
@@ -51,12 +58,12 @@ export default class NUService extends NUObject {
                 rootURL: url,
                 userName: null,
                 pageSize: 50,
-                protocol,
-                hostname,
-                port,
-                RESTRoot,
-                RESTResource,
-                APIVersion
+                protocol: URLParams.protocol,
+                hostname: URLParams.hostname,
+                port: URLParams.port,
+                RESTRoot: URLParams.RESTRoot,
+                RESTResource: URLParams.RESTResource,
+                APIVersion: URLParams.APIVersion
           });
           this._customHeaders = {};
           this._connection = new NURESTConnection();

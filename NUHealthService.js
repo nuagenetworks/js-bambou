@@ -1,8 +1,9 @@
 import NUService from './NUService';
 
 export default class NUHealthService extends NUService {
-    constructor(rootURL, headers, rootURLObj) {
-        super(rootURL, headers, URL);
+    constructor(props) {
+        super(props);
+        const { rootURLObj } = props;
         this.RESTResource = rootURLObj && rootURLObj.RESTResource ? rootURLObj.RESTResource : 'health';
         this.rootURL = `${this.protocol}://${this.hostname}${this.port ? ':' + this.port : ''}/${this.RESTRoot}/${this.RESTResource}`;
     }
