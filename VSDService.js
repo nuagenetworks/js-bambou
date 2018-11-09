@@ -134,7 +134,7 @@ export default class VSDService {
     }
 
     // Add custom searching from searchbox into VSD query
-    addSearching = (queryConfiguration, search) => {
+    addSearching = (queryConfiguration, search = []) => {
         if (!queryConfiguration)
             return null;
 
