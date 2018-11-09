@@ -1,8 +1,8 @@
 import objectPath from 'object-path';
-
+import { getLogger } from './Logger';
 import NUTemplateParser from "service/NUTemplateParser";
 
-const ERROR_MESSAGE = `No VSD API endpoint specified`;
+const ERROR_MESSAGE = 'Unable to fetch data';
 
 export default class VSDService {
 
@@ -52,14 +52,18 @@ export default class VSDService {
         if (!tmpConfiguration)
             return;
 
-        let endPoint = this.getParentEntity(configuration.query);
+        let endPoint = tmpConfiguration.query.parentResource;
 
-        if (configuration.query.hasOwnProperty("resource"))
-            endPoint += "/" + configuration.query.resource;
+        if (tmpConfiguration.query.hasOwnProperty("parentID"))
+            endPoint += "/" + tmpConfiguration.query.parentID;
+
+        if (tmpConfiguration.query.hasOwnProperty("resource"))
+            endPoint += "/" + tmpConfiguration.query.resource;
 
         endPoint = configuration.id ? `${configuration.vizID}-${configuration.id}-${endPoint}` : endPoint;
-        if (!tmpConfiguration.query.filter)
+        if (!tmpConfiguration.query.filter) {
             return endPoint;
+        }
 
         return endPoint + "-" + tmpConfiguration.query.filter;
     }
@@ -100,18 +104,20 @@ export default class VSDService {
                 undefined,
                 true,
             ).then(response => {
-
                 const header = {
                     page: response.headers['x-nuage-page'] || 0,
                     count: parseInt(response.headers['x-nuage-count'], 10) || 0,
                     hits: (response.data && response.data.length) || 0,
                 }
                 return resolve({
-                    response: response.data,
+                    response: response.data || [],
                     nextQuery: this.getNextRequest(header, configuration, pageSize)
                 })
             }
-            ).catch(error => reject(error));
+            ).catch(error => {
+                getLogger().error(error.message || error);
+                return reject(ERROR_MESSAGE);
+            });
         });
     }
 

@@ -6,7 +6,7 @@ import { getLogger } from '../Logger';
 import NUTemplateParser from "../NUTemplateParser";
 import { ESSearchConvertor } from 'vis-graphs/utils/helpers'
 
-const ERROR_MESSAGE = 'unable to fetch data.'
+const ERROR_MESSAGE = 'Unable to fetch data';
 export const SCROLL_TIME = '3m';
 
 export default class ESService {
