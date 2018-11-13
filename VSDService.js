@@ -1,6 +1,7 @@
 import objectPath from 'object-path';
 import { getLogger } from './Logger';
 import NUTemplateParser from "service/NUTemplateParser";
+import * as tabification from './tabify';
 
 const ERROR_MESSAGE = 'Unable to fetch data';
 
@@ -110,7 +111,7 @@ export default class VSDService {
                     hits: (response.data && response.data.length) || 0,
                 }
                 return resolve({
-                    response: response.data || [],
+                    response: this.tabify(response.data, configuration) || [],
                     nextQuery: this.getNextRequest(header, configuration, pageSize)
                 })
             }
@@ -119,6 +120,17 @@ export default class VSDService {
                 return reject(ERROR_MESSAGE);
             });
         });
+    }
+
+    tabify = (response, queryConfiguration) => {
+        if (queryConfiguration) {
+            const customTabify = objectPath.get(queryConfiguration, 'tabify');
+            if (customTabify) {
+                const tabificationFunction = tabification[customTabify];
+                return tabificationFunction(response)
+            }
+        }
+        return response;
     }
 
     // Add custom sorting into VSD query
