@@ -100,7 +100,7 @@ export default class VSDService {
             this.service.invokeRequest(
                 'GET',
                 api,
-                this.service.computeHeaders(page, filter, orderBy, null, pageSize),
+                this.service.computeHeaders(page, filter, orderBy, undefined, pageSize),
                 undefined,
                 true,
             ).then(response => {
