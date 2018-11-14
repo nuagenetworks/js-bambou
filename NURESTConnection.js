@@ -78,7 +78,7 @@ export default class NURESTConnection extends NUObject {
                     respHeaders[key] = value;
                 });
 
-                const result = ({ data, headers: respHeaders, responseStatusCode: response.status });
+                const result = ({ data, headers: respHeaders });
                 result.authFailure = authFailure;
 
                 if (response.status === 300 && this._onMultipleChoices) {
