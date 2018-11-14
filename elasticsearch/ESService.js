@@ -38,6 +38,7 @@ export default class ESService {
         const tabify = new ESTabify();
         let results = null;
         // if scrolling is enabled then update next query for fetching data via scrolling
+       // console.error("response", response)
         if (response.hits.hits.length && response._scroll_id) {
             results = {
                 response: tabify.process(response),
@@ -117,7 +118,7 @@ export default class ESService {
         return queryConfiguration;
     }
 
-    getNextPageQuery = (queryConfiguration, nextPage) => {
+    getNextPageQuery = (queryConfiguration, nextPage = {}) => {
         return Object.assign(queryConfiguration, {
             query: {
                 scroll: SCROLL_TIME,

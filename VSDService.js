@@ -165,7 +165,7 @@ export default class VSDService {
         return queryConfiguration;
     }
 
-    getNextPageQuery = (queryConfiguration, nextPage) => {
+    getNextPageQuery = (queryConfiguration, nextPage = 1) => {
         queryConfiguration.query.nextPage = nextPage;
         return queryConfiguration;
     }
