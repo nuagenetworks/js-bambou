@@ -79,13 +79,13 @@ export default class VSDService {
             nextPage = 0;
 
         if (((pageSize * (header.page + 1)) + header.hits) < header.count) {
-            nextPage = parseInt(header.page, 10) + 1
+            nextPage = header.page + 1;
             nextQuery = { ...query };
 
             nextQuery.query.nextPage = nextPage;
         }
 
-        return { ...nextQuery, "length": header.count }
+        return nextQuery;
     }
 
     // TODO - refactor later by using existing service
@@ -105,14 +105,17 @@ export default class VSDService {
                 undefined,
                 true,
             ).then(response => {
+
                 const header = {
-                    page: response.headers['x-nuage-page'] || 0,
+                    page: parseInt(response.headers['x-nuage-page'], 10) || 0,
                     count: parseInt(response.headers['x-nuage-count'], 10) || 0,
                     hits: (response.data && response.data.length) || 0,
                 }
+
                 return resolve({
                     response: this.tabify(response.data, configuration) || [],
-                    nextQuery: this.getNextRequest(header, configuration, pageSize)
+                    nextQuery: this.getNextRequest(header, configuration, pageSize),
+                    length : header.count
                 })
             }
             ).catch(error => {
@@ -165,7 +168,7 @@ export default class VSDService {
         return queryConfiguration;
     }
 
-    getNextPageQuery = (queryConfiguration, nextPage) => {
+    getNextPageQuery = (queryConfiguration, nextPage = 1) => {
         queryConfiguration.query.nextPage = nextPage;
         return queryConfiguration;
     }
