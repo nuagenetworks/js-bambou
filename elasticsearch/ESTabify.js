@@ -9,7 +9,7 @@ import { getLogger } from '../Logger';
 */
 export default class ESTabify {
 
-    process(response) {
+    process(response, filterTabify = {}) {
         let table;
 
         if (response.aggregations) {
@@ -27,7 +27,45 @@ export default class ESTabify {
             throw new Error(errorMessage);
         }
 
+        if (filterTabify.join) {
+            table = this.processTabifyOptions(table, filterTabify);
+        }
+
         return this.flatArray(table);
+    }
+
+    /**
+     *  Converting the provided array indexes to comma seprated values, instead of generating the multiple rows
+        For e.g -
+        "tabifyOptions": {
+            "join": [
+                {
+                    "path": "nuage_metadata.src-pgmem-info",
+                    "field": "name"
+                },
+                {
+                    "path": "nuage_metadata.dst-pgmem-info",
+                    "field": "name"
+                }
+            ]
+        }
+    **/
+    processTabifyOptions(table, tabifyOptions) {
+        const joinFields = tabifyOptions.join;
+        return table.map(d => {
+            joinFields.forEach(joinField => {
+                const dataSet = objectPath.get(d, joinField.path);
+                let value;
+                if (Array.isArray(dataSet)) {
+                    value = dataSet.map(name => name[joinField.field]).join(', ');
+                } else {
+                    value = dataSet;
+                }
+
+                objectPath.set(d, joinField.path, value);
+            });
+            return d;
+        })
     }
 
     flatArray(data) {
