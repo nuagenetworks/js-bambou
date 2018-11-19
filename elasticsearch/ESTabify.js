@@ -9,7 +9,7 @@ import { getLogger } from '../Logger';
 */
 export default class ESTabify {
 
-    process(response, filterTabify = {}) {
+    process(response, tabifyOptions = {}) {
         let table;
 
         if (response.aggregations) {
@@ -27,8 +27,8 @@ export default class ESTabify {
             throw new Error(errorMessage);
         }
 
-        if (filterTabify.join) {
-            table = this.processTabifyOptions(table, filterTabify);
+        if (tabifyOptions.join) {
+            table = this.processTabifyOptions(table, tabifyOptions);
         }
 
         return this.flatArray(table);

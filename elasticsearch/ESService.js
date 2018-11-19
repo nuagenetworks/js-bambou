@@ -18,7 +18,7 @@ export default class ESService {
         try {
             return new Promise((resolve, reject) => {
                 this._connection.makeRequest(configuration.query, configuration.scroll)
-                    .then(response => resolve(this.parseResponse(response, configuration.filterTabify)))
+                    .then(response => resolve(this.parseResponse(response, configuration.tabifyOptions)))
                     .catch(error => {
                         if (!error.body) {
                             return reject(error);
@@ -34,13 +34,13 @@ export default class ESService {
     }
 
     // process response for scroll & search response
-    parseResponse = (response = {}, filterTabify = {}) => {
+    parseResponse = (response = {}, tabifyOptions = {}) => {
         const tabify = new ESTabify();
         let results = null;
         // if scrolling is enabled then update next query for fetching data via scrolling
         if (response.hits.hits.length && response._scroll_id) {
             results = {
-                response: tabify.process(response, filterTabify),
+                response: tabify.process(response, tabifyOptions),
                 nextPage: {
                     scroll_id: response._scroll_id,
                 },
