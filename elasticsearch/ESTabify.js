@@ -1,4 +1,6 @@
 import { getLogger } from '../Logger';
+import evalExpression from 'eval-expression';
+
 /**
   This utility will convert the nested data structure
   returned from an ElasticSearch query into a tabular
@@ -27,7 +29,7 @@ export default class ESTabify {
             throw new Error(errorMessage);
         }
 
-        if (tabifyOptions.join) {
+        if (tabifyOptions.concatenationFields) {
             table = this.processTabifyOptions(table, tabifyOptions);
         }
 
@@ -38,31 +40,37 @@ export default class ESTabify {
      *  Converting the provided array indexes to comma seprated values, instead of generating the multiple rows
         For e.g -
         "tabifyOptions": {
-            "join": [
+            "concatenationFields": [
                 {
                     "path": "nuage_metadata.src-pgmem-info",
-                    "field": "name"
+                    "field": "name",
+                    "method": "(obj) => `${obj.name} (${obj.category})`"
                 },
                 {
                     "path": "nuage_metadata.dst-pgmem-info",
-                    "field": "name"
+                    "field": "category"
                 }
             ]
         }
     **/
     processTabifyOptions(table, tabifyOptions) {
-        const joinFields = tabifyOptions.join;
+        const concatenationFields = tabifyOptions.concatenationFields;
+
         return table.map(d => {
-            joinFields.forEach(joinField => {
-                const dataSet = objectPath.get(d, joinField.path);
+            concatenationFields.forEach(joinField => {
+                const dataSet = objectPath.get(d, joinField.path),
+                    method = joinField.method ? evalExpression(joinField.method) : null;
                 let value;
                 if (Array.isArray(dataSet)) {
-                    value = dataSet.map(name => name[joinField.field]).join(', ');
+                    value = dataSet.map(data => method ? method(data) : data[joinField.field])
+                        .filter(value => value)
+                        .join(', ');
+
                 } else {
                     value = dataSet;
                 }
 
-                objectPath.set(d, joinField.path, value);
+                objectPath.set(d, joinField.path, { [joinField.field]: value });
             });
             return d;
         })
@@ -176,7 +184,7 @@ export default class ESTabify {
     }
 
     extractTree(buckets, stack) {
-        return buckets.map( bucket => {
+        return buckets.map(bucket => {
             return Object.keys(bucket).reduce((tree, key) => {
                 let value = bucket[key];
 
@@ -231,7 +239,7 @@ export default class ESTabify {
                                     if (item[key]) {
                                         return item;
                                     }
-                                    return {[key]: item};
+                                    return { [key]: item };
                                 });
                             }
 
