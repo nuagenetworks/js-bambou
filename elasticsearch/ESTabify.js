@@ -57,21 +57,29 @@ export default class ESTabify {
         const concatenationFields = tabifyOptions.concatenationFields;
 
         return table.map(d => {
+            const cachedDataSets = {};
             concatenationFields.forEach(joinField => {
-                const dataSet = objectPath.get(d, joinField.path),
+                const dataSet = cachedDataSets[joinField.path] || objectPath.get(d, joinField.path),
                     method = joinField.method ? evalExpression(joinField.method) : null;
+
+                if (!cachedDataSets[joinField.path]) {
+                    cachedDataSets[joinField.path] = dataSet;
+                    objectPath.set(d, joinField.path, {});
+                }
+
                 let value;
                 if (Array.isArray(dataSet)) {
                     value = dataSet.map(data => method ? method(data) : data[joinField.field])
-                        .filter(value => value)
-                        .join(', ');
+                        .filter(value => value);
 
+                    value = _.uniq(value).join(', ');
                 } else {
-                    value = dataSet;
+                    value = dataSet && typeof dataSet === 'object' ? dataSet[joinField.field] : dataSet;
                 }
 
-                objectPath.set(d, joinField.path, { [joinField.field]: value });
+                objectPath.set(d, `${joinField.path}.${joinField.field}`, value);
             });
+
             return d;
         })
     }
