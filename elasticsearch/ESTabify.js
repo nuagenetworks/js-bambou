@@ -1,4 +1,6 @@
 import { getLogger } from '../Logger';
+import evalExpression from 'eval-expression';
+
 /**
   This utility will convert the nested data structure
   returned from an ElasticSearch query into a tabular
@@ -9,7 +11,7 @@ import { getLogger } from '../Logger';
 */
 export default class ESTabify {
 
-    process(response) {
+    process(response, tabifyOptions = {}) {
         let table;
 
         if (response.aggregations) {
@@ -27,7 +29,59 @@ export default class ESTabify {
             throw new Error(errorMessage);
         }
 
+        if (tabifyOptions.concatenationFields) {
+            table = this.processTabifyOptions(table, tabifyOptions);
+        }
+
         return this.flatArray(table);
+    }
+
+    /**
+     *  Converting the provided array indexes to comma seprated values, instead of generating the multiple rows
+        For e.g -
+        "tabifyOptions": {
+            "concatenationFields": [
+                {
+                    "path": "nuage_metadata.src-pgmem-info",
+                    "field": "name",
+                    "method": "(obj) => `${obj.name} (${obj.category})`"
+                },
+                {
+                    "path": "nuage_metadata.dst-pgmem-info",
+                    "field": "category"
+                }
+            ]
+        }
+    **/
+    processTabifyOptions(table, tabifyOptions) {
+        const concatenationFields = tabifyOptions.concatenationFields;
+
+        return table.map(d => {
+            const cachedDataSets = {};
+            concatenationFields.forEach(joinField => {
+                const dataSet = cachedDataSets[joinField.path] || objectPath.get(d, joinField.path),
+                    method = joinField.method ? evalExpression(joinField.method) : null;
+
+                if (!cachedDataSets[joinField.path]) {
+                    cachedDataSets[joinField.path] = dataSet;
+                    objectPath.set(d, joinField.path, {});
+                }
+
+                let value;
+                if (Array.isArray(dataSet)) {
+                    value = dataSet.map(data => method ? method(data) : data[joinField.field])
+                        .filter(value => value);
+
+                    value = _.uniq(value).join(', ');
+                } else {
+                    value = dataSet && typeof dataSet === 'object' ? dataSet[joinField.field] : dataSet;
+                }
+
+                objectPath.set(d, `${joinField.path}.${joinField.field}`, value);
+            });
+
+            return d;
+        })
     }
 
     flatArray(data) {
@@ -138,7 +192,7 @@ export default class ESTabify {
     }
 
     extractTree(buckets, stack) {
-        return buckets.map( bucket => {
+        return buckets.map(bucket => {
             return Object.keys(bucket).reduce((tree, key) => {
                 let value = bucket[key];
 
@@ -193,7 +247,7 @@ export default class ESTabify {
                                     if (item[key]) {
                                         return item;
                                     }
-                                    return {[key]: item};
+                                    return { [key]: item };
                                 });
                             }
 
