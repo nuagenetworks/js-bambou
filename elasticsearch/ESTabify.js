@@ -1,5 +1,7 @@
 import { getLogger } from '../Logger';
 import evalExpression from 'eval-expression';
+import _ from 'lodash';
+import objectPath from 'object-path';
 
 /**
   This utility will convert the nested data structure
