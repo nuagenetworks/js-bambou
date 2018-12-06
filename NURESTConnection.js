@@ -29,6 +29,7 @@ export default class NURESTConnection extends NUObject {
             RESTConnectionTimeout: 0,
             RESTConnectionLastActionTimer: null,
             ignoreRequestIdle: false,
+            isConnected: false
         });
     }
 

@@ -16,7 +16,8 @@ export default class ESRESTConnection extends NUObject {
             log: 'trace',
             apiVersion: 'master',
             host: host || process.env.REACT_APP_ELASTICSEARCH_HOST || 'http://localhost:9200',
-            client: null
+            client: null,
+            isConnected: false
         });
 
         this.setClient()
