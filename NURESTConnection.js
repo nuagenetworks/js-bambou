@@ -83,7 +83,7 @@ export default class NURESTConnection extends NUObject {
                 result.authFailure = authFailure;
 
                 if (response.status === 300 && this._onMultipleChoices) {
-                    return this._onMultipleChoices(data)
+                    return this._onMultipleChoices(data, requestURL)
                         .then(c => this.makeRequest(requestURL, verb, headers, body, c));
                 }
 
