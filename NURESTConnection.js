@@ -1,6 +1,116 @@
 import NUObject from './NUObject';
 import NUInterceptor from './NUInterceptor';
 import { getLogger } from './Logger';
+import { Enum } from 'enumify';
+
+class ResponseCodeEnum extends Enum {
+    static getClassName() {
+        return 'ResponseCodeEnum';
+    }
+
+    static getEnumForCode (code) {
+        return ResponseCodeEnum.enumValues.filter( item => item.code === code);
+    }
+
+    getClassName() {
+        return ResponseCodeEnum.getClassName();
+    }
+
+    static getErrors(result) {
+        const { response } = result;
+        switch (response.status) {
+            case 400:
+            case 401:
+            case 403:
+            case 404:
+            case 405:
+            case 500:
+                const item = ResponseCodeEnum.getEnumForCode(response.status);
+                if (item && item.length) {
+                    const descriptions = [item[0].errors];
+                    return {
+                        data: {
+                            errors: [{
+                                descriptions
+                            }]
+                        }
+                    };
+                }
+                return response.statusText;
+            default:
+                return {
+                    data: result.data
+                }
+        }
+    }
+}
+
+ResponseCodeEnum.initEnum({
+    Unauthorized: {
+        get code() { return 401; },
+        get errors() {
+            return {
+                title: "Permission denied",
+                description: "You are not allowed to access this resource."
+            }
+        }
+    },
+    PermissionDenied: {
+        get code() { return 403; },
+        get errors() {
+            return {
+                title: "Permission denied",
+                description: "You are not allowed to access this resource."
+            }
+        }
+    },
+    NotFound: {
+        get code() {
+            return 404;
+        },
+        get errors() {
+            return {
+                title: "Not Found",
+                description: "Requested URL is not found or server might not be reachable."
+            }
+        },
+    },
+    MethodNotAllowed: {
+        get code () { return 405; },
+        get errors() {}
+    },
+    PreconditionFailed: {
+        get code() { return 412; },
+        get errors() {}
+    },
+    BadRequest: {
+        get code() { return 400; },
+        get errors() {
+            return {
+                title: "Bad Request",
+                description: "This API call cannot be processed by the server. Please report this to the UI team"
+            }
+        }
+    },
+    CodeConflict: {
+        get code() { return 409; },
+        get errors() {}
+    },
+    InternalServerError: {
+        get code() { return 500; },
+        get errors() {
+            return {
+                title: "Internal Server Error",
+                description: "Please check the log and report this error to the server team"
+            }
+        }
+    },
+    ServiceUnavailable: {
+        get code() { return 503; },
+        get errors() {}
+    },
+});
+
 
 /*
   This class implements the HTTP actions invoked on the server
@@ -87,20 +197,17 @@ export default class NURESTConnection extends NUObject {
                         .then(c => this.makeRequest(requestURL, verb, headers, body, c));
                 }
 
+                const errors = ResponseCodeEnum.getErrors(result);
                 if (response.ok) {
                     this.interceptor.success(result);
                     return result;
                 } else if (authFailure) {
                     getLogger().error(`<<<< Authentication Failure: ${response.status}: ${response.statusText}`);
-                    this.interceptor.fail(`${response.status}: ${response.statusText}`);
-                    return Promise.reject(result);
-                } else if (response.status === 403) {
-                    getLogger().error(`<<<< Authentication Failure: ${response.status}`);
-                    this.interceptor.onAuthenticationFailure({response, result});
-                    return result;
+                    this.interceptor.onAuthenticationFailure({response, result, data: errors.data});
+                    return Promise.reject({response, result, data: errors.data});
                 }
 
-                this.interceptor.fail(result);
+                this.interceptor.fail({response, result, data: errors.data});
                 return Promise.reject(result);
             });
     }

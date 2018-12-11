@@ -1,6 +1,5 @@
 import NUObject from './NUObject';
 import NURESTConnection from './NURESTConnection';
-import NURESTUser from './NURESTUser';
 import ServiceClassRegistry from './ServiceClassRegistry';
 
 const getURLParams = (rootURL) => {
@@ -303,43 +302,9 @@ export default class NUService extends NUObject {
             );
     }
 
-    /*
-      Issues request on server. In case of authentication issue, retries once.
-    */
     invokeRequest(verb, URL, headers, requestData, ignoreRequestIdle = false) {
-        const svcObj = this;
         this._connection.ignoreRequestIdle = ignoreRequestIdle;
-        return this.invokeRequestOnConnection(verb, URL, headers, requestData).then(
-                (response) => {
-                    if (response.authFailure) {
-                        if (!svcObj.retry) {
-                            svcObj.retry = true;
-                            return this.reLogin().then(
-                                () => {
-                                    svcObj.retry = false;
-                                    headers.set(this.headerAuthorization, this.getAuthorization());
-                                    return this.invokeRequest(verb, URL, headers, requestData);
-                                },
-                                () => {
-                                    svcObj.retry = false;
-                                    const error = { message: 'auth failed' };
-                                    return Promise.reject(error);
-                                });
-                        }
-                    }
-                    return response;
-                });
-    }
-
-    /*
-      Resets APIKey, and re-attempts login
-    */
-    reLogin() {
-        const user = new NURESTUser();
-        user.userName = this.userName;
-        user.password = this.password;
-        this.APIKey = null;
-        return this.login(user);
+        return this.invokeRequestOnConnection(verb, URL, headers, requestData);
     }
 
     /*
