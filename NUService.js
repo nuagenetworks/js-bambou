@@ -100,6 +100,10 @@ export default class NUService extends NUObject {
         this.customHeaders[customHeader] = value;
     }
 
+    removeCustomHeader(customHeader) {
+        delete this.customHeaders[customHeader];
+    }
+
     computeHeaders(page, filter, orderBy, filterType = 'predicate', pageSize = null) {
         const headers = new Headers(this.customHeaders);
         headers.set(this.headerAuthorization, this.getAuthorization());
