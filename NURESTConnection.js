@@ -182,32 +182,35 @@ export default class NURESTConnection extends NUObject {
             ]))
             .then(([response, data]) => {
                 getLogger().log(`<<<< Response for \n\n${verb} ${requestURL} (${response.status}):\n\n${NURESTConnection._stringyfyBody(data)}`);
-                const respHeaders = {};
-                const authFailure = !response.ok && response.status === 401;
-
-                [...response.headers.entries()].forEach(([key, value]) => {
-                    respHeaders[key] = value;
-                });
-
-                const result = ({ data, headers: respHeaders, response });
-                result.authFailure = authFailure;
-
+                //handle response with choice
                 if (response.status === 300 && this._onMultipleChoices) {
                     return this._onMultipleChoices(data, requestURL)
                         .then(c => this.makeRequest(requestURL, verb, headers, body, c));
                 }
 
-                const errors = ResponseCodeEnum.getErrors(result);
+                const respHeaders = {};
+                [...response.headers.entries()].forEach(([key, value]) => {
+                    respHeaders[key] = value;
+                });
+
+                const result = ({ data, headers: respHeaders, response });
+
                 if (response.ok) {
                     this.interceptor.success(result);
                     return result;
-                } else if (authFailure) {
+                }
+                // server returned with some sort of error response
+                const errors = ResponseCodeEnum.getErrors(result);
+                const authFailure = !response.ok && response.status === 401;
+
+                if (authFailure) {
                     getLogger().error(`<<<< Authentication Failure: ${response.status}: ${response.statusText}`);
-                    this.interceptor.onAuthenticationFailure({response, result, data: errors.data});
+                    this.interceptor.onAuthenticationFailure({data: errors.data});
+                    result.authFailure = authFailure;
                     return Promise.reject({response, result, data: errors.data});
                 }
 
-                this.interceptor.fail({response, result, data: errors.data});
+                this.interceptor.fail({data: errors.data});
                 return Promise.reject(result);
             });
     }
