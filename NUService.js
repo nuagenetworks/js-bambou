@@ -333,21 +333,16 @@ export default class NUService extends NUObject {
      * Create a copy of NUService
      */
     clone() {
-        const newService = new NUService();
-        newService._APIKey = this._APIKey;
-        newService._headerAuthorization = this._headerAuthorization;
-        newService._headerCount = this._headerCount;
-        newService._headerFilter = this._headerFilter;
-        newService._headerFilterType = this._headerFilterType;
-        newService._headerMessage = this._headerMessage;
-        newService._headerOrderBy = this._headerOrderBy;
-        newService._headerPage = this._headerPage;
-        newService._headerPageSize = this._headerPageSize;
-        newService._password = this._password;
-        newService._rootURL = this._rootURL;
-        newService._userName = this._userName;
-        newService._pageSize = this._pageSize;
-        newService._customHeaders = this._customHeaders;
-        return newService;
+        const newService = new NUService({rootURL: this.rootURL});
+        return Object.assign(newService, this);
+    }
+
+    withHeaders(customHeaders) {
+        const svc = this.clone();
+        if (Array.isArray(customHeaders)) {
+            customHeaders.forEach(hdr => (svc.addCustomHeader(hdr.header, hdr.value)))
+        }
+
+        return svc;
     }
 }
