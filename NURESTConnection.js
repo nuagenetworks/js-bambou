@@ -77,11 +77,11 @@ ResponseCodeEnum.initEnum({
     },
     MethodNotAllowed: {
         get code () { return 405; },
-        get errors() {}
+        get errors() { return {}; }
     },
     PreconditionFailed: {
         get code() { return 412; },
-        get errors() {}
+        get errors() { return {}; }
     },
     BadRequest: {
         get code() { return 400; },
@@ -94,7 +94,7 @@ ResponseCodeEnum.initEnum({
     },
     CodeConflict: {
         get code() { return 409; },
-        get errors() {}
+        get errors() { return {}; }
     },
     InternalServerError: {
         get code() { return 500; },
@@ -107,7 +107,7 @@ ResponseCodeEnum.initEnum({
     },
     ServiceUnavailable: {
         get code() { return 503; },
-        get errors() {}
+        get errors() { return {}; }
     },
 });
 

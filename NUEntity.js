@@ -132,7 +132,7 @@ export default class NUEntity extends NUObject {
         Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
             if (attributeObj.remoteName in JSONObject) {
                 const value = JSONObject[attributeObj.remoteName];
-                if (attributeObj.attributeType == NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType == NUAttribute.ATTR_TYPE_FLOAT) {
+                if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
                     this[localName] = (!value && value !== 0) ? null : Number(value);
                 } else {
                     this[localName] = value;
