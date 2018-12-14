@@ -333,8 +333,10 @@ export default class NUService extends NUObject {
      * Create a copy of NUService
      */
     clone() {
-        const newService = new NUService({rootURL: this.rootURL});
-        return Object.assign(newService, this);
+        let newService = new NUService({rootURL: this.rootURL});
+        newService =  Object.assign(newService, this);
+        newService._customHeaders = {...this._customHeaders};
+        return newService;
     }
 
     withHeaders(customHeaders) {
