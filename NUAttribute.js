@@ -14,6 +14,7 @@ export default class NUAttribute extends NUObject {
     static ATTR_TYPE_LIST = 'list';
     static ATTR_TYPE_LONG = 'long';
     static ATTR_TYPE_STRING = 'string';
+    static ATTR_TYPE_OBJECT = 'object';
 
 
     constructor(obj) {
