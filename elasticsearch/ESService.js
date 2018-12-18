@@ -1,10 +1,11 @@
+import * as tabification from '../tabify';
 import objectPath from 'object-path';
 
 import ESRESTConnection from './ESRESTConnection';
 import ESTabify from './ESTabify';
 import { getLogger } from '../Logger';
 import NUTemplateParser from "../NUTemplateParser";
-import { ESSearchConvertor } from 'vis-graphs/utils/helpers'
+import { ESSearchConvertor } from 'vis-graphs/utils/helpers';
 
 const ERROR_MESSAGE = 'Unable to fetch data';
 export const SCROLL_TIME = '3m';
@@ -18,7 +19,7 @@ export default class ESService {
         try {
             return new Promise((resolve, reject) => {
                 this._connection.makeRequest(configuration.query, configuration.scroll)
-                    .then(response => resolve(this.parseResponse(response, configuration.tabifyOptions)))
+                    .then(response => resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
                     .catch(error => {
                         if (!error.body) {
                             return reject(error);
@@ -33,14 +34,24 @@ export default class ESService {
         }
     }
 
+    getTabify = (queryConfiguration) => {
+        if (queryConfiguration) {
+            const customTabify = objectPath.get(queryConfiguration, 'tabify');
+            if (customTabify) {
+                return new tabification[customTabify];
+            }
+        }
+        return new ESTabify();
+    }
+
     // process response for scroll & search response
-    parseResponse = (response = {}, tabifyOptions = {}) => {
-        const tabify = new ESTabify();
+    parseResponse = (response = {}, tabifyOptions = {}, queryConfiguration = {}) => {
+        const tabify = this.getTabify(queryConfiguration);
         let results = null;
         // if scrolling is enabled then update next query for fetching data via scrolling
         if (response.hits.hits.length && response._scroll_id) {
             results = {
-                response: tabify.process(response, tabifyOptions),
+                response: tabify.process(response, tabifyOptions, queryConfiguration),
                 nextPage: {
                     scroll_id: response._scroll_id,
                 },
@@ -49,7 +60,7 @@ export default class ESService {
 
         } else {
             results = {
-                response: tabify.process(response),
+                response: tabify.process(response, {}, queryConfiguration),
             };
         }
 
@@ -71,9 +82,9 @@ export default class ESService {
 
     }
 
-    tabify = (data) => {
+    tabify = (data, tabifyOptions = {}, queryConfiguration = {}) => {
         const tabify = new ESTabify();
-        return tabify.process(data);
+        return tabify.process(data, tabifyOptions, queryConfiguration);
     }
 
     // Add custom sorting into ES query

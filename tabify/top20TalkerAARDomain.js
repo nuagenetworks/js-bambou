@@ -6,37 +6,6 @@
   Inspired by Kibana's implementation, found at
   https://github.com/elastic/kibana/blob/master/src/ui/public/agg_response/tabify/tabify.js
 */
-export default function top20TalkerAARDomain(response) {
-    let table;
-
-    if (response.aggregations) {
-        const tree = collectBucket(response.aggregations);
-        table = flatten(tree);
-    } else if (response.hits) {
-        table = response.hits.hits.map((d) => d._source);
-
-    } else if (Array.isArray(response)) {
-        table = response;
-
-    } else {
-        throw new Error("Tabify() invoked with invalid result set. Result set must have either 'aggregations' or 'hits' defined.");
-    }
-
-    table = flatArray(table)
-
-    if (process.env.NODE_ENV === "development") {
-        console.log("Results from tabify (first 3 rows only):");
-
-        // This one shows where there are "undefined" values.
-        console.log(table)
-
-        // This one shows the full structure pretty-printed.
-        console.log(JSON.stringify(table.slice(0, 3), null, 2))
-    }
-
-    return table;
-}
-
 function flatArray(data) {
 
     let finalData = [];
@@ -222,4 +191,37 @@ function flatten(tree, parentNode={}){
 
         // Flatten the nested arrays.
         .reduce((a, b) => a.concat(b), []);
+}
+
+export default class CustomTop20TalkerAARDomain {
+    process(response) {
+        let table;
+
+        if (response.aggregations) {
+            const tree = collectBucket(response.aggregations);
+            table = flatten(tree);
+        } else if (response.hits) {
+            table = response.hits.hits.map((d) => d._source);
+
+        } else if (Array.isArray(response)) {
+            table = response;
+
+        } else {
+            throw new Error("Tabify() invoked with invalid result set. Result set must have either 'aggregations' or 'hits' defined.");
+        }
+
+        table = flatArray(table)
+
+        if (process.env.NODE_ENV === "development") {
+            console.log("Results from tabify (first 3 rows only):");
+
+            // This one shows where there are "undefined" values.
+            console.log(table)
+
+            // This one shows the full structure pretty-printed.
+            console.log(JSON.stringify(table.slice(0, 3), null, 2))
+        }
+
+        return table;
+    }
 }
