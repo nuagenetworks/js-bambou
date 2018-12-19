@@ -134,7 +134,7 @@ export default class NUEntity extends NUObject {
                 const value = JSONObject[attributeObj.remoteName];
                 if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
                     this[localName] = (!value && value !== 0) ? null : Number(value);
-                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType) {
+                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType && value) {
                     const subtypeEntity = new attributeObj.subType();
                     this[localName] = subtypeEntity.buildFromJSON(value);
                 } else {
