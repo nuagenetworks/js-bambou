@@ -132,8 +132,10 @@ export default class NUEntity extends NUObject {
         Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
             if (attributeObj.remoteName in JSONObject) {
                 const value = JSONObject[attributeObj.remoteName];
-                if (attributeObj.attributeType == NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType == NUAttribute.ATTR_TYPE_FLOAT) {
+                if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
                     this[localName] = (!value && value !== 0) ? null : Number(value);
+                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType) {
+                    this[localName] = this.buildFromJSON(value);
                 } else {
                     this[localName] = value;
                 }
@@ -161,10 +163,15 @@ export default class NUEntity extends NUObject {
         }
         const obj =  {};
         Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
-            const value = this[localName];
-            obj[attributeObj.remoteName] =
-            (value && attributeObj.attributeType === NUAttribute.ATTR_TYPE_ENUM && typeof value === 'object') ?
-                value.name : value;
+            let value = this[localName];
+            if (value) {
+                if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType) {
+                    value = value.toObject();
+                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_ENUM && typeof value === 'object') {
+                    value = value.name;
+                }
+            }
+            obj[attributeObj.remoteName] = value;
         });
         return obj;
     }
