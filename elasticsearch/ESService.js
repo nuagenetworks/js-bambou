@@ -38,7 +38,7 @@ export default class ESService {
         if (queryConfiguration) {
             const customTabify = objectPath.get(queryConfiguration, 'tabify');
             if (customTabify) {
-                return new tabification[customTabify];
+                return new tabification[customTabify]();
             }
         }
         return new ESTabify();
