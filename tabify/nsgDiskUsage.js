@@ -2,7 +2,7 @@ import evalExpression from 'eval-expression';
 
 export default class NSGDiskUsage {
 
-    process(response, tabifyOptions, queryConfig) {
+    process(response, tabifyOptions = {}, queryConfig = {}) {
         if (!response || !response.hits || !response.hits.hits) {
             throw new Error("Tabify() invoked with invalid result set. Result set must have 'hits'.");
         }
