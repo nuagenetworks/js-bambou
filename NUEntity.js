@@ -1,11 +1,11 @@
 import NUAttribute from './NUAttribute';
-import NUObject from './NUObject';
+import NUAbstractModel from './NUAbstractModel';
 import NUException from './NUException';
 
 /*
   This class models the base Entity
 */
-export default class NUEntity extends NUObject {
+export default class NUEntity extends NUAbstractModel {
     static attributeDescriptors = {
         creationDate: new NUAttribute({
             localName: 'creationDate',
@@ -108,9 +108,6 @@ export default class NUEntity extends NUObject {
             associatedEntities: [],
             associatedEntitiesResourceName: undefined,
         });
-        this._validationErrors = new Map();
-        this._validators = new Map();
-        this.registerAttributeValidators();
     }
 
     /*
@@ -124,90 +121,14 @@ export default class NUEntity extends NUObject {
         return this._validationErrors;
     }
 
-    /*
-        Populates individual properties of 'this' Entity object from the JSON object received
-    */
-    buildFromJSON(JSONObject) {
-        const attributeDescriptors = this.constructor.attributeDescriptors;
-        Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
-            if (attributeObj.remoteName in JSONObject) {
-                const value = JSONObject[attributeObj.remoteName];
-                if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
-                    this[localName] = (!value && value !== 0) ? null : Number(value);
-                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType && value) {
-                    const subtypeEntity = new attributeObj.subType();
-                    this[localName] = subtypeEntity.buildFromJSON(value);
-                } else {
-                    this[localName] = value;
-                }
-            }
-        });
-        return this;
-    }
-
-    /*
-        Return JSON representation of 'this' object
-    */
-    buildJSON() {
-        return JSON.stringify(this.toObject());
-    }
-
-    toString() {
-        return this.buildJSON();
-    }
-
     toObject() {
         const attributeDescriptors = this.constructor.attributeDescriptors;
         const assocEntities = this[attributeDescriptors.associatedEntities.name];
         if (assocEntities && assocEntities.length > 0) {
           return assocEntities.map(item => item.ID);
+        } else {
+            return super.toObject();
         }
-        const obj =  {};
-        Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
-            let value = this[localName];
-            if (value) {
-                if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType) {
-                    value = value.toObject();
-                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_ENUM && typeof value === 'object') {
-                    value = value.name;
-                }
-            }
-            obj[attributeObj.remoteName] = value;
-        });
-        return obj;
-    }
-
-    isValid(formValues) {
-        this.validationErrors.clear();
-        this.checkErrors(formValues);
-        return (this.validationErrors.size === 0);
-    }
-
-    checkErrors(formValues) {
-        const entity = this;
-        entity._validators.forEach((validator, attributeName) => {
-            const attrObj = this.constructor.attributeDescriptors[attributeName];
-            const validationError = validator.validate(entity, attrObj, formValues);
-            if (validationError) {
-                entity.validationErrors.set(validator.name, validationError);
-            }
-        });
-    }
-
-    /*
-        Register each NUAttribute as validator
-    */
-    registerAttributeValidators() {
-        Object.values(this.constructor.attributeDescriptors).forEach((attributeObj) => {
-            this._validators.set(attributeObj.name, attributeObj);
-        });
-    }
-
-    /*
-        Register custom validator
-    */
-    registerValidator(...args) {
-        this._validators.set(args[0].name, args[0]);
     }
 
     getDefaults() {
