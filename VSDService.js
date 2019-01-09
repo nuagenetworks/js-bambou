@@ -172,4 +172,7 @@ export default class VSDService {
         queryConfiguration.query.nextPage = nextPage;
         return queryConfiguration;
     }
+
+    isConnected = () => this.service._connection && this.service._connection._isConnected;
+
 }
