@@ -14,6 +14,7 @@ export default class NUAttribute extends NUObject {
     static ATTR_TYPE_LIST = 'list';
     static ATTR_TYPE_LONG = 'long';
     static ATTR_TYPE_STRING = 'string';
+    static ATTR_TYPE_OBJECT = 'object';
 
 
     constructor(obj) {
@@ -87,6 +88,9 @@ export default class NUAttribute extends NUObject {
                 } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
                     return attrObj.validateListValues(attrValue, attrObj);
                 }
+                else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT) {
+                    return attrObj.validateObjectValue(attrValue, attrObj);
+                }
             }
         }
         return null;
@@ -137,6 +141,17 @@ export default class NUAttribute extends NUObject {
                 return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                     'Invalid input',
                     `Allowed values are ${choiceValues}, but value provided is ${attrValue}`);
+            }
+        }
+        return null;
+    }
+
+    validateObjectValue(attrValue, attrObj) {
+        if (attrObj.subType) {
+            if (!attrValue instanceof attrObj.subType) {
+                return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+                    'Invalid subType',
+                    `Expected subType is ${attrObj.subType.getClassName()}`);
             }
         }
         return null;
