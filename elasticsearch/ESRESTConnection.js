@@ -20,7 +20,26 @@ export default class ESRESTConnection extends NUObject {
             isConnected: false
         });
 
-        this.setClient()
+        this.setClient();
+    }
+
+    ping() {
+        if (!this.getClient()) {
+            this.setClient();
+        }
+
+        return new Promise((resolve, reject) => {
+            this.client.ping({
+                // ping usually has a 3000ms timeout
+                requestTimeout: 3000,
+            }, (error) => {
+                if (error) {
+                    reject();
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 
     setClient() {
@@ -32,19 +51,6 @@ export default class ESRESTConnection extends NUObject {
     }
 
     getClient() {
-        if (!this.client) {
-            this.setClient();
-
-            this.client.ping({
-                // ping usually has a 3000ms timeout
-                requestTimeout: Infinity,
-            }, (error) => {
-                if (error) {
-                    return null;
-                }
-            });
-        }
-
         return this.client;
     }
 
