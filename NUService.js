@@ -2,6 +2,8 @@ import NUObject from './NUObject';
 import NURESTConnection from './NURESTConnection';
 import ServiceClassRegistry from './ServiceClassRegistry';
 
+const CUSTOM_HEADER_PATCH_TYPE = 'X-Nuage-PatchType';
+
 const getURLParams = (rootURL) => {
     const url = new URL(rootURL)
     const [ , RESTRoot, RESTResource, APIVersion ] = url.pathname.split('/');
@@ -306,6 +308,30 @@ export default class NUService extends NUObject {
             );
     }
 
+    addAssociatedEntities(entity) {
+        if (entity && entity.associatedEntitiesResourceName) {
+            const service = this.withHeaders([{header: CUSTOM_HEADER_PATCH_TYPE, value: 'add'}])
+            return service.invokeRequest(
+                'PATCH', service.buildURL(null, entity.associatedEntitiesResourceName, entity), service.computeHeaders(),
+                entity.associatedEntities.length ? entity.buildJSON() : '[]');
+        }
+        else {
+            return Promise.reject("Associated entities and associated entity resource is required");
+        }
+    }
+
+    removeAssociatedEntities(entity) {
+        if (entity && entity.associatedEntitiesResourceName) {
+            const service = this.withHeaders([{header: CUSTOM_HEADER_PATCH_TYPE, value: 'remove'}])
+            return service.invokeRequest(
+                'PATCH', service.buildURL(null, entity.associatedEntitiesResourceName, entity), service.computeHeaders(),
+                entity.associatedEntities.length ? entity.buildJSON() : '[]');
+        }
+        else {
+            return Promise.reject("Associated entities and associated entity resource is required");
+        }
+    }
+
     invokeRequest(verb, URL, headers, requestData, ignoreRequestIdle = false) {
         this._connection.ignoreRequestIdle = ignoreRequestIdle;
         return this.invokeRequestOnConnection(verb, URL, headers, requestData);
@@ -325,6 +351,8 @@ export default class NUService extends NUObject {
             return this._connection.makeDELETERequest(URL, headers);
         } else if (verb === 'HEAD') {
             return this._connection.makeHEADRequest(URL, headers);
+        } else if (verb === 'PATCH') {
+            return this._connection.makePATCHRequest(URL, headers, requestData);
         }
         return null;
     }

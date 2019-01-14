@@ -271,4 +271,10 @@ export default class NURESTConnection extends NUObject {
         return this.makeRequest(url, 'HEAD', headers);
     }
 
+    /*
+      Invokes a PATCH request on the server
+    */
+    makePATCHRequest(url, headers, body) {
+        return this.makeRequest(url, 'PATCH', headers, body);
+    }
 }
