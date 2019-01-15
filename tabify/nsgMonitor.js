@@ -23,10 +23,10 @@ const millsToDaysHoursMin = mills => {
 export default (response)  => {
     if (Array.isArray(response)) {
         return response.map( item => {
-            const vrsInfo = item.vrsinfo;
-            const nsgInfo = item.nsginfo;
-            const nsgState = item.nsgstate;
-            const nsgsummary = item.nsgsummary;
+            const vrsInfo = item.vrsinfo || {};
+            const nsgInfo = item.nsginfo || {};
+            const nsgState = item.nsgstate || {};
+            const nsgsummary = item.nsgsummary || {};
             const vscs = item.vscs;
             let vscIPs;
             if (vscs && vscs.length) {

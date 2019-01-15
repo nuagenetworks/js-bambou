@@ -6,8 +6,8 @@ const capitalizeFirstLetter = (input) => {
 export default (response)  => {
     if (Array.isArray(response)) {
         const ports = response.reduce((allPorts, item) => {
-            const monitoringPorts = item.monitoringPorts;
-            const configuredPorts = item.ports.reduce((acc, currVal) => {
+            const monitoringPorts = item.monitoringPorts || [];
+            const configuredPorts = (item.ports && item.ports.reduce((acc, currVal) => {
                 const portInfo = monitoringPorts.find(port => port.name === currVal.physicalName) || {state: 'Unknown'};
                 const port = {
                     ...currVal,
@@ -16,7 +16,7 @@ export default (response)  => {
                 }
                 acc.push(port);
                 return acc;
-            }, [])
+            }, [])) || [];
             allPorts.push(...configuredPorts);
             return allPorts;
         }, []);
