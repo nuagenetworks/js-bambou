@@ -27,6 +27,16 @@ export default (response)  => {
             const nsgInfo = item.nsginfo;
             const nsgState = item.nsgstate;
             const nsgsummary = item.nsgsummary;
+            const vscs = item.vscs;
+            let vscIPs;
+            if (vscs && vscs.length) {
+                vscIPs = vscs.reduce((ips, currVal) => {
+                    if (currVal.addresses && currVal.addresses.length) {
+                        ips.push(...currVal.addresses);
+                    }
+                    return ips;
+                }, [])
+            }
 
             return {
                 name: nsgsummary.gatewayName,
@@ -35,10 +45,11 @@ export default (response)  => {
                 model: nsgInfo.family,
                 softwareVersion: nsgsummary.NSGVersion,
                 state: nsgState.status,
-                vscIPs: '',
+                vscIPs: vscIPs ? vscIPs.join('\n') : '',
                 vrsUptime: millsToDaysHoursMin(vrsInfo.uptime),
                 address: vrsInfo.address,
-                managementIP: vrsInfo.managementIP
+                managementIP: vrsInfo.managementIP,
+                JSONRPCConnectionState: vrsInfo.JSONRPCConnectionState || 'Unknown'
             };
         })
     }

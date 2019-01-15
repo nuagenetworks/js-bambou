@@ -1,7 +1,25 @@
+const capitalizeFirstLetter = (input) => {
+    if (typeof input !== 'string') return '';
+    return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
+}
+
 export default (response)  => {
     if (Array.isArray(response)) {
-        return response.map( item => (
-            {...item, type: item.access ? 'Access' : item.uplink ? 'Network' : undefined}
-        ));
+        const ports = response.reduce((allPorts, item) => {
+            const monitoringPorts = item.monitoringPorts;
+            const configuredPorts = item.ports.reduce((acc, currVal) => {
+                const portInfo = monitoringPorts.find(port => port.name === currVal.physicalName) || {state: 'Unknown'};
+                const port = {
+                    ...currVal,
+                    type: capitalizeFirstLetter(currVal.portType),
+                    ...portInfo
+                }
+                acc.push(port);
+                return acc;
+            }, [])
+            allPorts.push(...configuredPorts);
+            return allPorts;
+        }, []);
+        return ports;
     }
 }
