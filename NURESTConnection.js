@@ -210,7 +210,7 @@ export default class NURESTConnection extends NUObject {
                     return Promise.reject({response, result, data: errors.data});
                 }
 
-                this.interceptor.fail({data: errors.data});
+                this.interceptor.fail({response, result, data: errors.data});
                 return Promise.reject(result);
             });
     }
