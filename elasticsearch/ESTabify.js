@@ -165,7 +165,7 @@ export default class ESTabify {
             const key = keys[i];
             const value = node[key];
 
-            if (typeof value === 'object') {
+            if (value && typeof value === 'object') {
 
                 if ("hits" in value && Array.isArray(value.hits) && value.hits.length === 1) {
                     if ("sort" in value.hits[0]) {
@@ -214,7 +214,7 @@ export default class ESTabify {
             return Object.keys(bucket).reduce((tree, key) => {
                 let value = bucket[key];
 
-                if (typeof value === "object") {
+                if ( value && typeof value === "object") {
                     if ("value" in value) {
                         value = value.value;
                     } else {
@@ -226,7 +226,7 @@ export default class ESTabify {
                     key = stack[stack.length - 2]
                 }
 
-                if (typeof value === 'object') {
+                if (value && typeof value === 'object') {
                     if ("value" in value) {
                         value = value.value;
                     }
