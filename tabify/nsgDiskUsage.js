@@ -1,5 +1,19 @@
 import evalExpression from 'eval-expression';
 
+const processByteLabel = (mbValue) => {
+    if (mbValue<1000) {
+        return `${mbValue} MB`;
+    }
+    else if (mbValue<1000000){
+        let val = mbValue/1000;
+        return `${val} GB`;
+    }
+    else if (mbValue<1000000000){
+        let val = mbValue/1000000;
+        return `${val} TB`;
+    }
+};
+
 export default class NSGDiskUsage {
 
     process(response, tabifyOptions = {}, queryConfig = {}) {
@@ -21,12 +35,14 @@ export default class NSGDiskUsage {
             finalData.push({
                 name:item.name,
                 field:"used",
-                value:(item.used*100/(item.used+item.available))
+                percent:(item.used*100/(item.used+item.available)),
+                value: processByteLabel(item.used)
             });
             finalData.push({
                 name:item.name,
                 field:"available",
-                value:(item.available*100/(item.used+item.available))
+                percent:(item.available*100/(item.used+item.available)),
+                value: processByteLabel(item.available)
             });
         })
 
