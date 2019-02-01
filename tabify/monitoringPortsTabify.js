@@ -20,6 +20,6 @@ export default (response)  => {
             allPorts.push(...configuredPorts);
             return allPorts;
         }, []);
-        return ports;
+        return ports.sort((first, second) => first.type === second.type ? 0 : first.type === 'Network' ? -1 : 1 );
     }
 }
