@@ -9,7 +9,7 @@ const NUPermissionLevelPowerUser = 'ORGNETWORKDESIGNER';
 const NUPermissionLevelRoot = 'CSPROOT';
 // const NUPermissionLevelSystem = 'CMS';
 const NUPermissionLevelUser = 'ORGUSER';
-
+const NUPermissionLevelSecAdmin = 'SECURITYADMINISTRATOR';
 
 export default class NURESTUser extends NURootEntity {
 
@@ -109,6 +109,8 @@ export default class NURESTUser extends NURootEntity {
                 return 'standard user of';
             case NUPermissionLevelAdminOperator:
                 return 'admin operator of';
+            case NUPermissionLevelSecAdmin:
+                return 'security administrator of';
             default:
                 return '';
         }
