@@ -1,5 +1,19 @@
 import evalExpression from 'eval-expression';
 
+const processByteLabel = (mbValue) => {
+    if (mbValue<1000) {
+        return `${mbValue.toFixed(2)} MB`;
+    }
+    else if (mbValue<1000000){
+        let val = mbValue/1000;
+        return `${val.toFixed(2)} GB`;
+    }
+    else if (mbValue<1000000000){
+        let val = mbValue/1000000;
+        return `${val.toFixed(2)} TB`;
+    }
+};
+
 export default class NSGDiskUsage {
 
     process(response, tabifyOptions = {}, queryConfig = {}) {
@@ -18,15 +32,31 @@ export default class NSGDiskUsage {
         disks.forEach(item => {
             //Select only these two disks, and populate their percentages.
             // Little workaround to avoid lots of configuration in configuration file
+            const availMb = item.available;
+            const usedMb = item.used;
+            const totalMb = availMb + usedMb;
+            const availPercent = (availMb*100/totalMb).toFixed(2);
+            const usedPercent = (usedMb*100/totalMb).toFixed(2);
+            const usedVal = processByteLabel(usedMb);
+            const availVal = processByteLabel(availMb);
+            const mbVal = `Used: ${usedVal}, Available: ${availVal}`;
+            const percentVal = `Used: ${usedPercent}%, Available: ${availPercent}%`;
+
             finalData.push({
-                name:item.name,
-                field:"used",
-                value:(item.used*100/(item.used+item.available))
+                disk:item.name,
+                field:"available",
+                percent:availPercent,
+                tooltipPercent:percentVal,
+                total: processByteLabel(totalMb),
+                value: mbVal
             });
             finalData.push({
-                name:item.name,
-                field:"available",
-                value:(item.available*100/(item.used+item.available))
+                disk:item.name,
+                field:"used",
+                percent:usedPercent,
+                tooltipPercent:percentVal,
+                total: processByteLabel(totalMb),
+                value: mbVal
             });
         })
 
