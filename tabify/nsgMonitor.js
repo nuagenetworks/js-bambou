@@ -45,7 +45,7 @@ export default (response)  => {
                 model: nsgInfo.family,
                 softwareVersion: nsgsummary.NSGVersion,
                 state: nsgState.status,
-                vscIPs: vscIPs ? vscIPs.join('\n') : '',
+                vscIPs: vscIPs ? vscIPs.join(',\n') : '',
                 vrsUptime: millsToDaysHoursMin(vrsInfo.uptime),
                 address: vrsInfo.address,
                 managementIP: vrsInfo.managementIP,
