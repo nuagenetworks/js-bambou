@@ -11,7 +11,8 @@ export default class NUEntity extends NUAbstractModel {
             localName: 'creationDate',
             attributeType: NUAttribute.ATTR_TYPE_LONG,
             isReadOnly: true,
-            isEditable: false }),
+            isEditable: false,
+            canSearch: true,}),
         entityScope: new NUAttribute({
             localName: 'entityScope',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
@@ -32,7 +33,8 @@ export default class NUEntity extends NUAbstractModel {
             localName: 'lastUpdatedDate',
             attributeType: NUAttribute.ATTR_TYPE_LONG,
             isReadOnly: true,
-            isEditable: false }),
+            isEditable: false,
+            canSearch: true,}),
         owner: new NUAttribute({
             localName: 'owner',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
