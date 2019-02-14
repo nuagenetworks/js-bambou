@@ -9,9 +9,10 @@ export default class NUEntity extends NUAbstractModel {
     static attributeDescriptors = {
         creationDate: new NUAttribute({
             localName: 'creationDate',
-            attributeType: NUAttribute.ATTR_TYPE_LONG,
+            attributeType: NUAttribute.ATTR_TYPE_TIMESTAMP,
             isReadOnly: true,
-            isEditable: false }),
+            isEditable: false,
+            canSearch: true,}),
         entityScope: new NUAttribute({
             localName: 'entityScope',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
@@ -30,9 +31,10 @@ export default class NUEntity extends NUAbstractModel {
             isEditable: false }),
         lastUpdatedDate: new NUAttribute({
             localName: 'lastUpdatedDate',
-            attributeType: NUAttribute.ATTR_TYPE_LONG,
+            attributeType: NUAttribute.ATTR_TYPE_TIMESTAMP,
             isReadOnly: true,
-            isEditable: false }),
+            isEditable: false,
+            canSearch: true,}),
         owner: new NUAttribute({
             localName: 'owner',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
