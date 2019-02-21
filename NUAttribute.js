@@ -16,8 +16,7 @@ export default class NUAttribute extends NUObject {
     static ATTR_TYPE_STRING = 'string';
     static ATTR_TYPE_OBJECT = 'object';
     static ATTR_TYPE_TIMESTAMP = 'long';
-
-
+    
     constructor(obj) {
         super();
         if (!obj.localName || !obj.attributeType) {
