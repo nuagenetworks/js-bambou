@@ -16,7 +16,7 @@ export default class NUAttribute extends NUObject {
     static ATTR_TYPE_STRING = 'string';
     static ATTR_TYPE_OBJECT = 'object';
     static ATTR_TYPE_TIMESTAMP = 'long';
-    
+
     constructor(obj) {
         super();
         if (!obj.localName || !obj.attributeType) {
@@ -102,7 +102,7 @@ export default class NUAttribute extends NUObject {
                 dataTypeMismatch = false;        
             if (attrObj.subType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType === NUAttribute.ATTR_TYPE_FLOAT) {
                 dataTypeMismatch = (typeof listElementValue !== 'number');
-            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && !(listElementValue instanceof attrObj.subType)) {
+            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue === 'object' && !(listElementValue instanceof attrObj.subType)) {
                 dataTypeMismatch = true;
             }
             if (dataTypeMismatch){
