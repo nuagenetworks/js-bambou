@@ -102,7 +102,7 @@ export default class NUAttribute extends NUObject {
                 dataTypeMismatch = false;        
             if (attrObj.subType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType === NUAttribute.ATTR_TYPE_FLOAT) {
                 dataTypeMismatch = (typeof listElementValue !== 'number');
-            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue !== attrObj.subType) {
+            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue === 'object' && !(listElementValue instanceof attrObj.subType)) {
                 dataTypeMismatch = true;
             }
             if (dataTypeMismatch){
@@ -111,9 +111,15 @@ export default class NUAttribute extends NUObject {
                     `Data type should be ${attrObj.subType}, but is ${typeof listElementValue}`);
             }
             if (attrObj.subType === NUAttribute.ATTR_TYPE_STRING) {
-                return attrObj.validateStringValue(listElementValue, attrObj);
+                let err = attrObj.validateStringValue(listElementValue, attrObj);
+                if (err) {
+                    return err;
+                }
             } else if (attrObj.subType === NUAttribute.ATTR_TYPE_ENUM) {
-                return attrObj.validateEnumValue(listElementValue, attrObj);
+                let err = attrObj.validateEnumValue(listElementValue, attrObj);
+                if (err) {
+                    return err;
+                }
             } 
         }
         return null;
