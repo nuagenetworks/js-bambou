@@ -27,10 +27,10 @@ export default class NUAbstractModel extends NUObject {
                     const subtypeEntity = new attributeObj.subType();
                     this[localName] = subtypeEntity.buildFromJSON(value);
                 } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_LIST && attributeObj.subType && typeof attributeObj.subType !== 'string') {
-                    this[localName] = value.map(item => {
+                    this[localName] = value ? value.map(item => {
                         const subtypeEntity = new attributeObj.subType();
                         return subtypeEntity.buildFromJSON(item);
-                    });
+                    }) : null;
                 } else {
                     this[localName] = value;
                 }
