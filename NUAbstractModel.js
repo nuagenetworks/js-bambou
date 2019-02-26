@@ -26,6 +26,11 @@ export default class NUAbstractModel extends NUObject {
                 } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType && value) {
                     const subtypeEntity = new attributeObj.subType();
                     this[localName] = subtypeEntity.buildFromJSON(value);
+                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_LIST && attributeObj.subType && typeof attributeObj.subType !== 'string') {
+                    this[localName] = value ? value.map(item => {
+                        const subtypeEntity = new attributeObj.subType();
+                        return subtypeEntity.buildFromJSON(item);
+                    }) : null;
                 } else {
                     this[localName] = value;
                 }
@@ -55,6 +60,8 @@ export default class NUAbstractModel extends NUObject {
                     value = value.toObject();
                 } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_ENUM && typeof value === 'object') {
                     value = value.name;
+                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_LIST && attributeObj.subType && typeof attributeObj.subType !== 'string') {
+                    value = value.map(item => item.toObject())
                 }
             }
             obj[attributeObj.remoteName] = value;
