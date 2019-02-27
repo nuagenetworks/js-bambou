@@ -1,7 +1,7 @@
 import NUObject from './NUObject';
 import NUAttributeValidationError from './NUAttributeValidationError';
 import NUException from './NUException';
-
+import { getLogger } from "./Logger";
 
 /*
   This class models an attribute object
@@ -102,8 +102,14 @@ export default class NUAttribute extends NUObject {
                 dataTypeMismatch = false;        
             if (attrObj.subType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType === NUAttribute.ATTR_TYPE_FLOAT) {
                 dataTypeMismatch = (typeof listElementValue !== 'number');
-            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue === 'object' && !(listElementValue instanceof attrObj.subType)) {
-                dataTypeMismatch = true;
+            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue === 'object') {
+                if (attrObj.subType.prototype && attrObj.subType.prototype.constructor.name) {
+                    if (!(listElementValue instanceof attrObj.subType)) {
+                        dataTypeMismatch = true;
+                    }
+                } else {
+                    getLogger().warn(`Invalid subType for attribute: ${attrObj.name}, subType: ${attrObj.subType}`);
+                }
             }
             if (dataTypeMismatch){
                 return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
