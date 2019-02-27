@@ -103,8 +103,8 @@ export default class NUAttribute extends NUObject {
             if (attrObj.subType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType === NUAttribute.ATTR_TYPE_FLOAT) {
                 dataTypeMismatch = (typeof listElementValue !== 'number');
             } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue === 'object') {
-                if (attrObj.subType.prototype && attrObj.subType.prototype.constructor.name) {
-                    if (!(listElementValue instanceof attrObj.subType)) {
+                if (attrObj.subType && attrObj.subType.getClassName) {
+                    if (listElementValue && listElementValue.getClassName && listElementValue.getClassName() !== attrObj.subType.getClassName()) {
                         dataTypeMismatch = true;
                     }
                 } else {
