@@ -205,7 +205,7 @@ export default class NURESTConnection extends NUObject {
 
                 if (authFailure) {
                     getLogger().error(`<<<< Authentication Failure: ${response.status}: ${response.statusText}`);
-                    this.interceptor.onAuthenticationFailure({data: errors.data});
+                    this.interceptor.onAuthenticationFailure({response, result, data: errors.data});
                     result.authFailure = authFailure;
                     return Promise.reject({response, result, data: errors.data});
                 }
