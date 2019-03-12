@@ -60,7 +60,7 @@ export default class ESService {
 
         } else {
             results = {
-                response: tabify.process(response, {}, queryConfiguration),
+                response: tabify.process(response, tabifyOptions, queryConfiguration),
             };
         }
 
