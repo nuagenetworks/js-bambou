@@ -225,9 +225,12 @@ export default class NUService extends NUObject {
       Returns an object {data: an array of NUEntity objects,
       headers: an object with properties page, pageSize, filter, orderBy, and count}
     */
-    fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null, filterType = undefined, light = true) {
+    fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null, filterType = undefined, light = false) {
         const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
-        const url = `${this.buildURL(null, RESTResourceName, parentEntity)}/?light=${light}`;
+        let url = this.buildURL(null, RESTResourceName, parentEntity);
+        if (light) {
+            url = `${url}/?light`;
+        }
         return this.invokeRequest(
             'GET', url, this.computeHeaders(page, filter, orderBy, filterType)).then((response) => {
                 let data = [];
