@@ -41,6 +41,7 @@ export default class NUService extends NUObject {
           headerOrderBy: 'X-Nuage-OrderBy',
           headerCount: 'X-Nuage-Count',
           headerMessage:'X-Nuage-Message',
+          headerClientType:'X-Nuage-ClientType'
       }}) {
           super();
           const url =rootURL ? rootURL : `${protocol}://${hostname}${port ? ":" + port : ''}/${RESTRoot}/${RESTResource}${APIVersion ? '/' + APIVersion : ''}`;
@@ -55,6 +56,7 @@ export default class NUService extends NUObject {
                 headerOrderBy: headers.headerOrderBy,
                 headerPage: headers.headerPage,
                 headerPageSize: headers.headerPageSize,
+                headerClientType: headers.headerClientType,
                 password: null,
                 rootURL: url,
                 userName: null,
@@ -106,10 +108,11 @@ export default class NUService extends NUObject {
         delete this.customHeaders[customHeader];
     }
 
-    computeHeaders(page, filter, orderBy, filterType = 'predicate', pageSize = null) {
+    computeHeaders(page, filter, orderBy, filterType = 'predicate', pageSize = null, clientType = 'UI') {
         const headers = new Headers(this.customHeaders);
         headers.set(this.headerAuthorization, this.getAuthorization());
         headers.set('Content-Type', 'application/json');
+        headers.set(this.headerClientType, clientType);
 
         Object.entries(this.customHeaders).forEach(([key, value]) => {
             headers.set(key, value);
@@ -225,7 +228,7 @@ export default class NUService extends NUObject {
       Returns an object {data: an array of NUEntity objects,
       headers: an object with properties page, pageSize, filter, orderBy, and count}
     */
-    fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null, filterType = undefined, light = false) {
+    fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null, filterType = undefined, light = true) {
         const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
         let url = this.buildURL(null, RESTResourceName, parentEntity);
         if (light) {
