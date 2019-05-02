@@ -242,9 +242,17 @@ export default class NUService extends NUObject {
       Returns an object {data: an array of NUEntity objects,
       headers: an object with properties page, pageSize, filter, orderBy, and count}
     */
-    fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null, filterType = undefined, light = true) {
-        const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
-        let URL = this.buildURL(null, RESTResourceName, parentEntity);
+    fetchAll({
+        resourceName,
+        parentEntity,
+        page = 0,
+        filter = null,
+        orderBy = null,
+        filterType = undefined,
+        light = true
+    }) {
+        const EntityClass = ServiceClassRegistry.entityClassForResourceName(resourceName);
+        let URL = this.buildURL(null, resourceName, parentEntity);
         if (light) {
             URL = `${URL}/?light`;
         }
@@ -336,10 +344,17 @@ export default class NUService extends NUObject {
     /*
       Issues a HEAD request, processes response, and resolves the count of entities
     */
-    count(RESTResourceName, parentEntity, page, filter, orderBy, filterType) {
+    count({
+        resourceName,
+        parentEntity,
+        page,
+        filter,
+        orderBy,
+        filterType
+    }) {
         return this.invokeRequest({
             verb: 'HEAD',
-            URL: this.buildURL(null, RESTResourceName, parentEntity),
+            URL: this.buildURL(null, resourceName, parentEntity),
             headers: this.computeHeaders(page, filter, orderBy, filterType)
         }).then(response => {
             const count = Number(response.headers[this.headerCount.toLowerCase()]);

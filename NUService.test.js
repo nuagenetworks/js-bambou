@@ -123,9 +123,9 @@ it('fetch', () => {
 
 // test fetchall
 it('fetchall', () => {
-    const parent = new Parent();
-    parent.ID = 'd8cf28fa-e6d5-4779-8229-e45192ef763b';
-    return VSDService.fetchAll(new Child().resourceName, parent).then((response) => {
+    const parentEntity = new Parent();
+    parentEntity.ID = 'd8cf28fa-e6d5-4779-8229-e45192ef763b';
+    return VSDService.fetchAll({resourceName: new Child().resourceName, parentEntity}).then((response) => {
         expect(response.data[1].ID).toEqual('xyz456');
         expect(response.data[1].attr1).toEqual('AC0098766');
         expect(response.data[1].attr2).toEqual('1485302226000');
@@ -134,9 +134,15 @@ it('fetchall', () => {
 
 // test fetchall by page, filter, and orderBy
 it('fetchall by page, filter, and orderBy', () => {
-    const parent = new Parent();
-    parent.ID = 'd8cf28fa-e6d5-4779-8229-e45192ef763b';
-    return VSDService.fetchAll(new Child().resourceName, parent, 3, 'value < 100', 'value ASC').then((response) => {
+    const parentEntity = new Parent();
+    parentEntity.ID = 'd8cf28fa-e6d5-4779-8229-e45192ef763b';
+    return VSDService.fetchAll({
+        resourceName: new Child().resourceName,
+        parentEntity,
+        page: 3,
+        filter: 'value < 100',
+        orderBy: 'value ASC'
+    }).then((response) => {
         expect(response.data[2].ID).toEqual('aad333');
         expect(response.data[2].attr1).toEqual('AAC098333');
         expect(response.data[2].attr2).toEqual('1485303336333');
@@ -183,9 +189,9 @@ it('delete', () => {
 
 // test count
 it('count', () => {
-    const parent = new Parent();
-    parent.ID = 'parent123';
-    return VSDService.count(new Child().resourceName, parent, null, 'value < 123').then((response) => {
+    const parentEntity = new Parent();
+    parentEntity.ID = 'parent123';
+    return VSDService.count({resourceName: new Child().resourceName, parentEntity, filter: 'value < 123'}).then((response) => {
         expect(response).toEqual(30);
     });
 });
