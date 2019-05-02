@@ -109,28 +109,28 @@ export default class NUService extends NUObject {
     }
 
     computeHeaders(page, filter, orderBy, filterType = 'predicate', pageSize = null, clientType = 'UI') {
-        const headers = new Headers(this.customHeaders);
-        headers.set(this.headerAuthorization, this.getAuthorization());
-        headers.set('Content-Type', 'application/json');
-        headers.set(this.headerClientType, clientType);
+        const headers = {};
+        headers[this.headerAuthorization] = this.getAuthorization();
+        headers['Content-Type'] = 'application/json';
+        headers[this.headerClientType] = clientType;
 
         Object.entries(this.customHeaders).forEach(([key, value]) => {
-            headers.set(key, value);
+            headers[key] = value;
         });
 
         // optional headers
         if (Number.isInteger(page)) {
-            headers.set(this.headerPage, page);
-            headers.set(this.headerPageSize, pageSize || this.pageSize);
+            headers[this.headerPage] = page;
+            headers[this.headerPageSize] = pageSize || this.pageSize;
         }
 
         if (filter) {
-            headers.set(this.headerFilter, filter);
-            headers.set(this.headerFilterType, filterType);
+            headers[this.headerFilter] = filter;
+            headers[this.headerFilterType] = filterType;
         }
 
         if (orderBy) {
-            headers.set(this.headerOrderBy, orderBy);
+            headers[this.headerOrderBy] = orderBy;
         }
         return headers;
     }
@@ -164,16 +164,19 @@ export default class NUService extends NUObject {
         this.userName = rootEntity.userName;
         this.password = rootEntity.password;
         const connObj =  this._connection;
-        return this.invokeRequest('GET', this.buildURL(rootEntity), this.computeHeaders()).then(
-                (response) => {
-                    if (!response.authFailure) {
-                        this.APIKey = response.data[0].APIKey;
-                        rootEntity.buildFromJSON(response.data[0]);
-                        return rootEntity;
-                    }
-                    connObj.interceptor.fail(response);
-                    return Promise.reject(response);
-                });
+        return this.invokeRequest({
+            verb: 'GET',
+            URL: this.buildURL(rootEntity),
+            headers: this.computeHeaders()
+        }).then((response) => {
+            if (!response.authFailure) {
+                this.APIKey = response.data[0].APIKey;
+                rootEntity.buildFromJSON(response.data[0]);
+                return rootEntity;
+            }
+            connObj.interceptor.fail(response);
+            return Promise.reject(response);
+        });
     }
 
     updatePassword(entity) {
@@ -188,7 +191,12 @@ export default class NUService extends NUObject {
         requestPayLoad = JSON.stringify(requestPayLoad);
         this.APIKey = null;
         
-        return this.invokeRequest('PUT', this.buildURL(entity), this.computeHeaders(), requestPayLoad);
+        return this.invokeRequest({
+            verb: 'PUT',
+            URL: this.buildURL(entity),
+            headers: this.computeHeaders(),
+            requestData: requestPayLoad
+        });
     }
 
     /*
@@ -196,11 +204,14 @@ export default class NUService extends NUObject {
       and builds corresponding NUEntity object
     */
     fetch(entity) {
-        return this.invokeRequest(
-            'GET', this.buildURL(entity), this.computeHeaders()).then((response) => {
-                entity.buildFromJSON(response.data[0]);
-                return entity;
-            });
+        return this.invokeRequest({
+            verb: 'GET',
+            URL: this.buildURL(entity),
+            headers: this.computeHeaders()
+        }).then((response) => {
+            entity.buildFromJSON(response.data[0]);
+            return entity;
+        });
     }
 
     /*
@@ -209,9 +220,12 @@ export default class NUService extends NUObject {
     */
     fetchStats(statsResourceName, parentEntity, queryStringParams) {
         const queryString = Object.entries(queryStringParams).map( ([key, value]) => (`${key}=${value}`)).join('&');
-        const url = `${this.buildURL(null, statsResourceName, parentEntity)}/?${queryString}`
-        return this.invokeRequest(
-            'GET', url, this.computeHeaders()).then((response) => {
+        const URL = `${this.buildURL(null, statsResourceName, parentEntity)}/?${queryString}`
+        return this.invokeRequest({
+            verb: 'GET',
+            URL,
+            headers: this.computeHeaders()
+        }).then((response) => {
             const EntityClass = ServiceClassRegistry.entityClassForResourceName(statsResourceName);
             if (EntityClass) {
                 const statsEntity = new EntityClass();
@@ -230,19 +244,22 @@ export default class NUService extends NUObject {
     */
     fetchAll(RESTResourceName, parentEntity, page = 0, filter = null, orderBy = null, filterType = undefined, light = true) {
         const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
-        let url = this.buildURL(null, RESTResourceName, parentEntity);
+        let URL = this.buildURL(null, RESTResourceName, parentEntity);
         if (light) {
-            url = `${url}/?light`;
+            URL = `${URL}/?light`;
         }
-        return this.invokeRequest(
-            'GET', url, this.computeHeaders(page, filter, orderBy, filterType)).then((response) => {
-                let data = [];
+        return this.invokeRequest({
+            verb: 'GET',
+            URL,
+            headers: this.computeHeaders(page, filter, orderBy, filterType)
+        }).then((response) => {
+            let data = [];
 
-                if (response.data) {
-                    data = response.data.map(obj => new EntityClass().buildFromJSON(obj));
-                }
-                return { data, headers: this.extractResponseHeaders(response.headers) };
-            });
+            if (response.data) {
+                data = response.data.map(obj => new EntityClass().buildFromJSON(obj));
+            }
+            return { data, headers: this.extractResponseHeaders(response.headers) };
+        });
     }
 
     extractResponseHeaders(_responseHeaders) {
@@ -265,8 +282,12 @@ export default class NUService extends NUObject {
       Issues a PUT request on the entity to update that entity on server
     */
     update(entity) {
-        return this.invokeRequest(
-            'PUT', this.buildURL(entity), this.computeHeaders(), entity.buildJSON());
+        return this.invokeRequest({
+            verb: 'PUT',
+            URL: this.buildURL(entity),
+            headers: this.computeHeaders(),
+            requestData: entity.buildJSON()
+        });
     }
 
     /*
@@ -274,9 +295,12 @@ export default class NUService extends NUObject {
     */
     updateAssociatedEntities(entity) {
         if (entity && entity.associatedEntitiesResourceName) {
-            return this.invokeRequest(
-              'PUT', this.buildURL(null, entity.associatedEntitiesResourceName, entity), this.computeHeaders(),
-              entity.associatedEntities.length ? entity.buildJSON() : '[]');
+            return this.invokeRequest({
+                verb: 'PUT',
+                URL: this.buildURL(null, entity.associatedEntitiesResourceName, entity),
+                headers: this.computeHeaders(),
+                requestData: entity.associatedEntities.length ? entity.buildJSON() : '[]'
+            });
         }
         else {
           return Promise.reject("Associated entities and associated entity resource is required");
@@ -287,40 +311,51 @@ export default class NUService extends NUObject {
       Issues a POST request for the entity passed
     */
     create(entity, parentEntity) {
-        return this.invokeRequest(
-            'POST', this.buildURL(entity, null, parentEntity), this.computeHeaders(), entity.buildJSON()).then((response) => {
-                entity.buildFromJSON(response.data[0]);
-                return entity;
-            });
+        return this.invokeRequest({
+            verb: 'POST',
+            URL: this.buildURL(entity, null, parentEntity),
+            headers: this.computeHeaders(),
+            requestData: entity.buildJSON()
+        }).then((response) => {
+            entity.buildFromJSON(response.data[0]);
+            return entity;
+        });
     }
 
     /*
       Issues a DELETE request on the entity
     */
     delete(entity) {
-        return this.invokeRequest(
-            'DELETE', this.buildURL(entity), this.computeHeaders());
+        return this.invokeRequest({
+            verb: 'DELETE',
+            URL: this.buildURL(entity),
+            headers: this.computeHeaders()
+        });
     }
 
     /*
       Issues a HEAD request, processes response, and resolves the count of entities
     */
     count(RESTResourceName, parentEntity, page, filter, orderBy, filterType) {
-        return this.invokeRequest(
-            'HEAD', this.buildURL(null, RESTResourceName, parentEntity), this.computeHeaders(page, filter, orderBy, filterType)).then(
-                response => {
-                    const count = Number(response.headers[this.headerCount.toLowerCase()]);
-                    return count || 0;
-                }
-            );
+        return this.invokeRequest({
+            verb: 'HEAD',
+            URL: this.buildURL(null, RESTResourceName, parentEntity),
+            headers: this.computeHeaders(page, filter, orderBy, filterType)
+        }).then(response => {
+            const count = Number(response.headers[this.headerCount.toLowerCase()]);
+            return count || 0;
+        });
     }
 
     addAssociatedEntities(entity) {
         if (entity && entity.associatedEntitiesResourceName) {
             const service = this.withHeaders([{header: CUSTOM_HEADER_PATCH_TYPE, value: 'add'}])
-            return service.invokeRequest(
-                'PATCH', service.buildURL(null, entity.associatedEntitiesResourceName, entity), service.computeHeaders(),
-                entity.associatedEntities.length ? entity.buildJSON() : '[]');
+            return service.invokeRequest({
+                verb: 'PATCH',
+                URL: service.buildURL(null, entity.associatedEntitiesResourceName, entity),
+                headers: service.computeHeaders(),
+                requestData: entity.associatedEntities.length ? entity.buildJSON() : '[]'
+            });
         }
         else {
             return Promise.reject("Associated entities and associated entity resource is required");
@@ -330,26 +365,26 @@ export default class NUService extends NUObject {
     removeAssociatedEntities(entity) {
         if (entity && entity.associatedEntitiesResourceName) {
             const service = this.withHeaders([{header: CUSTOM_HEADER_PATCH_TYPE, value: 'remove'}])
-            return service.invokeRequest(
-                'PATCH', service.buildURL(null, entity.associatedEntitiesResourceName, entity), service.computeHeaders(),
-                entity.associatedEntities.length ? entity.buildJSON() : '[]');
+            return service.invokeRequest({
+                verb: 'PATCH',
+                URL: service.buildURL(null, entity.associatedEntitiesResourceName, entity),
+                headers: service.computeHeaders(),
+                requestData: entity.associatedEntities.length ? entity.buildJSON() : '[]'
+            });
         }
         else {
             return Promise.reject("Associated entities and associated entity resource is required");
         }
     }
 
-    invokeRequest(verb, URL, headers, requestData, ignoreRequestIdle = false) {
-        this._connection.ignoreRequestIdle = ignoreRequestIdle;
-        return this.invokeRequestOnConnection(verb, URL, headers, requestData);
-    }
-
     /*
-      Invokes applicable method on NURESTConnection
+        Invokes applicable method on NURESTConnection
     */
-    invokeRequestOnConnection(verb, URL, headers, requestData) {
+    invokeRequest({verb, URL, headers, requestData, ignoreRequestIdle = false, cancelToken}) {
+        this._connection.ignoreRequestIdle = ignoreRequestIdle;
+
         if (verb === 'GET') {
-            return this._connection.makeGETRequest(URL, headers);
+            return this._connection.makeGETRequest(URL, headers, cancelToken);
         } else if (verb === 'PUT') {
             return this._connection.makePUTRequest(URL, headers, requestData);
         } else if (verb === 'POST') {
