@@ -12,10 +12,10 @@ export default class NUHealthService extends NUService {
     *  Fetch health status.
     *  component: name of the server component whose status is requested
     */
-    fetch = (component) => {
+    fetch = (component, cancelToken) => {
         const healthURL = `${this.rootURL}/?proxyRequest=false`;
-        const url = component ? `${healthURL}&component=${component}` : healthURL;
-        return this.invokeRequest('GET', url).then((response) => {
+        const requestURL = component ? `${healthURL}&component=${component}` : healthURL;
+        return this.invokeRequest({verb: 'GET', requestURL, cancelToken}).then((response) => {
             return response.data[0];
         });
     }
