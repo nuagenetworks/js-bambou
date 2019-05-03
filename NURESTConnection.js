@@ -187,21 +187,26 @@ export default class NURESTConnection extends NUObject {
             this.interceptor.success(result);
             return result;
         }).catch((error) => {
-            // server returned with some sort of error response
-            const { response } = error;
-            const result = ({ headers: {...response.headers}, response });
-
-            //handle error
-            const errors = ResponseCodeEnum.getErrors(response);
-            if (response.status === 401) {
-                getLogger().error(`<<<< Authentication Failure: ${response.status}: ${response.statusText}`);
-                this.interceptor.onAuthenticationFailure({response, result, data: errors.data});
-                result.authFailure = true;
-                return Promise.reject({response, result, data: errors.data});
+            if (axios.isCancel(error)) {
+                // request was cancelled, possibly through the cancelToken
+                getLogger().error(`<<<< Request canceled ${error.message}`);
+            } else {
+                // server returned with some sort of error response
+                const {response} = error;
+                const result = response ? {headers: {...response.headers}, response} : {};
+                const errors = ResponseCodeEnum.getErrors(response);
+                if (response) {
+                    //handle error
+                    if (response.status === 401) {
+                        getLogger().error(`<<<< Authentication Failure: ${response.status}: ${response.statusText}`);
+                        this.interceptor.onAuthenticationFailure({response, result, data: errors.data});
+                        result.authFailure = true;
+                        return Promise.reject({response, result, data: errors.data});
+                    }
+                }
+                this.interceptor.fail({response, result, data: errors.data});
+                return Promise.reject(result);
             }
-
-            this.interceptor.fail({response, result, data: errors.data});
-            return Promise.reject(result);
         });
     }
     /*
@@ -236,35 +241,35 @@ export default class NURESTConnection extends NUObject {
     /*
       Invokes a PUT request on the server
     */
-    makePUTRequest(requestURL, headers, body) {
-        return this.makeRequest({requestURL, verb: 'PUT', headers, body});
+    makePUTRequest(requestURL, headers, body, cancelToken) {
+        return this.makeRequest({requestURL, verb: 'PUT', headers, body, cancelToken});
     }
 
     /*
       Invokes a POST request on the server
     */
-    makePOSTRequest(requestURL, headers, body) {
-        return this.makeRequest({requestURL, verb: 'POST', headers, body});
+    makePOSTRequest(requestURL, headers, body, cancelToken) {
+        return this.makeRequest({requestURL, verb: 'POST', headers, body, cancelToken});
     }
 
     /*
       Invokes a DELETE request on the server
     */
-    makeDELETERequest(requestURL, headers) {
-        return this.makeRequest({requestURL, verb: 'DELETE', headers});
+    makeDELETERequest(requestURL, headers, cancelToken) {
+        return this.makeRequest({requestURL, verb: 'DELETE', headers, cancelToken});
     }
 
     /*
       Invokes a HEAD request on the server
     */
-    makeHEADRequest(requestURL, headers) {
-        return this.makeRequest({requestURL, verb: 'HEAD', headers});
+    makeHEADRequest(requestURL, headers, cancelToken) {
+        return this.makeRequest({requestURL, verb: 'HEAD', headers, cancelToken});
     }
 
     /*
       Invokes a PATCH request on the server
     */
-    makePATCHRequest(requestURL, headers, body) {
-        return this.makeRequest({requestURL, verb: 'PATCH', headers, body});
+    makePATCHRequest(requestURL, headers, body, cancelToken) {
+        return this.makeRequest({requestURL, verb: 'PATCH', headers, body, cancelToken});
     }
 }
