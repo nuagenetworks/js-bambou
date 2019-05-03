@@ -166,7 +166,7 @@ export default class NUService extends NUObject {
         const connObj =  this._connection;
         return this.invokeRequest({
             verb: 'GET',
-            URL: this.buildURL(rootEntity),
+            requestURL: this.buildURL(rootEntity),
             headers: this.computeHeaders(),
             cancelToken
         }).then((response) => {
@@ -194,7 +194,7 @@ export default class NUService extends NUObject {
         
         return this.invokeRequest({
             verb: 'PUT',
-            URL: this.buildURL(entity),
+            requestURL: this.buildURL(entity),
             headers: this.computeHeaders(),
             requestData: requestPayLoad,
             cancelToken
@@ -208,7 +208,7 @@ export default class NUService extends NUObject {
     fetch(entity, cancelToken) {
         return this.invokeRequest({
             verb: 'GET',
-            URL: this.buildURL(entity),
+            requestURL: this.buildURL(entity),
             headers: this.computeHeaders(),
             cancelToken
         }).then((response) => {
@@ -223,10 +223,10 @@ export default class NUService extends NUObject {
     */
     fetchStats(statsResourceName, parentEntity, queryStringParams, cancelToken) {
         const queryString = Object.entries(queryStringParams).map( ([key, value]) => (`${key}=${value}`)).join('&');
-        const URL = `${this.buildURL(null, statsResourceName, parentEntity)}/?${queryString}`
+        const requestURL = `${this.buildURL(null, statsResourceName, parentEntity)}/?${queryString}`
         return this.invokeRequest({
             verb: 'GET',
-            URL,
+            requestURL,
             headers: this.computeHeaders(),
             cancelToken
         }).then((response) => {
@@ -257,14 +257,14 @@ export default class NUService extends NUObject {
         cancelToken
     }) {
         const EntityClass = ServiceClassRegistry.entityClassForResourceName(resourceName);
-        let URL = this.buildURL(null, resourceName, parentEntity);
+        let requestURL = this.buildURL(null, resourceName, parentEntity);
         if (light) {
-            URL = `${URL}/?light`;
+            requestURL = `${requestURL}/?light`;
         }
 
         return this.invokeRequest({
             verb: 'GET',
-            URL,
+            requestURL,
             headers: this.computeHeaders(page, filter, orderBy, filterType),
             cancelToken
         }).then((response) => {
@@ -299,7 +299,7 @@ export default class NUService extends NUObject {
     update(entity, cancelToken) {
         return this.invokeRequest({
             verb: 'PUT',
-            URL: this.buildURL(entity),
+            requestURL: this.buildURL(entity),
             headers: this.computeHeaders(),
             requestData: entity.buildJSON(),
             cancelToken
@@ -313,7 +313,7 @@ export default class NUService extends NUObject {
         if (entity && entity.associatedEntitiesResourceName) {
             return this.invokeRequest({
                 verb: 'PUT',
-                URL: this.buildURL(null, entity.associatedEntitiesResourceName, entity),
+                requestURL: this.buildURL(null, entity.associatedEntitiesResourceName, entity),
                 headers: this.computeHeaders(),
                 requestData: entity.associatedEntities.length ? entity.buildJSON() : '[]',
                 cancelToken
@@ -330,7 +330,7 @@ export default class NUService extends NUObject {
     create(entity, parentEntity, cancelToken) {
         return this.invokeRequest({
             verb: 'POST',
-            URL: this.buildURL(entity, null, parentEntity),
+            requestURL: this.buildURL(entity, null, parentEntity),
             headers: this.computeHeaders(),
             requestData: entity.buildJSON(),
             cancelToken
@@ -346,7 +346,7 @@ export default class NUService extends NUObject {
     delete(entity, cancelToken) {
         return this.invokeRequest({
             verb: 'DELETE',
-            URL: this.buildURL(entity),
+            requestURL: this.buildURL(entity),
             headers: this.computeHeaders(),
             cancelToken
         });
@@ -366,7 +366,7 @@ export default class NUService extends NUObject {
     }) {
         return this.invokeRequest({
             verb: 'HEAD',
-            URL: this.buildURL(null, resourceName, parentEntity),
+            requestURL: this.buildURL(null, resourceName, parentEntity),
             headers: this.computeHeaders(page, filter, orderBy, filterType),
             cancelToken
         }).then(response => {
@@ -380,7 +380,7 @@ export default class NUService extends NUObject {
             const service = this.withHeaders([{header: CUSTOM_HEADER_PATCH_TYPE, value: 'add'}])
             return service.invokeRequest({
                 verb: 'PATCH',
-                URL: service.buildURL(null, entity.associatedEntitiesResourceName, entity),
+                requestURL: service.buildURL(null, entity.associatedEntitiesResourceName, entity),
                 headers: service.computeHeaders(),
                 requestData: entity.associatedEntities.length ? entity.buildJSON() : '[]',
                 cancelToken
@@ -396,7 +396,7 @@ export default class NUService extends NUObject {
             const service = this.withHeaders([{header: CUSTOM_HEADER_PATCH_TYPE, value: 'remove'}])
             return service.invokeRequest({
                 verb: 'PATCH',
-                URL: service.buildURL(null, entity.associatedEntitiesResourceName, entity),
+                requestURL: service.buildURL(null, entity.associatedEntitiesResourceName, entity),
                 headers: service.computeHeaders(),
                 requestData: entity.associatedEntities.length ? entity.buildJSON() : '[]',
                 cancelToken
@@ -410,21 +410,21 @@ export default class NUService extends NUObject {
     /*
         Invokes applicable method on NURESTConnection
     */
-    invokeRequest({verb, URL, headers, requestData, ignoreRequestIdle = false, cancelToken}) {
+    invokeRequest({verb, requestURL, headers, requestData, ignoreRequestIdle = false, cancelToken}) {
         this._connection.ignoreRequestIdle = ignoreRequestIdle;
 
         if (verb === 'GET') {
-            return this._connection.makeGETRequest(URL, headers, cancelToken);
+            return this._connection.makeGETRequest(requestURL, headers, cancelToken);
         } else if (verb === 'PUT') {
-            return this._connection.makePUTRequest(URL, headers, requestData, cancelToken);
+            return this._connection.makePUTRequest(requestURL, headers, requestData, cancelToken);
         } else if (verb === 'POST') {
-            return this._connection.makePOSTRequest(URL, headers, requestData, cancelToken);
+            return this._connection.makePOSTRequest(requestURL, headers, requestData, cancelToken);
         } else if (verb === 'DELETE') {
-            return this._connection.makeDELETERequest(URL, headers, cancelToken);
+            return this._connection.makeDELETERequest(requestURL, headers, cancelToken);
         } else if (verb === 'HEAD') {
-            return this._connection.makeHEADRequest(URL, headers, cancelToken);
+            return this._connection.makeHEADRequest(requestURL, headers, cancelToken);
         } else if (verb === 'PATCH') {
-            return this._connection.makePATCHRequest(URL, headers, requestData, cancelToken);
+            return this._connection.makePATCHRequest(requestURL, headers, requestData, cancelToken);
         }
         return null;
     }
