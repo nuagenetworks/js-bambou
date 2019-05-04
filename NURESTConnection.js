@@ -17,7 +17,14 @@ class ResponseCodeEnum extends Enum {
         return ResponseCodeEnum.getClassName();
     }
 
-    static getErrors(response) {
+    static getErrors(error) {
+        const { response, message } = error;
+        if (!response) {
+            getLogger().error(`<<<< Error response without status: ${message}`);
+            return {
+                data: message
+            }
+        }
         switch (response.status) {
             case 400:
             case 401:
@@ -194,7 +201,7 @@ export default class NURESTConnection extends NUObject {
                 // server returned with some sort of error response
                 const {response} = error;
                 const result = response ? {headers: {...response.headers}, response} : {};
-                const errors = ResponseCodeEnum.getErrors(response);
+                const errors = ResponseCodeEnum.getErrors(error);
                 if (response) {
                     //handle error
                     if (response.status === 401) {
