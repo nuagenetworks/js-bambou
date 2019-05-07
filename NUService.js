@@ -253,7 +253,7 @@ export default class NUService extends NUObject {
         filter = null,
         orderBy = null,
         filterType = undefined,
-        light = true,
+        light = false,
         cancelToken
     }) {
         const EntityClass = ServiceClassRegistry.entityClassForResourceName(resourceName);
