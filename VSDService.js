@@ -96,32 +96,27 @@ export default class VSDService {
             orderBy = configuration.query.sort || null,
             api = this.service.buildURL(this.getEntity(configuration.query), null, this.getParentEntity(configuration.query)),
             pageSize = configuration.query.pageSize || this.service.pageSize;
-
-        return new Promise((resolve, reject) => {
-            this.service.invokeRequest(
-                'GET',
-                api,
-                this.service.computeHeaders(page, filter, orderBy, undefined, pageSize),
-                undefined,
-                true,
-            ).then(response => {
-
-                const header = {
-                    page: parseInt(response.headers['x-nuage-page'], 10) || 0,
-                    count: parseInt(response.headers['x-nuage-count'], 10) || 0,
-                    hits: (response.data && response.data.length) || 0,
-                }
-
-                return resolve({
-                    response: this.tabify(response.data, configuration) || [],
-                    nextQuery: this.getNextRequest(header, configuration, pageSize),
-                    length : header.count
-                })
+        return this.service.invokeRequest({
+            verb: 'GET',
+            requestURL: api,
+            headers: this.service.computeHeaders(page, filter, orderBy, undefined, pageSize),
+            requestData: undefined,
+            ignoreRequestIdle: true,
+        }).then(response => {
+            const header = {
+                page: parseInt(response.headers['x-nuage-page'], 10) || 0,
+                count: parseInt(response.headers['x-nuage-count'], 10) || 0,
+                hits: (response.data && response.data.length) || 0,
             }
-            ).catch(error => {
-                getLogger().error(error.message || error);
-                return reject(ERROR_MESSAGE);
-            });
+            return {
+                response: this.tabify(response.data, configuration) || [],
+                nextQuery: this.getNextRequest(header, configuration, pageSize),
+                length: header.count
+            }
+        }
+        ).catch(error => {
+            getLogger().error(error.message || error);
+            return Promise.reject(ERROR_MESSAGE);
         });
     }
 
