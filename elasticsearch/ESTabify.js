@@ -161,6 +161,7 @@ export default class ESTabify {
         /*
             The below delete meta was necessitated by https://github.com/elastic/elasticsearch/pull/28185
             Though no aggregation metadata was specified in the query, the query response may have an empty meta object
+            This behavior has been observed from Elastic Search 6.7
             The below block of code deletes the empty meta such that it does not impact tabification logic
         */
         if (node.meta && _.isEmpty(node.meta)) {
