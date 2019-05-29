@@ -158,6 +158,15 @@ export default class ESTabify {
         if (!node)
             return;
 
+        /*
+            The below delete meta was necessitated by https://github.com/elastic/elasticsearch/pull/28185
+            Though no aggregation metadata was specified in the query, the query response may have an empty meta object
+            The below block of code deletes the empty meta such that it does not impact tabification logic
+        */
+        if (node.meta && _.isEmpty(node.meta)) {
+            delete node.meta;
+        }
+
         const keys = Object.keys(node);
 
         // Use old school `for` so we can break control flow by returning.
