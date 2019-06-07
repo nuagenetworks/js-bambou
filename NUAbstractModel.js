@@ -50,10 +50,14 @@ export default class NUAbstractModel extends NUObject {
         return this.buildJSON();
     }
 
-    toObject() {
+    toObject(props = {}) {
+        const {isInspect = false} = props;
         const attributeDescriptors = this.constructor.attributeDescriptors;
         const obj =  {};
         Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
+            if (isInspect && attributeObj.isInternal) {
+                return;
+            }
             let value = this[localName];
             if (value) {
                 if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType) {
