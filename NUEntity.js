@@ -50,11 +50,13 @@ export default class NUEntity extends NUAbstractModel {
         associatedEntities: new NUAttribute({
           localName: 'associatedEntities',
           attributeType: NUAttribute.ATTR_TYPE_LIST,
-          isEditable: true }),
+          isEditable: true,
+          isInternal: true }),
         associatedEntitiesResourceName: new NUAttribute({
           localName: 'associatedEntitiesResourceName',
           attributeType: NUAttribute.ATTR_TYPE_STRING,
-          isEditable: true }),
+          isEditable: true,
+          isInternal: true }),
     }
 
     static getSearchableAttributes() {
@@ -123,13 +125,13 @@ export default class NUEntity extends NUAbstractModel {
         return this._validationErrors;
     }
 
-    toObject() {
+    toObject(props) {
         const attributeDescriptors = this.constructor.attributeDescriptors;
         const assocEntities = this[attributeDescriptors.associatedEntities.name];
         if (assocEntities && assocEntities.length > 0) {
           return assocEntities.map(item => item.ID);
         } else {
-            return super.toObject();
+            return super.toObject(props);
         }
     }
 

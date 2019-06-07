@@ -48,6 +48,7 @@ export default class NUAttribute extends NUObject {
             remoteName: remName,
             subType: obj.subType,
             userlabel: obj.userlabel,
+            isInternal: obj.isInternal,
         });
     }
 
