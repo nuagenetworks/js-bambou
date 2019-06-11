@@ -68,10 +68,10 @@ export default class NUAttribute extends NUObject {
                     'Invalid input', 'This value is mandatory');
             }
 
-            if (attrValue) {
+            if (attrValue !== undefined && attrValue !== null) {
                 var dataTypeMismatch = false;
                 if (attrObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT || attrObj.attributeType === NUAttribute.ATTR_TYPE_LONG || attrObj.attributeType === NUAttribute.ATTR_TYPE_TIMESTAMP) {
-                    dataTypeMismatch = (typeof attrValue !== 'number');
+                    dataTypeMismatch = isNaN(attrValue);
                 } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
                     dataTypeMismatch = (typeof attrValue !== 'object');
                 } else if (attrObj.attributeType !== NUAttribute.ATTR_TYPE_ENUM && typeof attrValue !== attrObj.attributeType) {
