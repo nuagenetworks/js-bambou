@@ -22,7 +22,7 @@ export default class NUAbstractModel extends NUObject {
             if (attributeObj.remoteName in JSONObject) {
                 const value = JSONObject[attributeObj.remoteName];
                 if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
-                    this[localName] = (!value && value !== 0) ? null : Number(value);
+                    this[localName] = (!value && value !== 0) ? null : isNaN(value) ? value : Number(value);
                 } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType && value) {
                     const subtypeEntity = new attributeObj.subType();
                     this[localName] = subtypeEntity.buildFromJSON(value);
