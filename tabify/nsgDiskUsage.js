@@ -28,48 +28,16 @@ export default class NSGDiskUsage {
         const getDisksMethod = queryConfig.getDisks ? evalExpression(queryConfig.getDisks) : undefined;
         const disks = getDisksMethod ? getDisksMethod(response.hits.hits[0]._source.disks) : response.hits.hits[0]._source.disks;
 
-        const finalData = [];
-        disks.forEach(item => {
-            //Select only these two disks, and populate their percentages.
-            // Little workaround to avoid lots of configuration in configuration file
-            const availMb = item.available;
-            const usedMb = item.used;
-            const totalMb = availMb + usedMb;
-            const availPercent = (availMb*100/totalMb).toFixed(2);
-            const usedPercent = (usedMb*100/totalMb).toFixed(2);
-            const usedVal = processByteLabel(usedMb);
-            const availVal = processByteLabel(availMb);
-            const mbVal = `Used: ${usedVal}, Available: ${availVal}`;
-            const percentVal = `Used: ${usedPercent}%, Available: ${availPercent}%`;
-
-            finalData.push({
-                disk:item.name,
-                field:"available",
-                percent:availPercent,
-                tooltipPercent:percentVal,
-                total: processByteLabel(totalMb),
-                value: mbVal
-            });
-            finalData.push({
-                disk:item.name,
-                field:"used",
-                percent:usedPercent,
-                tooltipPercent:percentVal,
-                total: processByteLabel(totalMb),
-                value: mbVal
-            });
-        })
-
         if (process.env.NODE_ENV === "development") {
             console.log("Results from tabify (first 3 rows only):");
 
             // This one shows where there are "undefined" values.
-            console.log(finalData)
+            console.log(disks)
 
             // This one shows the full structure pretty-printed.
-            console.log(JSON.stringify(finalData.slice(0, 3), null, 2))
+            console.log(JSON.stringify(disks.slice(0, 3), null, 2))
         }
 
-        return finalData;
+        return disks;
     }
 }
