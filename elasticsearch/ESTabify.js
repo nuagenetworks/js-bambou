@@ -272,7 +272,7 @@ export default class ESTabify {
 
                             if (value.length) {
                                 return value.map(item => {
-                                    if (item[key]) {
+                                    if (item[key] || item[key] === 0) {
                                         return item;
                                     }
                                     return { [key]: item };
