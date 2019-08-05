@@ -140,4 +140,6 @@ export default class ESService {
     ping = () => this._connection.ping();
 
     isConnected = () => this._connection._isConnected;
+
+    getESColumnList = (queryConfiguration) => this._connection.getMapping(queryConfiguration);
 }
