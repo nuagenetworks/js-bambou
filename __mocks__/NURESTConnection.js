@@ -4,21 +4,19 @@
 
 export default class NURESTConnection {
 
-    makeRequest(URL, verb, headers, body) {
+    makeRequest(URL, verb, headers = {}, body) {
         const response = {};
         const responseHeaders = {};
-        headers.forEach((value, key) => {
-            if (key) {
-                responseHeaders[key.toLowerCase()] = value;
-            }
-        });
+        for (let key in headers) {
+            responseHeaders[key.toLowerCase()] = headers[key];
+        }
         responseHeaders.count = 10;
 
         if (URL !== null && verb !== null) {
             if (headers !== null) {
                 switch (verb) {
                     case 'GET': {
-                        const page = headers.get('Page');
+                        const page = headers['Page'];
                         response.data = this.getResponseForGET(URL, page);
                         if (page === '3') {
                             responseHeaders.count = 20;
