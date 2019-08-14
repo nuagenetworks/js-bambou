@@ -115,7 +115,18 @@ export default class ESService {
             return queryConfiguration;
 
         if (search.length) {
-            objectPath.push(queryConfiguration, 'query.body.query.bool.must', ESSearchConvertor(search));
+            if (objectPath.has(queryConfiguration, 'query.body.query.bool.should')) {
+                const allShould = objectPath.get(queryConfiguration, 'query.body.query.bool.should');
+                if (Array.isArray(allShould)) {
+                    allShould.map(item => {
+                        objectPath.push(item, 'bool.must', ESSearchConvertor(search))
+                    })
+                } else {
+                    objectPath.push(queryConfiguration, 'query.body.query.bool.should', ESSearchConvertor(search))
+                }
+            } else {
+                objectPath.push(queryConfiguration, 'query.body.query.bool.must', ESSearchConvertor(search));
+            }
         }
 
         return queryConfiguration;
