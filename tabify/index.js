@@ -4,3 +4,4 @@ export { default as nsgDiskUsage } from './nsgDiskUsage';
 export { default as monitoringPortsTabify} from './monitoringPortsTabify';
 export { default as nsgMonitor} from './nsgMonitor';
 export { default as gwRankingTranslator} from './gwRankingTranslator';
+export { default as trafficTypeTabify } from './trafficTypeTabify';
