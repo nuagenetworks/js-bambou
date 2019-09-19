@@ -90,7 +90,7 @@ export default class ESTabify {
                     value = dataSet.map(data => method ? method(data) : data[joinField.field])
                         .filter(value => value);
 
-                    value = _.uniq(value).join(', ');
+                    value = _.uniq(value).join(`${joinField.delimiter ? joinField.delimiter : ','} `);
                 } else {
                     value = dataSet && typeof dataSet === 'object' ? dataSet[joinField.field] : dataSet;
                 }
