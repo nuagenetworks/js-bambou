@@ -98,10 +98,12 @@ export default class ESRESTConnection extends NUObject {
     }
 
     getESColumns(data, parentKey = null, columns = []) {
+        let isNestedColumn = false;
         if (parentKey !== null && data[0] !== "nested") {
             data = data[0];
         } else if (data[0] === "nested") {
             data = data[1];
+            isNestedColumn = true
         }
 
         Object.entries(data).forEach(([key, val]) => {
@@ -109,9 +111,9 @@ export default class ESRESTConnection extends NUObject {
                 this.getESColumns(Object.values(val), parentKey ? `${parentKey}.${key}` : key, columns);
             } else {
                 if (parentKey === null) {
-                    columns.push(key);
+                    columns.push({key : key, nested : isNestedColumn });
                 } else {
-                    columns.push(`${parentKey}.${key}`);
+                    columns.push({key: `${parentKey}.${key}`, nested : isNestedColumn});
                 }
             }
         });
