@@ -58,7 +58,7 @@ ResponseCodeEnum.initEnum({
         get errors() {
             return {
                 title: "Permission denied",
-                description: "You are not allowed to access this resource."
+                description: "You are either not allowed to access this resource or you used an incorrect password."
             }
         }
     },
@@ -206,7 +206,7 @@ export default class NURESTConnection extends NUObject {
                     //handle error
                     if (response.status === 401) {
                         getLogger().error(`<<<< Authentication Failure: ${response.status}: ${response.statusText}`);
-                        this.interceptor.onAuthenticationFailure({response, result, data: errors.data});
+                        this.interceptor.onAuthenticationFailure({response, result, data: errors});
                         result.authFailure = true;
                         return Promise.reject({response, result, data: errors.data});
                     }
