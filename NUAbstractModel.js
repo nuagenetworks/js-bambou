@@ -1,5 +1,6 @@
 import NUAttribute from './NUAttribute';
 import NUObject from './NUObject';
+import { getLogger } from './Logger';
 
 /*
   This class models the base Entity
@@ -18,24 +19,29 @@ export default class NUAbstractModel extends NUObject {
     */
     buildFromJSON(JSONObject) {
         const attributeDescriptors = this.constructor.attributeDescriptors;
-        Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
-            if (attributeObj.remoteName in JSONObject) {
-                const value = JSONObject[attributeObj.remoteName];
-                if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
-                    this[localName] = (!value && value !== 0) ? null : isNaN(value) ? value : Number(value);
-                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType && value) {
-                    const subtypeEntity = new attributeObj.subType();
-                    this[localName] = subtypeEntity.buildFromJSON(value);
-                } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_LIST && attributeObj.subType && typeof attributeObj.subType !== 'string') {
-                    this[localName] = value ? value.map(item => {
+        if (typeof JSONObject === 'object') {
+            Object.entries(attributeDescriptors).forEach(([localName, attributeObj]) => {
+                if (attributeObj.remoteName in JSONObject) {
+                    const value = JSONObject[attributeObj.remoteName];
+                    if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
+                        this[localName] = (!value && value !== 0) ? null : isNaN(value) ? value : Number(value);
+                    } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType && value) {
                         const subtypeEntity = new attributeObj.subType();
-                        return subtypeEntity.buildFromJSON(item);
-                    }) : null;
-                } else {
-                    this[localName] = value;
+                        this[localName] = subtypeEntity.buildFromJSON(value);
+                    } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_LIST && attributeObj.subType && typeof attributeObj.subType !== 'string') {
+                        this[localName] = value ? value.map(item => {
+                            const subtypeEntity = new attributeObj.subType();
+                            return subtypeEntity.buildFromJSON(item);
+                        }) : null;
+                    } else {
+                        this[localName] = value;
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            getLogger().warn(`Invalid JSON object ${JSONObject}, type expected ${this.getClassName()}, but is ${typeof JSONObject}`);
+        }
+
         return this;
     }
 
