@@ -17,18 +17,22 @@ export default class ESService {
 
     fetch = (configuration) => {
         try {
-            return new Promise((resolve, reject) => {
-                this._connection.makeRequest(configuration.query, configuration.scroll)
-                    .then(response => resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
-                    .catch(error => {
-                        if (!error.body) {
-                            return reject(error);
-                        } else {
-                            getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
-                            return reject(ERROR_MESSAGE);
-                        }
-                    });
-            });
+            if (!configuration.enabledCount) {
+                return new Promise((resolve, reject) => {
+                    this._connection.makeRequest(configuration.query, configuration.scroll)
+                        .then(response => resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
+                        .catch(error => {
+                            if (!error.body) {
+                                return reject(error);
+                            } else {
+                                getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
+                                return reject(ERROR_MESSAGE);
+                            }
+                        });
+                });
+            } else {
+                return this.getCount(configuration.query).then(result => (result));
+            }
         } catch (error) {
             return Promise.reject(error);
         }
@@ -43,13 +47,32 @@ export default class ESService {
         }
         return new ESTabify();
     }
+ 
+    getCount = (queryConfiguration) => {
+        try {
+            return new Promise((resolve, reject) => {
+                this._connection.getCount(queryConfiguration.query)
+                    .then(response => resolve(this.parseResponse(response, queryConfiguration.tabifyOptions, queryConfiguration)))
+                    .catch(error => {
+                        if (!error.body) {
+                            return reject(error);
+                        } else {
+                            getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
+                            return reject(ERROR_MESSAGE);
+                        }
+                    });
+            });
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 
     // process response for scroll & search response
     parseResponse = (response = {}, tabifyOptions = {}, queryConfiguration = {}) => {
         const tabify = this.getTabify(queryConfiguration);
         let results = null;
         // if scrolling is enabled then update next query for fetching data via scrolling
-        if (response.hits.hits.length && response._scroll_id) {
+        if (response.hits && response.hits.hits.length && response._scroll_id) {
             results = {
                 response: tabify.process(response, tabifyOptions, queryConfiguration),
                 nextPage: {
