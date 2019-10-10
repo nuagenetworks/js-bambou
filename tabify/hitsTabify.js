@@ -1,11 +1,8 @@
 import { getLogger } from '../Logger';
-import ESTabify from "../elasticsearch/ESTabify";
 
-export default class HitsTabify extends ESTabify {
+export default class HitsTabify {
 
-    process(response, tabifyOptions = {}) {
-        let table;
-
+    process(response) {
         if (response.hits) {
             const hits = response.hits.total || 0;
             return [{hits}];
