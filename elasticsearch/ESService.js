@@ -17,22 +17,21 @@ export default class ESService {
 
     fetch = (configuration) => {
         try {
+            let connection;
             if (!configuration.enabledCount) {
-                return new Promise((resolve, reject) => {
-                    this._connection.makeRequest(configuration.query, configuration.scroll)
-                        .then(response => resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
-                        .catch(error => {
-                            if (!error.body) {
-                                return reject(error);
-                            } else {
-                                getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
-                                return reject(ERROR_MESSAGE);
-                            }
-                        });
-                });
+                connection = this._connection.makeRequest(configuration.query, configuration.scroll);
             } else {
-                return this.getCount(configuration.query).then(result => (result));
+                connection = this._connection.getCount(configuration.query.query);
             }
+            return connection.then(response => Promise.resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
+                .catch(error => {
+                    if (!error.body) {
+                        return Promise.reject(error);
+                    } else {
+                        getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
+                        return Promise.reject(ERROR_MESSAGE);
+                    }
+                });
         } catch (error) {
             return Promise.reject(error);
         }
@@ -46,25 +45,6 @@ export default class ESService {
             }
         }
         return new ESTabify();
-    }
- 
-    getCount = (queryConfiguration) => {
-        try {
-            return new Promise((resolve, reject) => {
-                this._connection.getCount(queryConfiguration.query)
-                    .then(response => resolve(this.parseResponse(response, queryConfiguration.tabifyOptions, queryConfiguration)))
-                    .catch(error => {
-                        if (!error.body) {
-                            return reject(error);
-                        } else {
-                            getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
-                            return reject(ERROR_MESSAGE);
-                        }
-                    });
-            });
-        } catch (error) {
-            return Promise.reject(error);
-        }
     }
 
     // process response for scroll & search response
