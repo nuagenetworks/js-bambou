@@ -86,6 +86,11 @@ export default class ESRESTConnection extends NUObject {
         return this.client.search(updatedQuery);
     }
 
+    // get count from ES
+    getCount(query) {
+        return this.client.count(query);
+    }
+
     async getMapping(query){
         try {
             const index = objectPath.get(query,['query', 'index']);
