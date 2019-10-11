@@ -14,6 +14,10 @@ import objectPath from 'object-path';
 export default class ESTabify {
 
     process(response, tabifyOptions = {}) {
+        if (response.count || response.count === 0) {
+            return this.cartesianProduct(response);
+        }
+
         let table;
 
         if (response.aggregations) {
@@ -90,7 +94,7 @@ export default class ESTabify {
                     value = dataSet.map(data => method ? method(data) : data[joinField.field])
                         .filter(value => value);
 
-                    value = _.uniq(value).join(', ');
+                    value = _.uniq(value).join(`${joinField.delimiter ? joinField.delimiter : ','} `);
                 } else {
                     value = dataSet && typeof dataSet === 'object' ? dataSet[joinField.field] : dataSet;
                 }
@@ -272,7 +276,7 @@ export default class ESTabify {
 
                             if (value.length) {
                                 return value.map(item => {
-                                    if (item[key]) {
+                                    if (item[key] || item[key] === 0) {
                                         return item;
                                     }
                                     return { [key]: item };

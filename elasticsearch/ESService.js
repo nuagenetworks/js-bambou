@@ -17,18 +17,21 @@ export default class ESService {
 
     fetch = (configuration) => {
         try {
-            return new Promise((resolve, reject) => {
-                this._connection.makeRequest(configuration.query, configuration.scroll)
-                    .then(response => resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
-                    .catch(error => {
-                        if (!error.body) {
-                            return reject(error);
-                        } else {
-                            getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
-                            return reject(ERROR_MESSAGE);
-                        }
-                    });
-            });
+            let connection;
+            if (!configuration.enabledCount) {
+                connection = this._connection.makeRequest(configuration.query, configuration.scroll);
+            } else {
+                connection = this._connection.getCount(configuration.query);
+            }
+            return connection.then(response => Promise.resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
+                .catch(error => {
+                    if (!error.body) {
+                        return Promise.reject(error);
+                    } else {
+                        getLogger().error(error.body.error.reason + ": " + error.body.error["resource.id"])
+                        return Promise.reject(ERROR_MESSAGE);
+                    }
+                });
         } catch (error) {
             return Promise.reject(error);
         }
@@ -49,7 +52,7 @@ export default class ESService {
         const tabify = this.getTabify(queryConfiguration);
         let results = null;
         // if scrolling is enabled then update next query for fetching data via scrolling
-        if (response.hits.hits.length && response._scroll_id) {
+        if (response.hits && response.hits.hits.length && response._scroll_id) {
             results = {
                 response: tabify.process(response, tabifyOptions, queryConfiguration),
                 nextPage: {
@@ -115,7 +118,18 @@ export default class ESService {
             return queryConfiguration;
 
         if (search.length) {
-            objectPath.push(queryConfiguration, 'query.body.query.bool.must', ESSearchConvertor(search));
+            if (objectPath.has(queryConfiguration, 'query.body.query.bool.should')) {
+                const allShould = objectPath.get(queryConfiguration, 'query.body.query.bool.should');
+                if (Array.isArray(allShould)) {
+                    allShould.map(item => {
+                        objectPath.push(item, 'bool.must', ESSearchConvertor(search))
+                    })
+                } else {
+                    objectPath.push(queryConfiguration, 'query.body.query.bool.should', ESSearchConvertor(search))
+                }
+            } else {
+                objectPath.push(queryConfiguration, 'query.body.query.bool.must', ESSearchConvertor(search));
+            }
         }
 
         return queryConfiguration;
@@ -140,4 +154,6 @@ export default class ESService {
     ping = () => this._connection.ping();
 
     isConnected = () => this._connection._isConnected;
+
+    getESColumnList = (queryConfiguration) => this._connection.getMapping(queryConfiguration);
 }

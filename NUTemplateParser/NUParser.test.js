@@ -26,7 +26,7 @@ describe('NU Template Parser', () => {
     });
 
     it('expected parameters', () => {
-        const parameters = NUTemplateParser.getUsedParameters(mockQueryTemplate, { 'type': 'sample type' });
+        const parameters = NUTemplateParser.getUsedParameters(mockQueryTemplate, { 'type': 'sample type', value: '' });
         expect(parameters).toEqual({
             index: 'nuage_flow',
             type: 'sample type',

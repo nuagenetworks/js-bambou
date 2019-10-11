@@ -143,10 +143,10 @@ it('fetchall by page, filter, and orderBy', () => {
         filter: 'value < 100',
         orderBy: 'value ASC'
     }).then((response) => {
-        expect(response.data[2].ID).toEqual('aad333');
-        expect(response.data[2].attr1).toEqual('AAC098333');
-        expect(response.data[2].attr2).toEqual('1485303336333');
-        expect(response.headers.count).toEqual(20);
+        expect(response.data[2].ID).toEqual('xyz789');
+        expect(response.data[2].attr1).toEqual('AC0098767');
+        expect(response.data[2].attr2).toEqual('1485303336000');
+        expect(response.headers.count).toEqual(10);
         expect(response.headers.filter).toEqual('value < 100');
         expect(response.headers.orderBy).toEqual('value ASC');
         expect(response.headers.page).toEqual(3);
