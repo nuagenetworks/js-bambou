@@ -21,7 +21,7 @@ export default class ESService {
             if (!configuration.enabledCount) {
                 connection = this._connection.makeRequest(configuration.query, configuration.scroll);
             } else {
-                connection = this._connection.getCount(configuration.query.query);
+                connection = this._connection.getCount(configuration.query);
             }
             return connection.then(response => Promise.resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
                 .catch(error => {

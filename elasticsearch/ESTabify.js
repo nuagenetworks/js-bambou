@@ -14,7 +14,7 @@ import objectPath from 'object-path';
 export default class ESTabify {
 
     process(response, tabifyOptions = {}) {
-        if (response.count) {
+        if (response.count || response.count === 0) {
             return this.cartesianProduct(response);
         }
 
