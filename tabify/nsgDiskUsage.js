@@ -40,23 +40,13 @@ export default class NSGDiskUsage {
             const usedVal = processByteLabel(usedMb);
             const availVal = processByteLabel(availMb);
             const mbVal = `Used: ${usedVal}, Available: ${availVal}`;
-            const percentVal = `Used: ${usedPercent}%, Available: ${availPercent}%`;
 
             finalData.push({
-                disk:item.name,
-                field:"available",
-                percent:availPercent,
-                tooltipPercent:percentVal,
-                total: processByteLabel(totalMb),
-                value: mbVal
-            });
-            finalData.push({
-                disk:item.name,
-                field:"used",
-                percent:usedPercent,
-                tooltipPercent:percentVal,
-                total: processByteLabel(totalMb),
-                value: mbVal
+                ...item,
+                availPercent,
+                usedPercent,
+                totalMB: processByteLabel(totalMb),
+                valueMB: mbVal
             });
         })
 
