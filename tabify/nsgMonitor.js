@@ -28,6 +28,21 @@ export default (response)  => {
             const nsgState = item.nsgstate || {};
             const nsgsummary = item.nsgsummary || {};
             const vscs = item.vscs;
+
+            const controllervrslinks = item.controllervrslinks;
+            let uplinks;
+            const vscIds = [];
+            if (controllervrslinks && controllervrslinks.length) {
+                uplinks = controllervrslinks.reduce((link, currVal) => {
+                    vscIds.push(currVal.controllerID);
+                    if (currVal.connections) {
+                        link.push(...currVal.connections);
+                    }
+
+                    return link;
+                }, [])
+            }
+
             let vscIPs;
             if (vscs && vscs.length) {
                 vscIPs = vscs.reduce((ips, currVal) => {
@@ -49,7 +64,8 @@ export default (response)  => {
                 vrsUptime: millsToDaysHoursMin(vrsInfo.uptime),
                 address: vrsInfo.address,
                 managementIP: vrsInfo.managementIP,
-                JSONRPCConnectionState: vrsInfo.JSONRPCConnectionState || 'Unknown'
+                JSONRPCConnectionState: vrsInfo.JSONRPCConnectionState || 'Unknown',
+                uplinks
             };
         })
     }
