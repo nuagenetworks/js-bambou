@@ -6,9 +6,9 @@ import ESTabify from './ESTabify';
 import { getLogger } from '../Logger';
 import NUTemplateParser from "../NUTemplateParser";
 import { ESSearchConvertor } from 'vis-graphs/utils/helpers';
+import { SCROLL_TIME } from './ESRESTConnection';
 
 const ERROR_MESSAGE = 'Unable to fetch data';
-export const SCROLL_TIME = '3m';
 
 export default class ESService {
     constructor(host = null) {
