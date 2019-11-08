@@ -2,9 +2,9 @@ import elasticsearch from 'elasticsearch';
 import _ from 'lodash';
 
 import NUObject from '../NUObject';
-import { SCROLL_TIME } from './ESService';
 import objectPath from 'object-path';
 
+export const SCROLL_TIME = '3m';
 /*
   This class implements the HTTP actions invoked on the server
 */
