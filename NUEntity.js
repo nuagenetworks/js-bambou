@@ -24,6 +24,7 @@ export default class NUEntity extends NUAbstractModel {
         ID: new NUAttribute({
             localName: 'ID',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
+            canSearch: true,
             isIdentifier: true }),
         lastUpdatedBy: new NUAttribute({
             localName: 'lastUpdatedBy',
