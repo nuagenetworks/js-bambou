@@ -1,6 +1,10 @@
 import ESTabify from "../elasticsearch/ESTabify";
 import isEmpty from "lodash/isEmpty";
 
+/*
+    Adds data for missing GatewayRank items, with NSGCount value as 0
+    Sorts by Rank 1 to 4 (4 to 1 as per data received from elasticsearch response
+ */
 export default class GatewayRanksTabify extends ESTabify {
 
     process(response) {
