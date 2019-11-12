@@ -6,3 +6,4 @@ export { default as nsgMonitor} from './nsgMonitor';
 export { default as gwRankingTranslator} from './gwRankingTranslator';
 export { default as trafficTypeTabify } from './trafficTypeTabify';
 export { default as flowExplorerTabify } from './flowExplorerTabify';
+export { default as gatewayRanksTabify } from './gatewayRanksTabify';
