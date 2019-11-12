@@ -11,7 +11,7 @@ export default class GatewayRanksTabify extends ESTabify {
         const result =  super.process(response) || [];
         const computedItems = [];
         if (!isEmpty(result)) {
-            for (let rank = 1; rank <= 4; rank++) {
+            for (let rank = 0; rank <= 4; rank++) {
                 if (!result.find((item) => item && item.GatewayRank === rank)) {
                     computedItems.push({GatewayRank: rank, NSGCount: 0});
                 }
