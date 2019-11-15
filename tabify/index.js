@@ -7,3 +7,4 @@ export { default as gwRankingTranslator} from './gwRankingTranslator';
 export { default as trafficTypeTabify } from './trafficTypeTabify';
 export { default as flowExplorerTabify } from './flowExplorerTabify';
 export { default as gatewayRanksTabify } from './gatewayRanksTabify';
+export { default as webDomainNamesTabify } from './webDomainNamesTabify';
