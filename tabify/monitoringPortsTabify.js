@@ -10,9 +10,12 @@ export default (response)  => {
             const wirelessPorts = item.wirelessPorts;
             const configuredPorts = (item.ports && item.ports.reduce((acc, currVal) => {
                 const portInfo = monitoringPorts.find(port => port.name === currVal.physicalName) || {state: 'Unknown'};
+                const { uplinkconnections } = currVal;
+                const type = Array.isArray(uplinkconnections) && uplinkconnections.length && uplinkconnections.find(conn => conn.mode === 'LTE') ?
+                    'LTE' :  capitalizeFirstLetter(currVal.portType);
                 const port = {
                     ...currVal,
-                    type: capitalizeFirstLetter(currVal.portType),
+                    type,
                     ...portInfo
                 }
                 acc.push(port);
