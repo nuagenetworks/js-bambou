@@ -30,27 +30,20 @@ export default (response)  => {
             const vscs = item.vscs;
 
             const controllervrslinks = item.controllervrslinks;
-            let uplinks;
-            const vscIds = [];
+            const vscLinks = [];
             if (controllervrslinks && controllervrslinks.length) {
-                uplinks = controllervrslinks.reduce((link, currVal) => {
-                    vscIds.push(currVal.controllerID);
-                    if (currVal.connections) {
-                        link.push(...currVal.connections);
+                for (let link of controllervrslinks) {
+                    if (link.controllerType === 'VSC') {
+                        const vscObj = {connections: link.connections, controllerID: link.controllerID};
+                        const vsc = vscs && vscs.length && vscs.find( item => item.ID === link.controllerID);
+                        if (vsc) {
+                            vscObj.addresses = Array.isArray(vsc.addresses) && vsc.addresses.length ? vsc.addresses.join(',\n') : '';
+                            vscObj.managementIP = vsc.managementIP;
+                        }
+                        vscLinks.push(vscObj);
                     }
 
-                    return link;
-                }, [])
-            }
-
-            let vscIPs;
-            if (vscs && vscs.length) {
-                vscIPs = vscs.reduce((ips, currVal) => {
-                    if (currVal.addresses && currVal.addresses.length) {
-                        ips.push(...currVal.addresses);
-                    }
-                    return ips;
-                }, [])
+                }
             }
 
             return {
@@ -60,12 +53,8 @@ export default (response)  => {
                 model: nsgInfo.family,
                 softwareVersion: nsgsummary.NSGVersion,
                 state: nsgState.status,
-                vscIPs: vscIPs ? vscIPs.join(',\n') : '',
                 vrsUptime: millsToDaysHoursMin(vrsInfo.uptime),
-                address: vrsInfo.address,
-                managementIP: vrsInfo.managementIP,
-                JSONRPCConnectionState: vrsInfo.JSONRPCConnectionState || 'Unknown',
-                uplinks
+                vscs: vscLinks
             };
         })
     }
