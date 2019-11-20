@@ -97,7 +97,7 @@ const parseString = (() => {
                     const parameter = parameters[i];
 
                     const value = context[parameter.key] || parameter.defaultValue;
-                    return str.replace(match, value);
+                    return Array.isArray(value) ? value : str.replace(match, value);
                 }, str);
             }, parameters);
 
