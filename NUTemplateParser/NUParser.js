@@ -82,8 +82,8 @@ const Template = (fn, parameters) => {
 const parseString = (() => {
 
     // This regular expression detects instances of the
-    // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
-    const regex = /{{(\w|:|\s|-|\.|\)|\(|'|,)+}}/g;
+    // template parameter syntax such as {{foo}}, {{foo:someDefault}} or {{foo:['someDefault']}}.
+    const regex = /{{(\w|:|\s|-|\.|\[|\)|\(|'|,|])+}}/g;
 
     return (str) => {
         if (regex.test(str)) {
