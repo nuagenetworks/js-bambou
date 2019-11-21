@@ -30,10 +30,7 @@ export default class ESRESTConnection extends NUObject {
         }
 
         return new Promise((resolve, reject) => {
-            this.client.ping({
-                // ping usually has a 3000ms timeout
-                requestTimeout: 3000,
-            }, (error) => {
+            this.client.ping({}, (error) => {
                 if (error) {
                     reject();
                 } else {
