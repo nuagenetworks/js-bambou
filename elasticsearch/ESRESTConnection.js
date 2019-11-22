@@ -30,7 +30,10 @@ export default class ESRESTConnection extends NUObject {
         }
 
         return new Promise((resolve, reject) => {
-            this.client.ping({}, (error) => {
+            this.client.ping({
+                // ping usually has a 30000ms timeout
+                requestTimeout: 30000,
+            }, (error) => {
                 if (error) {
                     reject();
                 } else {
@@ -44,7 +47,8 @@ export default class ESRESTConnection extends NUObject {
         this.client = new elasticsearch.Client({
             log: this.log,
             apiVersion: this.apiVersion,
-            host: this.host
+            host: this.host,
+            requestTimeout: 30000
         });
     }
 
