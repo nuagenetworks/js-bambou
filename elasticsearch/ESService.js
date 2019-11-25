@@ -155,5 +155,5 @@ export default class ESService {
 
     isConnected = () => this._connection._isConnected;
 
-    getESColumnList = (queryConfiguration) => this._connection.getMapping(queryConfiguration);
+    getESColumnList = (queryIndex) => this._connection.getMapping(queryIndex);
 }
