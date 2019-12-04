@@ -25,7 +25,9 @@ export default class GatewayRanksTabify extends ESTabify {
                     computedItems.push({GatewayRank: rank, NSGCount: 0});
                 }
             }
-            return [...resultArray, ...computedItems].sort((item1, item2) => (item2.GatewayRank - item1.GatewayRank));
+            return [...resultArray, ...computedItems].sort((item1, item2) => (
+                item1.GatewayRank === 0 ? 1 : item2.GatewayRank === 0 ? -1 : item1.GatewayRank - item2.GatewayRank
+            ));
         }
         return result;
     }
