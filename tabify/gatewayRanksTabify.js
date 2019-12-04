@@ -16,7 +16,7 @@ export default class GatewayRanksTabify extends ESTabify {
                 resultByRank[GatewayRank] = (resultByRank[GatewayRank] || 0) + 1;
             });
             const resultArray = [];
-            for (var GatewayRank in resultByRank) {
+            for (const GatewayRank in resultByRank) {
                 resultArray.push({GatewayRank, NSGCount: resultByRank[GatewayRank]});
             }
             const computedItems = [];
