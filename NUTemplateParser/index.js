@@ -91,7 +91,7 @@ export default class NUTemplateParser {
             // else ignore the parameter because it is not used in the provided configuration.
         }
 
-        if(context.value !== '') {
+        if (context.value !== '' && context.value !== undefined) {
             queryParams['value'] = context.value.replace(/ /g,'');
         }
 
