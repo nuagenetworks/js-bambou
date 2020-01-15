@@ -1,4 +1,5 @@
 import NUParser from './NUParser';
+import isEmpty from 'lodash/isEmpty';
 
 export default class NUTemplateParser {
     /**
@@ -91,7 +92,7 @@ export default class NUTemplateParser {
             // else ignore the parameter because it is not used in the provided configuration.
         }
 
-        if(context.value !== '') {
+        if(!isEmpty(context.value) && typeof context.value === 'string') {
             queryParams['value'] = context.value.replace(/ /g,'');
         }
 
