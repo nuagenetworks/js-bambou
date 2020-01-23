@@ -24,6 +24,14 @@ export default class NUTemplateParser {
         //     }
         // }
 
+        if (!isEmpty(parameters)) {
+            parameters.forEach(param => {
+                if (param.key && param.method) {
+                    context[param.key] = param.method(context);
+                }
+            });
+        }
+
         return context;
     }
 
@@ -38,7 +46,7 @@ export default class NUTemplateParser {
     static shouldParameterizedContext(parameters, context) {
 
         return parameters.every((parameter) => {
-            return "defaultValue" in parameter || parameter.key in context;
+            return "defaultValue" in parameter || parameter.key in context || parameter.method;
         });
     }
 
@@ -88,6 +96,8 @@ export default class NUTemplateParser {
                 queryParams[parameter.key] = context[parameter.key];
             } else if ("defaultValue" in parameter) {
                 queryParams[parameter.key] = parameter.defaultValue;
+            } else if ("method" in parameter) {
+                queryParams[parameter.key] = parameter.method(context);
             }
             // else ignore the parameter because it is not used in the provided configuration.
         }
