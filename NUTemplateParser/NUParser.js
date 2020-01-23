@@ -63,9 +63,8 @@ const Parameter = (match) => {
         if (value.includes('call(')) {
             let re = /(call\(')(.*)('\))/;
             parameter.evaluate = value.replace(re, "$2");
-        } else if (value.startsWith('eval(')) {
-            const method = value.substring(5, value.length-1);
-            parameter.method = evalExpression(method);
+        } else if (value.startsWith('(props)')) {
+            parameter.method = evalExpression(value);
         } else {
             parameter.defaultValue = value;
         }
