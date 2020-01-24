@@ -1,3 +1,5 @@
+import evalExpression from 'eval-expression';
+
 /*
 MIT License
 
@@ -61,6 +63,8 @@ const Parameter = (match) => {
         if (value.includes('call(')) {
             let re = /(call\(')(.*)('\))/;
             parameter.evaluate = value.replace(re, "$2");
+        } else if (value.startsWith('(props)')) {
+            parameter.function = evalExpression(value);
         } else {
             parameter.defaultValue = value;
         }
@@ -83,7 +87,7 @@ const parseString = (() => {
 
     // This regular expression detects instances of the
     // template parameter syntax such as {{foo}}, {{foo:someDefault}} or {{foo:['someDefault']}}.
-    const regex = /{{(\w|:|\s|-|\.|\[|\)|\(|'|,|])+}}/g;
+    const regex = /{{(\w|:|\s|-|\.|\[|\)|\(|'|,|]|\+|=|>|&|\?|"|\\)+}}/g;
 
     return (str) => {
         if (regex.test(str)) {
