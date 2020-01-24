@@ -64,7 +64,7 @@ const Parameter = (match) => {
             let re = /(call\(')(.*)('\))/;
             parameter.evaluate = value.replace(re, "$2");
         } else if (value.startsWith('(props)')) {
-            parameter.method = evalExpression(value);
+            parameter.function = evalExpression(value);
         } else {
             parameter.defaultValue = value;
         }
