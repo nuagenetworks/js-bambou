@@ -1,6 +1,5 @@
 import NUAttribute from './NUAttribute';
 import NUObject from './NUObject';
-import isEmpty from 'lodash/isEmpty';
 
 const doValidate = (validator, entity, attrObj, formValues) => {
     const validationError = validator.validate(entity, attrObj, formValues);
