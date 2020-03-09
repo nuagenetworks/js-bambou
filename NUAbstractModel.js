@@ -92,7 +92,7 @@ export default class NUAbstractModel extends NUObject {
         Register custom validator
     */
     registerValidator(...args) {
-        if (args.length == 2 && args[1]) {
+        if (args.length === 2 && args[1]) {
             //if the second argument is true, the new validator will be appended to the list of existing validators
             const currentValidator = this._validators.get(args[0].name) || [];
             if (Array.isArray(currentValidator)) {
