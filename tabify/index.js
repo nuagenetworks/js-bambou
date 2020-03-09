@@ -8,3 +8,4 @@ export { default as trafficTypeTabify } from './trafficTypeTabify';
 export { default as flowExplorerTabify } from './flowExplorerTabify';
 export { default as gatewayRanksTabify } from './gatewayRanksTabify';
 export { default as webDomainNamesTabify } from './webDomainNamesTabify';
+export { default as tiRiskyPublicIPsTabify } from './tiRiskyPublicIPsTabify';
