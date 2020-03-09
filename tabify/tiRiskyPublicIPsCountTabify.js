@@ -4,7 +4,7 @@ import union from "lodash/union";
 /*
  *Returns the cardinality of unique public IPs coming from source and destination IPs terms aggregations
  */
-export default class TiRiskyPublicIPsTabify {
+export default class TiRiskyPublicIPsCountTabify {
     
     process(response) {
         const aggregations = response && response.aggregations;
