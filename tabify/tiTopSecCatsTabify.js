@@ -1,7 +1,7 @@
 import isEmpty from "lodash/isEmpty";
 
 /*
- *Returns the top risky public IPs coming from source and destination IPs by flows aggregations
+ *Returns the top security categories coming from source and destination IP Categories by flows aggregations
  */
 export default class TiTopSecCatsTabify {
     
