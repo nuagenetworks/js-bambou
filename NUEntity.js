@@ -138,7 +138,7 @@ export default class NUEntity extends NUAbstractModel {
 
     getDefaults() {
         return Object.entries(this).reduce((acc, [key, value]) => {
-            return (value && key !== '_validationErrors' && key !== '_validators' && key !== '_associatedEntities')
+            return (value !== undefined && value !== null && key !== '_validationErrors' && key !== '_validators' && key !== '_associatedEntities')
                 ? { ...acc, [key.substring(1)]: value } : acc;
         }, {});
     }
