@@ -73,24 +73,9 @@ export default class NUEntity extends NUAbstractModel {
         return this.searchableAttributes;
     }
 
-    static getMandatoryAttributes() {
-        if (!this.mandatoryAttributes) {
-            this.mandatoryAttributes = Object
-                .entries(this.attributeDescriptors)
-                .reduce((acc, attr) => {
-                    const [key, value] = attr;
-                    if (value.isRequired) {
-                        acc.push(key)
-                    };
-                    return acc;
-                }, []);
-        }
-        return this.mandatoryAttributes;
-    }
-    
     static hasMandatoryAttributesSet(JSONObject) {
-        for (const attr of this.getMandatoryAttributes()) {
-            if (!JSONObject[attr]) {
+        for (const [attr, descriptor] of Object.entries(this.attributeDescriptors)) {
+            if (descriptor.isRequired && !descriptor.isValueSet(JSONObject[attr])) {
                 return false;
             }
         }
