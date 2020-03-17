@@ -87,11 +87,10 @@ export default class NUEntity extends NUAbstractModel {
         }
         return this.mandatoryAttributes;
     }
-    
+
     static hasMandatoryAttributesSet(JSONObject) {
-        for (const attr of this.getMandatoryAttributes()) {
-            const attrValue = JSONObject[attr];
-            if (attrValue === null || attrValue === undefined) {
+        for (const [attr, descriptor] of Object.entries(this.attributeDescriptors)) {
+            if (descriptor.isRequired && !descriptor.isValueSet(JSONObject[attr])) {
                 return false;
             }
         }

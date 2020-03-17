@@ -51,6 +51,12 @@ export default class NUAttribute extends NUObject {
             isInternal: obj.isInternal,
         });
     }
+    
+
+    isValueSet(attrValue) {
+        return ((this.attributeType === NUAttribute.ATTR_TYPE_STRING && attrValue) ||
+            (this.attributeType !== NUAttribute.ATTR_TYPE_STRING && attrValue !== undefined && attrValue !== null));
+    }
 
     /*
         Invoked from NUEntity.
@@ -62,8 +68,7 @@ export default class NUAttribute extends NUObject {
         if (attrObj) {
             const attrValue =  entity && entity[attrObj.name];
             //if STRING use !attrValue to check if value provided. For all other attribute types use !undefined and !null
-            if (attrObj.isRequired && ((attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING && !attrValue) ||
-                (attrObj.attributeType !== NUAttribute.ATTR_TYPE_STRING && (attrValue === undefined || attrValue === null)))) {
+            if (attrObj.isRequired && !attrObj.isValueSet(attrValue)) {
                 return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                     'Invalid input', 'This value is mandatory');
             }
