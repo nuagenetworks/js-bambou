@@ -197,6 +197,7 @@ export default class NURESTConnection extends NUObject {
             if (axios.isCancel(error)) {
                 // request was cancelled, possibly through the cancelToken
                 getLogger().error(`<<<< Request canceled ${error.message}`);
+                return Promise.reject(error);
             } else {
                 // server returned with some sort of error response
                 const {response} = error;
