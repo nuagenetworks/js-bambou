@@ -9,10 +9,10 @@ export default class TiRiskyPublicIPsCountTabify {
     process(response) {
         const aggregations = response && response.aggregations;
         if (!isEmpty(aggregations)) {
-            const uniqueSrcPublicIps = aggregations.uniqueSrcPublicIps && aggregations.uniqueSrcPublicIps.buckets 
-                ? aggregations.uniqueSrcPublicIps.buckets.map(item => item.key) : [];
-            const uniqueDstPublicIps = aggregations.uniqueDstPublicIps && aggregations.uniqueDstPublicIps.buckets 
-                ? aggregations.uniqueDstPublicIps.buckets.map(item => item.key) : [];
+            const uniqueSrcPublicIps = aggregations.uniqueSrcPublicIps && aggregations.uniqueSrcPublicIps.riskySrcIps.buckets 
+                ? aggregations.uniqueSrcPublicIps.riskySrcIps.buckets.map(item => item.key) : [];
+            const uniqueDstPublicIps = aggregations.uniqueDstPublicIps && aggregations.uniqueDstPublicIps.riskyDstIps.buckets 
+                ? aggregations.uniqueDstPublicIps.riskyDstIps.buckets.map(item => item.key) : [];
             const result = union(uniqueSrcPublicIps, uniqueDstPublicIps);
             return [{value: result.length}];
         }
