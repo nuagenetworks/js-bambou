@@ -16,6 +16,7 @@ export default class NUAttribute extends NUObject {
     static ATTR_TYPE_STRING = 'string';
     static ATTR_TYPE_OBJECT = 'object';
     static ATTR_TYPE_TIMESTAMP = 'long';
+    static ATTR_TYPES_NUMBER = [NUAttribute.ATTR_TYPE_INTEGER, NUAttribute.ATTR_TYPE_FLOAT, NUAttribute.ATTR_TYPE_LONG];
 
     constructor(obj) {
         super();
@@ -49,6 +50,8 @@ export default class NUAttribute extends NUObject {
             subType: obj.subType,
             userlabel: obj.userlabel,
             isInternal: obj.isInternal,
+            minValue: obj.minValue,
+            maxValue: obj.maxValue
         });
     }
     
@@ -96,6 +99,8 @@ export default class NUAttribute extends NUObject {
                 }
                 else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT) {
                     return attrObj.validateObjectValue(attrValue, attrObj);
+                } else if (NUAttribute.ATTR_TYPES_NUMBER.includes(attrObj.attributeType)) {
+                    return attrObj.validateNumberValue(attrValue, attrObj);
                 }
             }
         }
@@ -173,5 +178,18 @@ export default class NUAttribute extends NUObject {
             }
         }
         return null;
+    }
+
+    validateNumberValue(attrValue, attrObj) {
+        if (!isNaN(attrObj.minValue) && (isNaN(attrValue) || attrValue < attrObj.minValue)) {
+            return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+                'Invalid value',
+                `Minimum accepted value is ${attrObj.minValue}`);
+        }
+        if (!isNaN(attrObj.maxValue) && (isNaN(attrValue) || attrValue > attrObj.maxValue)) {
+            return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+                'Invalid value',
+                `Maximum accepted value is ${attrObj.maxValue}`);
+        }
     }
 }
