@@ -129,22 +129,21 @@ export default class NUAttribute extends NUObject {
             switch (attrObj.subType) {
                 case NUAttribute.ATTR_TYPE_STRING:
                     err = attrObj.validateStringValue(listElementValue, attrObj, true);
+                    if (err) return err;
                     break;
 
                 case NUAttribute.ATTR_TYPE_ENUM:
                     err = attrObj.validateEnumValue(listElementValue, attrObj, true);
+                    if (err) return err;
                     break;
 
                 case NUAttribute.ATTR_TYPE_INTEGER:
                 case NUAttribute.ATTR_TYPE_FLOAT:
                     err = attrObj.validateNumberValue(listElementValue, attrObj, true);
+                    if (err) return err;
                     break;
 
                 default:
-            }
-
-            if (err) {
-                return err;
             }
         }
         return null;
