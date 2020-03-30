@@ -116,6 +116,7 @@ export default class NUAttribute extends NUObject {
         for (const listElementValue of listValues) {
             let err = false;
             if (typeof listElementValue === 'object') {
+                //validate type list of embedded objects
                 if (attrObj.subType && attrObj.subType.getClassName) {
                     if (listElementValue.getClassName && listElementValue.getClassName() !== attrObj.subType.getClassName()) {
                         return dataTypeMismatchError(attrObj, listElementValue, true)
