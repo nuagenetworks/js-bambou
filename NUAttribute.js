@@ -6,7 +6,7 @@ import { getLogger } from "./Logger";
 const dataTypeMismatchError = (attrObj, attrValue, validateSubType) => (
     new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
             'Invalid data type',
-            `Data type should be ${validateSubType ? attrObj.subType : attrObj.attributeType}, but is ${typeof attrValue}`)
+            `Data type should be ${validateSubType ? attrObj.subType : attrObj.attributeType}`)
 );
 
 /*
@@ -191,7 +191,8 @@ export default class NUAttribute extends NUObject {
     }
 
     validateNumberValue(attrValue, attrObj, validateSubType) {
-        if (isNaN(attrValue)) {
+        const expectedType = validateSubType ? attrObj.subType : attrObj.attributeType;
+        if (isNaN(attrValue) || (expectedType === NUAttribute.ATTR_TYPE_INTEGER && !Number.isInteger(attrValue))) {
             return dataTypeMismatchError(attrObj, attrValue, validateSubType);
         }
         if (!isNaN(attrObj.minValue) && attrValue < attrObj.minValue) {
