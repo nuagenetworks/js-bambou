@@ -3,6 +3,12 @@ import NUAttributeValidationError from './NUAttributeValidationError';
 import NUException from './NUException';
 import { getLogger } from "./Logger";
 
+const dataTypeMismatchError = (attrObj, attrValue, validateSubType) => (
+    new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+            'Invalid data type',
+            `Data type should be ${validateSubType ? attrObj.subType : attrObj.attributeType}`)
+);
+
 /*
   This class models an attribute object
 */
@@ -49,6 +55,8 @@ export default class NUAttribute extends NUObject {
             subType: obj.subType,
             userlabel: obj.userlabel,
             isInternal: obj.isInternal,
+            minValue: obj.minValue,
+            maxValue: obj.maxValue
         });
     }
     
@@ -74,28 +82,27 @@ export default class NUAttribute extends NUObject {
             }
 
             if (attrValue !== undefined && attrValue !== null) {
-                var dataTypeMismatch = false;
-                if (attrObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT || attrObj.attributeType === NUAttribute.ATTR_TYPE_LONG || attrObj.attributeType === NUAttribute.ATTR_TYPE_TIMESTAMP) {
-                    dataTypeMismatch = isNaN(attrValue);
-                } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
-                    dataTypeMismatch = (typeof attrValue !== 'object');
-                } else if (attrObj.attributeType !== NUAttribute.ATTR_TYPE_ENUM && typeof attrValue !== attrObj.attributeType) {
-                    dataTypeMismatch = true;
-                }
-                if (dataTypeMismatch) {
-                    return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
-                        'Invalid data type',
-                        `Data type should be ${attrObj.attributeType}, but is ${typeof attrValue}`);
-                }
-                if (attrObj.attributeType === NUAttribute.ATTR_TYPE_STRING) {
-                    return attrObj.validateStringValue(attrValue, attrObj);
-                } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_ENUM) {
-                    return attrObj.validateEnumValue(attrValue, attrObj);
-                } else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_LIST) {
-                    return attrObj.validateListValues(attrValue, attrObj);
-                }
-                else if (attrObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT) {
-                    return attrObj.validateObjectValue(attrValue, attrObj);
+                //if value provided
+                switch (attrObj.attributeType) {
+                    case NUAttribute.ATTR_TYPE_STRING:
+                        return attrObj.validateStringValue(attrValue, attrObj);
+
+                    case NUAttribute.ATTR_TYPE_ENUM:
+                        return attrObj.validateEnumValue(attrValue, attrObj);
+
+                    case NUAttribute.ATTR_TYPE_LIST:
+                        return attrObj.validateListValues(attrValue, attrObj);
+
+                    case NUAttribute.ATTR_TYPE_OBJECT:
+                        return attrObj.validateObjectValue(attrValue, attrObj);
+
+                    case NUAttribute.ATTR_TYPE_INTEGER:
+                    case NUAttribute.ATTR_TYPE_FLOAT:
+                    case NUAttribute.ATTR_TYPE_LONG:
+                    case NUAttribute.ATTR_TYPE_TIMESTAMP:
+                        return attrObj.validateNumberValue(attrValue, attrObj);
+
+                    default:
                 }
             }
         }
@@ -103,41 +110,49 @@ export default class NUAttribute extends NUObject {
     }
 
     validateListValues(listValues, attrObj) {
-        for (var i = 0; i < listValues.length; i++) {
-            var listElementValue = listValues[i],
-                dataTypeMismatch = false;        
-            if (attrObj.subType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType === NUAttribute.ATTR_TYPE_FLOAT) {
-                dataTypeMismatch = (typeof listElementValue !== 'number');
-            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue === 'object') {
+        if (typeof listValues !== 'object') {
+            return dataTypeMismatchError(attrObj, listValues);
+        }
+        for (const listElementValue of listValues) {
+            let err = false;
+            if (typeof listElementValue === 'object') {
+                //validate type list of embedded objects
                 if (attrObj.subType && attrObj.subType.getClassName) {
-                    if (listElementValue && listElementValue.getClassName && listElementValue.getClassName() !== attrObj.subType.getClassName()) {
-                        dataTypeMismatch = true;
+                    if (listElementValue.getClassName && listElementValue.getClassName() !== attrObj.subType.getClassName()) {
+                        return dataTypeMismatchError(attrObj, listElementValue, true)
                     }
                 } else {
                     getLogger().warn(`Invalid subType for attribute: ${attrObj.name}, subType: ${attrObj.subType}`);
                 }
             }
-            if (dataTypeMismatch){
-                return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
-                    'Invalid data type',
-                    `Data type should be ${attrObj.subType}, but is ${typeof listElementValue}`);
+
+            switch (attrObj.subType) {
+                case NUAttribute.ATTR_TYPE_STRING:
+                    err = attrObj.validateStringValue(listElementValue, attrObj, true);
+                    if (err) return err;
+                    break;
+
+                case NUAttribute.ATTR_TYPE_ENUM:
+                    err = attrObj.validateEnumValue(listElementValue, attrObj, true);
+                    if (err) return err;
+                    break;
+
+                case NUAttribute.ATTR_TYPE_INTEGER:
+                case NUAttribute.ATTR_TYPE_FLOAT:
+                    err = attrObj.validateNumberValue(listElementValue, attrObj, true);
+                    if (err) return err;
+                    break;
+
+                default:
             }
-            if (attrObj.subType === NUAttribute.ATTR_TYPE_STRING) {
-                let err = attrObj.validateStringValue(listElementValue, attrObj);
-                if (err) {
-                    return err;
-                }
-            } else if (attrObj.subType === NUAttribute.ATTR_TYPE_ENUM) {
-                let err = attrObj.validateEnumValue(listElementValue, attrObj);
-                if (err) {
-                    return err;
-                }
-            } 
         }
         return null;
     }
     
-    validateStringValue(attrValue, attrObj) {
+    validateStringValue(attrValue, attrObj, validateSubType) {
+        if (typeof attrValue !== (validateSubType ? attrObj.subType : attrObj.attributeType)) {
+            return dataTypeMismatchError(attrObj, attrValue, validateSubType);
+        }
         if (attrObj.minLength > -1 && attrValue.length < attrObj.minLength) {
             return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                 'Invalid length',
@@ -152,7 +167,7 @@ export default class NUAttribute extends NUObject {
         return null;
     }
 
-    validateEnumValue(attrValue, attrObj) {
+    validateEnumValue(attrValue, attrObj, validateSubType) {
         if (attrObj.choices) {
             var choiceValues = attrObj.choices.map(function(choice) { return choice.name; });
             if (choiceValues.indexOf(attrValue) === -1) {
@@ -173,5 +188,22 @@ export default class NUAttribute extends NUObject {
             }
         }
         return null;
+    }
+
+    validateNumberValue(attrValue, attrObj, validateSubType) {
+        const expectedType = validateSubType ? attrObj.subType : attrObj.attributeType;
+        if (isNaN(attrValue) || (expectedType === NUAttribute.ATTR_TYPE_INTEGER && (attrValue % 1 !== 0))) {
+            return dataTypeMismatchError(attrObj, attrValue, validateSubType);
+        }
+        if (!isNaN(attrObj.minValue) && attrValue < attrObj.minValue) {
+            return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+                'Invalid value',
+                `Minimum accepted value is ${attrObj.minValue}`);
+        }
+        if (!isNaN(attrObj.maxValue) && attrValue > attrObj.maxValue) {
+            return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
+                'Invalid value',
+                `Maximum accepted value is ${attrObj.maxValue}`);
+        }
     }
 }
