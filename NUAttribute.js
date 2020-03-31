@@ -192,7 +192,7 @@ export default class NUAttribute extends NUObject {
 
     validateNumberValue(attrValue, attrObj, validateSubType) {
         const expectedType = validateSubType ? attrObj.subType : attrObj.attributeType;
-        if (isNaN(attrValue) || (expectedType === NUAttribute.ATTR_TYPE_INTEGER && !Number.isInteger(attrValue))) {
+        if (isNaN(attrValue) || (expectedType === NUAttribute.ATTR_TYPE_INTEGER && (attrValue % 1 !== 0))) {
             return dataTypeMismatchError(attrObj, attrValue, validateSubType);
         }
         if (!isNaN(attrObj.minValue) && attrValue < attrObj.minValue) {
