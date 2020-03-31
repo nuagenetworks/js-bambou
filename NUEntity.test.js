@@ -82,7 +82,7 @@ it('attribute validations', () => {
     myEntity.attr4 = 123;
     isValid = myEntity.isValid(myEntity);
     expect(isValid).toEqual(false);
-    expect(errors.get('attr4').description).toEqual('Data type should be string, but is number');
+    expect(errors.get('attr4').description).toEqual('Data type should be string');
     myEntity.attr4 = 'abcdef';
     isValid = myEntity.isValid(myEntity);
     expect(isValid).toEqual(true);
@@ -100,7 +100,7 @@ it('attribute validations', () => {
     myEntity.attr9 = ["abc", "def"];
     isValid = myEntity.isValid(myEntity);
     expect(isValid).toEqual(false);
-    expect(errors.get('attr9').description).toEqual('Data type should be float, but is string');
+    expect(errors.get('attr9').description).toEqual('Data type should be float');
     myEntity.attr9 = [1, 2.22, 3.56, 4];
     isValid = myEntity.isValid(myEntity);
     expect(isValid).toEqual(true);
