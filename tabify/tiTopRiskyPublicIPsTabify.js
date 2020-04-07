@@ -9,16 +9,16 @@ export default class TiTopRiskyPublicIPsTabify {
     process(response) {
         const aggregations = response && response.aggregations;
         if (!isEmpty(aggregations)) {
-            const result = aggregations.srcPublicIPs && aggregations.srcPublicIPs.riskySrcIps.buckets 
-                ? aggregations.srcPublicIPs.riskySrcIps.buckets.map(item => { 
+            const result = aggregations.srcPublicIPs && aggregations.srcPublicIPs.riskySrcIps 
+                && aggregations.srcPublicIPs.riskySrcIps.buckets ? aggregations.srcPublicIPs.riskySrcIps.buckets.map(item => { 
                     return {
                         publicIP: item.key,
                         CardinalityOf: item.CardinalityOf.value,
                         flowIds: item.flowIds.buckets ? item.flowIds.buckets.map((flowId) => flowId.key) : []
                     }
                 }) : [];
-            const dstPublicIPs = aggregations.dstPublicIPs && aggregations.dstPublicIPs.riskyDstIps.buckets 
-                ? aggregations.dstPublicIPs.riskyDstIps.buckets.map(item => { 
+            const dstPublicIPs = aggregations.dstPublicIPs && aggregations.dstPublicIPs.riskyDstIps 
+                && aggregations.dstPublicIPs.riskyDstIps.buckets ? aggregations.dstPublicIPs.riskyDstIps.buckets.map(item => { 
                     return {
                         publicIP: item.key,
                         CardinalityOf: item.CardinalityOf.value,
