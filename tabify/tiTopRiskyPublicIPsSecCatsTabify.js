@@ -28,7 +28,7 @@ export default class TiTopRiskyPublicIPsSecCatsTabify {
 
             if (!isEmpty(dsts)) {
                 dsts.forEach((dstsItem) => {
-                    const resultItem = result.find(item => item.publicIP === dstsItem.publicIP);
+                    const resultItem = result.find(item => item.topxAttr === dstsItem.topxAttr);
                     if (resultItem) {
                         const uniqueFlowIds = union(resultItem.flowIds, dstsItem.flowIds);
                         resultItem.flowIds = uniqueFlowIds;
