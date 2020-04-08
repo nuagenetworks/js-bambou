@@ -2,39 +2,39 @@ import isEmpty from "lodash/isEmpty";
 import union from "lodash/union";
 
 /*
- *Returns the top security categories coming from source and destination IP Categories by flows aggregations
+ *Returns the top risky public IPs coming from source and destination IPs by flows aggregations
  */
-export default class TiTopSecCatsTabify {
+export default class TiTopRiskyPublicIPsSecCatsTabify {
     
     process(response) {
         const aggregations = response && response.aggregations;
         if (!isEmpty(aggregations)) {
-            const result = aggregations.srcIpCats && aggregations.srcIpCats.buckets 
-                ? aggregations.srcIpCats.buckets.map(item => { 
+            const result = aggregations.sources && aggregations.sources.riskySrcs 
+                && aggregations.sources.riskySrcs.buckets ? aggregations.sources.riskySrcs.buckets.map(item => { 
                     return {
-                        secCats: item.key,
+                        topxAttr: item.key,
                         CardinalityOf: item.CardinalityOf.value,
                         flowIds: item.flowIds.buckets ? item.flowIds.buckets.map((flowId) => flowId.key) : []
                     }
                 }) : [];
-            const dstIpCats = aggregations.dstIpCats && aggregations.dstIpCats.buckets 
-                ? aggregations.dstIpCats.buckets.map(item => { 
+            const dsts = aggregations.destinations && aggregations.destinations.riskyDsts 
+                && aggregations.destinations.riskyDsts.buckets ? aggregations.destinations.riskyDsts.buckets.map(item => { 
                     return {
-                        secCats: item.key,
+                        topxAttr: item.key,
                         CardinalityOf: item.CardinalityOf.value,
                         flowIds: item.flowIds.buckets ? item.flowIds.buckets.map((flowId) => flowId.key) : []
                     }
                 }) : [];
 
-            if (!isEmpty(dstIpCats)) {
-                dstIpCats.forEach((dstIpCatsItem) => {
-                    const resultItem = result.find(item => item.secCats === dstIpCatsItem.secCats);
+            if (!isEmpty(dsts)) {
+                dsts.forEach((dstsItem) => {
+                    const resultItem = result.find(item => item.publicIP === dstsItem.publicIP);
                     if (resultItem) {
-                        const uniqueFlowIds = union(resultItem.flowIds, dstIpCatsItem.flowIds);
+                        const uniqueFlowIds = union(resultItem.flowIds, dstsItem.flowIds);
                         resultItem.flowIds = uniqueFlowIds;
                         resultItem.CardinalityOf = uniqueFlowIds.length;
                     } else {
-                        result.push({...dstIpCatsItem});
+                        result.push({...dstsItem});
                     }
                 });
             }

@@ -9,5 +9,4 @@ export { default as flowExplorerTabify } from './flowExplorerTabify';
 export { default as gatewayRanksTabify } from './gatewayRanksTabify';
 export { default as webDomainNamesTabify } from './webDomainNamesTabify';
 export { default as tiRiskyPublicIPsCountTabify } from './tiRiskyPublicIPsCountTabify';
-export { default as tiTopRiskyPublicIPsTabify } from './tiTopRiskyPublicIPsTabify';
-export { default as tiTopSecCatsTabify } from './tiTopSecCatsTabify';
+export { default as tiTopRiskyPublicIPsSecCatsTabify } from './tiTopRiskyPublicIPsSecCatsTabify';
