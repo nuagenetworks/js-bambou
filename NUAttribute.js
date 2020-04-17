@@ -22,7 +22,7 @@ export default class NUAttribute extends NUObject {
     static ATTR_TYPE_STRING = 'string';
     static ATTR_TYPE_OBJECT = 'object';
     static ATTR_TYPE_TIMESTAMP = 'long';
-    static ATTR_SUBTYPE_JSON = 'JSON';
+    static ATTR_TYPE_JSON = 'JSON';
 
     constructor(obj) {
         super();
@@ -118,7 +118,7 @@ export default class NUAttribute extends NUObject {
             let err = false;
             if (typeof listElementValue === 'object') {
                 //validate type list of embedded objects
-                if (attrObj.subType && attrObj.subType !== NUAttribute.ATTR_SUBTYPE_JSON && attrObj.subType.getClassName) {
+                if (attrObj.subType && attrObj.subType !== NUAttribute.ATTR_TYPE_JSON && attrObj.subType.getClassName) {
                     if (listElementValue.getClassName && listElementValue.getClassName() !== attrObj.subType.getClassName()) {
                         return dataTypeMismatchError(attrObj, listElementValue, true)
                     }
@@ -182,12 +182,12 @@ export default class NUAttribute extends NUObject {
 
     validateObjectValue(attrValue, attrObj) {
         if (attrObj.subType) {
-            if (attrObj.subType === NUAttribute.ATTR_SUBTYPE_JSON) {
+            if (attrObj.subType === NUAttribute.ATTR_TYPE_JSON) {
                 if (typeof attrValue !== 'object') {
                     //attrValue not null and not of type object
                     return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                         'Invalid subType',
-                        `Expected subType is ${NUAttribute.ATTR_SUBTYPE_JSON}`);
+                        `Expected subType is ${NUAttribute.ATTR_TYPE_JSON}`);
                 }
 
             } else {
