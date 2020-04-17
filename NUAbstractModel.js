@@ -30,7 +30,7 @@ export default class NUAbstractModel extends NUObject {
                 if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_INTEGER || attributeObj.attributeType === NUAttribute.ATTR_TYPE_FLOAT) {
                     this[localName] = (!value && value !== 0) ? null : isNaN(value) ? value : Number(value);
                 } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_OBJECT && attributeObj.subType && attributeObj.subType !== NUAttribute.ATTR_SUBTYPE_JSON && value) {
-                    //if subType is ATTR_TYPE_OBJECT this implies a JSON object, NUEntity instance not applicable
+                    //if subType is ATTR_SUBTYPE_JSON, NUEntity instance not applicable
                     const subtypeEntity = new attributeObj.subType();
                     this[localName] = subtypeEntity.buildFromJSON(value);
                 } else if (attributeObj.attributeType === NUAttribute.ATTR_TYPE_LIST && attributeObj.subType && typeof attributeObj.subType !== 'string') {
