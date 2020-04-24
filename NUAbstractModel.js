@@ -1,8 +1,8 @@
 import NUAttribute from './NUAttribute';
 import NUObject from './NUObject';
 
-const doValidate = (validator, entity, attrObj, formValues) => {
-    const validationError = validator.validate(entity, attrObj, formValues);
+const doValidate = (validator, entity, attrObj, formValues, operation) => {
+    const validationError = validator.validate(entity, attrObj, formValues, operation);
     if (validationError) {
         entity.validationErrors.set(validator.name, validationError);
     }
@@ -111,22 +111,22 @@ export default class NUAbstractModel extends NUObject {
         }
     }
 
-    isValid(formValues) {
+    isValid(formValues, operation) {
         this.validationErrors.clear();
-        this.checkErrors(formValues);
+        this.checkErrors(formValues, operation);
         return (this.validationErrors.size === 0);
     }
 
-    checkErrors(formValues) {
+    checkErrors(formValues, operation) {
         const entity = this;
         entity._validators.forEach((validator, attributeName) => {
             const attrObj = this.constructor.attributeDescriptors[attributeName];
             if (Array.isArray((validator))) {
                 validator.forEach(validatorItem => {
-                    doValidate(validatorItem, entity, attrObj, formValues);
+                    doValidate(validatorItem, entity, attrObj, formValues, operation);
                 })
             } else {
-                doValidate(validator, entity, attrObj, formValues);
+                doValidate(validator, entity, attrObj, formValues, operation);
             }
         });
     }
