@@ -1,8 +1,8 @@
 import NUAttribute from './NUAttribute';
 import NUObject from './NUObject';
 
-const doValidate = (validator, entity, attrObj, formValues, operation) => {
-    const validationError = validator.validate(entity, attrObj, formValues, operation);
+const doValidate = (validator, entity, attrObj, formValues, isOptional) => {
+    const validationError = validator.validate(entity, attrObj, formValues, isOptional);
     if (validationError) {
         entity.validationErrors.set(validator.name, validationError);
     }
@@ -111,22 +111,22 @@ export default class NUAbstractModel extends NUObject {
         }
     }
 
-    isValid(formValues, operation) {
+    isValid(formValues, optionalAttrs) {
         this.validationErrors.clear();
-        this.checkErrors(formValues, operation);
+        this.checkErrors(formValues, optionalAttrs);
         return (this.validationErrors.size === 0);
     }
 
-    checkErrors(formValues, operation) {
+    checkErrors(formValues, optionalAttrs = []) {
         const entity = this;
         entity._validators.forEach((validator, attributeName) => {
             const attrObj = this.constructor.attributeDescriptors[attributeName];
             if (Array.isArray((validator))) {
                 validator.forEach(validatorItem => {
-                    doValidate(validatorItem, entity, attrObj, formValues, operation);
+                    doValidate(validatorItem, entity, attrObj, formValues, optionalAttrs.includes(attrObj.name));
                 })
             } else {
-                doValidate(validator, entity, attrObj, formValues, operation);
+                doValidate(validator, entity, attrObj, formValues, optionalAttrs.includes(attrObj.name));
             }
         });
     }

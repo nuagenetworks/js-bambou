@@ -72,12 +72,12 @@ export default class NUAttribute extends NUObject {
         'this' would correspond to the NUEntity object being validated.
         NUAttribute object on which the validation needs to be executed is passed as args[0].
     */
-    validate(entity, attrObj, formValues, operation) {
+    validate(entity, attrObj, formValues, isOptional) {
         
         if (attrObj) {
             const attrValue =  entity && entity[attrObj.name];
             //if STRING use !attrValue to check if value provided. For all other attribute types use !undefined and !null
-            if (attrObj.isRequired && !attrObj.isValueSet(attrValue) && !(attrObj.isPassword && operation === 'edit')) {
+            if (attrObj.isRequired && !attrObj.isValueSet(attrValue) && !isOptional) {
                 return new NUAttributeValidationError(attrObj.localName, attrObj.remoteName,
                     'Invalid input', 'This value is mandatory');
             }
