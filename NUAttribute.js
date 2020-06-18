@@ -16,6 +16,7 @@ export default class NUAttribute extends NUObject {
     static ATTR_TYPE_STRING = 'string';
     static ATTR_TYPE_OBJECT = 'object';
     static ATTR_TYPE_TIMESTAMP = 'long';
+    static ATTR_TYPE_JSON = 'JSON';
 
     constructor(obj) {
         super();
@@ -103,7 +104,7 @@ export default class NUAttribute extends NUObject {
                 dataTypeMismatch = false;        
             if (attrObj.subType === NUAttribute.ATTR_TYPE_INTEGER || attrObj.subType === NUAttribute.ATTR_TYPE_FLOAT) {
                 dataTypeMismatch = (typeof listElementValue !== 'number');
-            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue === 'object') {
+            } else if (attrObj.subType !== NUAttribute.ATTR_TYPE_JSON && attrObj.subType !== NUAttribute.ATTR_TYPE_ENUM && typeof listElementValue === 'object') {
                 if (attrObj.subType && attrObj.subType.getClassName) {
                     if (listElementValue && listElementValue.getClassName && listElementValue.getClassName() !== attrObj.subType.getClassName()) {
                         dataTypeMismatch = true;
