@@ -43,6 +43,7 @@ export default class NSGDiskUsage {
 
             finalData.push({
                 ...item,
+                total: item.total || totalMb,
                 availPercent,
                 usedPercent,
                 totalMB: processByteLabel(totalMb),
