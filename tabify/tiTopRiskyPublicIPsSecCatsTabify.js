@@ -38,6 +38,7 @@ export default class TiTopRiskyPublicIPsSecCatsTabify {
                     }
                 });
             }
+            result.sort((a,b) => (a.CardinalityOf > b.CardinalityOf) ? -1 : ((b.CardinalityOf > a.CardinalityOf) ? 1 : 0));
             return result;
         }
         return [];
