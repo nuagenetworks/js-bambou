@@ -25,30 +25,33 @@ export default class FecHeatmapTabify {
     process(response) {
         const aggregations = response && response.aggregations;
         if (!isEmpty(aggregations)) {
-            const result = aggregations.date_histo && aggregations.date_histo.buckets &&  aggregations.date_histo.buckets.map(dateHistoEntry => {
-                const networkLossInfo = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.buckets && dateHistoEntry.NetworkLoss.buckets.map(element => ({ 
-                    key_as_string: dateHistoEntry.key_as_string,
-                    date_histo: dateHistoEntry.key,
-                    doc_count: 1,
-                    stat: "NetworkLoss",
-                    key: element.key || 0,
-                    ColorValue: element.ColorValue && element.ColorValue.buckets && element.ColorValue.buckets.length > 0 ?
-                        element.ColorValue.buckets[0].key : "0.0% - 0.499%"
-                }));
-                const lossAfterFecInfo = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.buckets && dateHistoEntry.LossAfterFEC.buckets.map(element => ({ 
-                    key_as_string: dateHistoEntry.key_as_string,
-                    date_histo: dateHistoEntry.key,
-                    doc_count: 1,
-                    stat: "LossAfterFEC",
-                    key: element.key || 0,
-                    ColorValue: element.ColorValue && element.ColorValue.buckets && element.ColorValue.buckets.length > 0 ?
-                        element.ColorValue.buckets[0].key : "0.0% - 0.499%"
-                }));
-                const temp = networkLossInfo.reduce(function(arr, v, i) {
-                    return arr.concat(v, lossAfterFecInfo[i]); 
-                }, []);
-                return temp;
-            });
+            const getColorValue = (key) => {
+                return key >= 0.0 && key < 0.5 ? '0.0% - 0.499%' : key >= 0.5 && key < 2.0 ? '0.5% - 1.99%' : key >= 2.0 && key < 4.0 ? '2.0% - 3.99%' : key >= 4.0 && key < 10.0 ? '4.0% - 9.99%' : '>= 10.0%';
+            };
+            const result = [];
+            if (aggregations.date_histo && aggregations.date_histo.buckets) {
+                for (const dateHistoEntry of aggregations.date_histo.buckets) {
+                    const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value || 0;
+                    const lossAfterFecValue = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value || 0;
+                    result.push({
+                        key_as_string: dateHistoEntry.key_as_string,
+                        date_histo: dateHistoEntry.key,
+                        doc_count: 1,
+                        stat: "Network Loss",
+                        key: networkLossValue,
+                        ColorValue: getColorValue(networkLossValue)
+                    },
+                    {
+                        key_as_string: dateHistoEntry.key_as_string,
+                        date_histo: dateHistoEntry.key,
+                        doc_count: 1,
+                        stat: "Loss After FEC",
+                        key: lossAfterFecValue,
+                        ColorValue: getColorValue(lossAfterFecValue)
+                    });
+                }
+            }
+            console.log(result);
             return result;
         }
         return [];
