@@ -1,3 +1,6 @@
+import { getLogger } from '../Logger';
+import ESTabify from "../elasticsearch/ESTabify";
+
 /*
  * Returns the Network Loss and Loss after FEC percentages for a given Source and Destination NSG combination in the given format
  * [
