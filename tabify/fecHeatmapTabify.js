@@ -1,5 +1,4 @@
-import { getLogger } from '../Logger';
-import ESTabify from "../elasticsearch/ESTabify";
+import isEmpty from "lodash/isEmpty";
 
 /*
  * Returns the Network Loss and Loss after FEC percentages for a given Source and Destination NSG combination in the given format
@@ -21,24 +20,37 @@ import ESTabify from "../elasticsearch/ESTabify";
  *   ...
  * ]
  */
-export default class FecHeatmapTabify extends ESTabify {
+export default class FecHeatmapTabify {
     
-    process(response, tabifyOptions = {}) {
-        let table;
-
-        if (response.hits) {
-            console.log(response);
+    process(response) {
+        const aggregations = response && response.aggregations;
+        if (!isEmpty(aggregations)) {
+            const result = aggregations.date_histo && aggregations.date_histo.buckets &&  aggregations.date_histo.buckets.map(dateHistoEntry => {
+                const networkLossInfo = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.buckets && dateHistoEntry.NetworkLoss.buckets.map(element => ({ 
+                    key_as_string: dateHistoEntry.key_as_string,
+                    date_histo: dateHistoEntry.key,
+                    doc_count: 1,
+                    stat: "NetworkLoss",
+                    key: element.key || 0,
+                    ColorValue: element.ColorValue && element.ColorValue.buckets && element.ColorValue.buckets.length > 0 ?
+                        element.ColorValue.buckets[0].key : "0.0% - 0.499%"
+                }));
+                const lossAfterFecInfo = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.buckets && dateHistoEntry.LossAfterFEC.buckets.map(element => ({ 
+                    key_as_string: dateHistoEntry.key_as_string,
+                    date_histo: dateHistoEntry.key,
+                    doc_count: 1,
+                    stat: "LossAfterFEC",
+                    key: element.key || 0,
+                    ColorValue: element.ColorValue && element.ColorValue.buckets && element.ColorValue.buckets.length > 0 ?
+                        element.ColorValue.buckets[0].key : "0.0% - 0.499%"
+                }));
+                const temp = networkLossInfo.reduce(function(arr, v, i) {
+                    return arr.concat(v, lossAfterFecInfo[i]); 
+                }, []);
+                return temp;
+            });
+            return result;
         }
-        else {
-            const errorMessage = "Tabify() invoked with invalid result set. Result set must have 'hits' defined.";
-            getLogger().error(errorMessage);
-            throw new Error(errorMessage);
-        }
-
-        if (tabifyOptions.concatenationFields) {
-            table = this.processTabifyOptions(table, tabifyOptions);
-        }
-
-        return this.flatArray(table);
+        return [];
     }
 }
