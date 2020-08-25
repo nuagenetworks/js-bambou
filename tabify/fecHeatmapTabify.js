@@ -1,6 +1,3 @@
-import isEmpty from "lodash/isEmpty";
-import union from "lodash/union";
-
 /*
  * Returns the Network Loss and Loss after FEC percentages for a given Source and Destination NSG combination in the given format
  * [
@@ -21,15 +18,24 @@ import union from "lodash/union";
  *   ...
  * ]
  */
-export default class FecHeatmapTabify {
+export default class FecHeatmapTabify extends ESTabify {
     
-    process(response) {
-        const aggregations = response && response.aggregations;
-        if (!isEmpty(aggregations)) {
-            const result = aggregations.date_histo;
-            console.log(result);
-            return result;
+    process(response, tabifyOptions = {}) {
+        let table;
+
+        if (response.hits) {
+            console.log(response);
         }
-        return [];
+        else {
+            const errorMessage = "Tabify() invoked with invalid result set. Result set must have 'hits' defined.";
+            getLogger().error(errorMessage);
+            throw new Error(errorMessage);
+        }
+
+        if (tabifyOptions.concatenationFields) {
+            table = this.processTabifyOptions(table, tabifyOptions);
+        }
+
+        return this.flatArray(table);
     }
 }
