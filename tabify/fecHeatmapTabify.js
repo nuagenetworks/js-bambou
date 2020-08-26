@@ -51,7 +51,6 @@ export default class FecHeatmapTabify {
                     });
                 }
             }
-            console.log(result);
             return result;
         }
         return [];
