@@ -145,6 +145,10 @@ export default class NURESTUser extends NURootEntity {
         return this._getUserRole().hasAdmin();
     }
 
+    isAuditAdmin() {
+        return this._getUserRole().hasAuditAdmin();
+    }
+
     isSecurityAdmin() {
         return this._getUserRole().hasSecurityAdmin();
     }
