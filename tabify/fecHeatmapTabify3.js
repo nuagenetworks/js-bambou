@@ -20,7 +20,7 @@ import isEmpty from "lodash/isEmpty";
  *   ...
  * ]
  */
-export default class FecHeatmapTabify0 {
+export default class FecHeatmapTabify3 {
     
     process(response) {
         const aggregations = response && response.aggregations;
