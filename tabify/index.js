@@ -10,6 +10,4 @@ export { default as gatewayRanksTabify } from './gatewayRanksTabify';
 export { default as webDomainNamesTabify } from './webDomainNamesTabify';
 export { default as tiRiskyPublicIPsCountTabify } from './tiRiskyPublicIPsCountTabify';
 export { default as tiTopRiskyPublicIPsSecCatsTabify } from './tiTopRiskyPublicIPsSecCatsTabify';
-export { default as fecHeatmapTabify0 } from './fecHeatmapTabify0';
-export { default as fecHeatmapTabify1 } from './fecHeatmapTabify1';
-export { default as fecHeatmapTabify2 } from './fecHeatmapTabify2';
+export { default as fecHeatmapTabify } from './fecHeatmapTabify';

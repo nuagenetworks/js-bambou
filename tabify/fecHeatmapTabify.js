@@ -1,5 +1,4 @@
 import isEmpty from "lodash/isEmpty";
-import { getFECHeatmapColorValue } from './utils';
 
 /*
  * Returns the Network Loss and Loss after FEC percentages for a given Source and Destination NSG combination in the given format
@@ -21,7 +20,7 @@ import { getFECHeatmapColorValue } from './utils';
  *   ...
  * ]
  */
-export default class FecHeatmapTabify2 {
+export default class FecHeatmapTabify {
     
     process(response) {
         const aggregations = response && response.aggregations;
