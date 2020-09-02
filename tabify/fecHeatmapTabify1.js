@@ -21,7 +21,7 @@ import { getFECHeatmapTabifyResults } from './utils';
  *   ...
  * ]
  */
-export default class FecHeatmapTabify {
+export default class FecHeatmapTabify1 {
     
     process(response) {
         const aggregations = response && response.aggregations;
