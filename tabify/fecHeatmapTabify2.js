@@ -1,5 +1,5 @@
 import isEmpty from "lodash/isEmpty";
-import { getFECHeatmapTabifyResults } from './utils';
+import { getFECHeatmapColorValue } from './utils';
 
 /*
  * Returns the Network Loss and Loss after FEC percentages for a given Source and Destination NSG combination in the given format
@@ -26,7 +26,30 @@ export default class FecHeatmapTabify2 {
     process(response) {
         const aggregations = response && response.aggregations;
         if (!isEmpty(aggregations)) {
-            return getFECHeatmapTabifyResults(aggregations);
+            const result = [];
+            if (aggregations.date_histo && aggregations.date_histo.buckets) {
+                for (const dateHistoEntry of aggregations.date_histo.buckets) {
+                    const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value || undefined;
+                    const lossAfterFecValue = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value || undefined;
+                    result.push({
+                        key_as_string: dateHistoEntry.key_as_string,
+                        date_histo: dateHistoEntry.key,
+                        doc_count: 1,
+                        stat: "Network Loss",
+                        key: networkLossValue,
+                        ColorValue: getFECHeatmapColorValue(networkLossValue)
+                    },
+                    {
+                        key_as_string: dateHistoEntry.key_as_string,
+                        date_histo: dateHistoEntry.key,
+                        doc_count: 1,
+                        stat: "Loss After FEC",
+                        key: lossAfterFecValue,
+                        ColorValue: getFECHeatmapColorValue(lossAfterFecValue)
+                    });
+                }
+            }
+            return result;
         }
         return [];
     }
