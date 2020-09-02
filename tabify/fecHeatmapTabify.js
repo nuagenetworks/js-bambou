@@ -20,7 +20,7 @@ import isEmpty from "lodash/isEmpty";
  *   ...
  * ]
  */
-export default class FecHeatmapTabify2 {
+export default class FecHeatmapTabify {
     
     process(response) {
         const aggregations = response && response.aggregations;
@@ -29,9 +29,9 @@ export default class FecHeatmapTabify2 {
             const getFECHeatmapColorValue = (key) => {
                 return key >= 0.0 && key < 0.5 ? '0.0% - 0.499%' : key >= 0.5 && key < 2.0 ? '0.5% - 1.99%' : key >= 2.0 && key < 4.0 ? '2.0% - 3.99%' : key >= 4.0 && key < 10.0 ? '4.0% - 9.99%' : '>= 10.0%';
             };
-            if (aggregations.date_histo2 && aggregations.date_histo2.buckets) {
-                for (const dateHistoEntry of aggregations.date_histo2.buckets) {
-                    const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value || 0.0 ;
+            if (aggregations.date_histo && aggregations.date_histo.buckets) {
+                for (const dateHistoEntry of aggregations.date_histo.buckets) {
+                    const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value || 0.0;
                     const lossAfterFecValue = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value || 0.0;
                     result.push({
                         key_as_string: dateHistoEntry.key_as_string,
