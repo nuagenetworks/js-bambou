@@ -29,8 +29,8 @@ export default class FecHeatmapTabify1 {
             const result = [];
             if (aggregations.date_histo && aggregations.date_histo.buckets) {
                 for (const dateHistoEntry of aggregations.date_histo.buckets) {
-                    const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value || undefined;
-                    const lossAfterFecValue = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value || undefined;
+                    const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value;
+                    const lossAfterFecValue = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value;
                     result.push({
                         key_as_string: dateHistoEntry.key_as_string,
                         date_histo: dateHistoEntry.key,
