@@ -1,4 +1,4 @@
-const getFECHeatmapTabifyResults = aggregations => {
+export const getFECHeatmapTabifyResults = aggregations => {
     const result = [];
     if (aggregations.date_histo && aggregations.date_histo.buckets) {
         for (const dateHistoEntry of aggregations.date_histo.buckets) {
