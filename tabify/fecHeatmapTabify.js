@@ -39,6 +39,8 @@ export default class FecHeatmapTabify {
                         doc_count: 1,
                         stat: "Network Loss",
                         key: networkLossValue,
+                        min: dateHistoEntry.MinNetworkLoss && dateHistoEntry.MinNetworkLoss.value || 0.0,
+                        max: dateHistoEntry.MaxNetworkLoss && dateHistoEntry.MaxNetworkLoss.value || 0.0,
                         ColorValue: getFECHeatmapColorValue(networkLossValue)
                     },
                     {
@@ -47,6 +49,8 @@ export default class FecHeatmapTabify {
                         doc_count: 1,
                         stat: "Loss After FEC",
                         key: lossAfterFecValue,
+                        min: dateHistoEntry.MinLossAfterFEC && dateHistoEntry.MinLossAfterFEC.value || 0.0,
+                        max: dateHistoEntry.MaxLossAfterFEC && dateHistoEntry.MaxLossAfterFEC.value || 0.0,
                         ColorValue: getFECHeatmapColorValue(lossAfterFecValue)
                     });
                 }
