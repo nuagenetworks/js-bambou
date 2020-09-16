@@ -29,29 +29,29 @@ export default class FecHeatmapTabify3 {
             const getFECHeatmapColorValue = (key) => {
                 return key >= 0.0 && key < 0.5 ? '0.0% - 0.499%' : key >= 0.5 && key < 2.0 ? '0.5% - 1.99%' : key >= 2.0 && key < 4.0 ? '2.0% - 3.99%' : key >= 4.0 && key < 10.0 ? '4.0% - 9.99%' : '>= 10.0%';
             };
-            if (aggregations.date_histo && aggregations.date_histo.buckets) {
-                for (const dateHistoEntry of aggregations.date_histo.buckets) {
+            if (aggregations.date_histo3 && aggregations.date_histo3.buckets) {
+                for (const dateHistoEntry of aggregations.date_histo3.buckets) {
                     const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value || 0.0;
                     const lossAfterFecValue = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value || 0.0;
                     result.push({
-                        key_as_string: dateHistoEntry.key_as_string,
-                        date_histo: dateHistoEntry.key,
+                        key_as_string3: dateHistoEntry.key_as_string,
+                        date_histo3: dateHistoEntry.key,
                         doc_count: 1,
-                        stat: "Network Loss (%)",
-                        key: networkLossValue,
-                        min: dateHistoEntry.MinNetworkLoss && dateHistoEntry.MinNetworkLoss.value || 0.0,
-                        max: dateHistoEntry.MaxNetworkLoss && dateHistoEntry.MaxNetworkLoss.value || 0.0,
-                        ColorValue: getFECHeatmapColorValue(networkLossValue)
+                        stat3: "Network Loss (%)",
+                        key3: networkLossValue,
+                        min3: dateHistoEntry.MinNetworkLoss && dateHistoEntry.MinNetworkLoss.value || 0.0,
+                        max3: dateHistoEntry.MaxNetworkLoss && dateHistoEntry.MaxNetworkLoss.value || 0.0,
+                        ColorValue3: getFECHeatmapColorValue(networkLossValue)
                     },
                     {
-                        key_as_string: dateHistoEntry.key_as_string,
-                        date_histo: dateHistoEntry.key,
+                        key_as_string3: dateHistoEntry.key_as_string,
+                        date_histo3: dateHistoEntry.key,
                         doc_count: 1,
-                        stat: "Loss After FEC (%)",
-                        key: lossAfterFecValue,
-                        min: dateHistoEntry.MinLossAfterFEC && dateHistoEntry.MinLossAfterFEC.value || 0.0,
-                        max: dateHistoEntry.MaxLossAfterFEC && dateHistoEntry.MaxLossAfterFEC.value || 0.0,
-                        ColorValue: getFECHeatmapColorValue(lossAfterFecValue)
+                        stat3: "Loss After FEC (%)",
+                        key3: lossAfterFecValue,
+                        min3: dateHistoEntry.MinLossAfterFEC && dateHistoEntry.MinLossAfterFEC.value || 0.0,
+                        max3: dateHistoEntry.MaxLossAfterFEC && dateHistoEntry.MaxLossAfterFEC.value || 0.0,
+                        ColorValue3: getFECHeatmapColorValue(lossAfterFecValue)
                     });
                 }
             }
