@@ -34,7 +34,7 @@ export default class FecHeatmapTabify2 {
                     const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value || 0.0;
                     const lossAfterFecValue = dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value || 0.0;
                     result.push({
-                        key_as_string2: dateHistoEntry.key_as_string,
+                        key_as_string: dateHistoEntry.key_as_string,
                         date_histo2: dateHistoEntry.key,
                         doc_count: 1,
                         stat2: "Network Loss (%)",
@@ -44,7 +44,7 @@ export default class FecHeatmapTabify2 {
                         ColorValue2: getFECHeatmapColorValue(networkLossValue)
                     },
                     {
-                        key_as_string2: dateHistoEntry.key_as_string,
+                        key_as_string: dateHistoEntry.key_as_string,
                         date_histo2: dateHistoEntry.key,
                         doc_count: 1,
                         stat2: "Loss After FEC (%)",
