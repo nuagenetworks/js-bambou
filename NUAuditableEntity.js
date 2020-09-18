@@ -1,10 +1,12 @@
 import NUAttribute from './NUAttribute';
+import NUEntity from './NUEntity';
 
 /*
   This class models AuditableEntity
 */
 export default class NUAuditableEntity extends NUEntity {
     static attributeDescriptors = {
+        ...NUEntity.attributeDescriptors,
         creationDate: new NUAttribute({
             localName: 'creationDate',
             attributeType: NUAttribute.ATTR_TYPE_TIMESTAMP,
