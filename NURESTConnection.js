@@ -32,6 +32,9 @@ class ResponseCodeEnum extends Enum {
             case 404:
             case 405:
             case 500:
+                if (response && response.data && Array.isArray(response.data.errors)) {
+                    return {data: response.data};
+                }
                 const item = ResponseCodeEnum.getEnumForCode(response.status);
                 if (item && item.length) {
                     const descriptions = [item[0].errors];
