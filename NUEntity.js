@@ -7,14 +7,6 @@ import NUException from './NUException';
 */
 export default class NUEntity extends NUAbstractModel {
     static attributeDescriptors = {
-        entityScope: new NUAttribute({
-            localName: 'entityScope',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
-        externalID: new NUAttribute({
-            localName: 'externalID',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
         ID: new NUAttribute({
             localName: 'ID',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
@@ -110,5 +102,9 @@ export default class NUEntity extends NUAbstractModel {
 
     isScopeGlobal() {
         return this.entityScope === 'GLOBAL';
+    }
+
+    isOwnedByUser(user) {
+        return user && this.owner === user.ID;
     }
 }
