@@ -10,6 +10,10 @@ class UserRole extends Enum {
         return this._hasRole(UserRole.CSPROOT);
     }
 
+    hasAuditAdmin() {
+        return this._hasRole(UserRole.AUDITADMIN);
+    }
+
     hasAdmin() {
         return this._hasRole(UserRole.ORGADMIN);
     }
@@ -44,6 +48,7 @@ UserRole.initEnum([
     'CSPROOT',
     'CMS',
     'CSPOPERATOR',
+    'AUDITADMIN',
     'ORGADMIN',
     'ORGNETWORKDESIGNER',
     'SECURITYADMINISTRATOR',
