@@ -57,8 +57,6 @@ export default class NUEntity extends NUAbstractModel {
     constructor() {
         super();
         this.defineProperties({
-            entityScope: undefined,
-            externalID: undefined,
             ID: null,
             parentID: undefined,
             parentObject: undefined,
