@@ -7,39 +7,11 @@ import NUException from './NUException';
 */
 export default class NUEntity extends NUAbstractModel {
     static attributeDescriptors = {
-        creationDate: new NUAttribute({
-            localName: 'creationDate',
-            attributeType: NUAttribute.ATTR_TYPE_TIMESTAMP,
-            isReadOnly: true,
-            isEditable: false,
-            canSearch: true,}),
-        entityScope: new NUAttribute({
-            localName: 'entityScope',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
-        externalID: new NUAttribute({
-            localName: 'externalID',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
         ID: new NUAttribute({
             localName: 'ID',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
             canSearch: true,
             isIdentifier: true }),
-        lastUpdatedBy: new NUAttribute({
-            localName: 'lastUpdatedBy',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
-        lastUpdatedDate: new NUAttribute({
-            localName: 'lastUpdatedDate',
-            attributeType: NUAttribute.ATTR_TYPE_TIMESTAMP,
-            isReadOnly: true,
-            isEditable: false,
-            canSearch: true,}),
-        owner: new NUAttribute({
-            localName: 'owner',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
         parentID: new NUAttribute({
             localName: 'parentID',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
@@ -58,7 +30,7 @@ export default class NUEntity extends NUAbstractModel {
           attributeType: NUAttribute.ATTR_TYPE_STRING,
           isEditable: true,
           isInternal: true }),
-    }
+    };
 
     static getSearchableAttributes() {
         if (!this.searchableAttributes) {
@@ -85,13 +57,7 @@ export default class NUEntity extends NUAbstractModel {
     constructor() {
         super();
         this.defineProperties({
-            creationDate: undefined,
-            entityScope: undefined,
-            externalID: undefined,
             ID: null,
-            lastUpdatedBy: undefined,
-            lastUpdatedDate: undefined,
-            owner: undefined,
             parentID: undefined,
             parentObject: undefined,
             parentType: undefined,
@@ -137,6 +103,6 @@ export default class NUEntity extends NUAbstractModel {
     }
 
     isOwnedByUser(user) {
-      return user && this.owner === user.ID;
+        return user && this.owner === user.ID;
     }
 }
