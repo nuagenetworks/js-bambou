@@ -57,7 +57,8 @@ export default class NUAttribute extends NUObject {
             userlabel: obj.userlabel,
             isInternal: obj.isInternal,
             minValue: obj.minValue,
-            maxValue: obj.maxValue
+            maxValue: obj.maxValue,
+            isTransient: obj.isTransient
         });
     }
     
