@@ -21,14 +21,18 @@ import isEmpty from "lodash/isEmpty";
  * ]
  */
 export default class FecHeatmapTabify {
+
+    getFECHeatmapColorValue = (key) => {
+        return key >= 0.0 && key < 0.5 ? '0.0% - 0.499%' : 
+            key >= 0.5 && key < 2.0 ? '0.5% - 1.99%' : 
+            key >= 2.0 && key < 4.0 ? '2.0% - 3.99%' : 
+            key >= 4.0 && key < 10.0 ? '4.0% - 9.99%' : '>= 10.0%';
+    };
     
     process(response) {
         const aggregations = response && response.aggregations;
         if (!isEmpty(aggregations)) {
             const result = [];
-            const getFECHeatmapColorValue = (key) => {
-                return key >= 0.0 && key < 0.5 ? '0.0% - 0.499%' : key >= 0.5 && key < 2.0 ? '0.5% - 1.99%' : key >= 2.0 && key < 4.0 ? '2.0% - 3.99%' : key >= 4.0 && key < 10.0 ? '4.0% - 9.99%' : '>= 10.0%';
-            };
             if (aggregations.date_histo && aggregations.date_histo.buckets) {
                 for (const dateHistoEntry of aggregations.date_histo.buckets) {
                     const networkLossValue = dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value || 0.0;
@@ -41,7 +45,7 @@ export default class FecHeatmapTabify {
                         key: networkLossValue,
                         min: dateHistoEntry.MinNetworkLoss && dateHistoEntry.MinNetworkLoss.value || 0.0,
                         max: dateHistoEntry.MaxNetworkLoss && dateHistoEntry.MaxNetworkLoss.value || 0.0,
-                        ColorValue: getFECHeatmapColorValue(networkLossValue)
+                        ColorValue: this.getFECHeatmapColorValue(networkLossValue)
                     },
                     {
                         key_as_string: dateHistoEntry.key_as_string,
@@ -51,7 +55,7 @@ export default class FecHeatmapTabify {
                         key: lossAfterFecValue,
                         min: dateHistoEntry.MinLossAfterFEC && dateHistoEntry.MinLossAfterFEC.value || 0.0,
                         max: dateHistoEntry.MaxLossAfterFEC && dateHistoEntry.MaxLossAfterFEC.value || 0.0,
-                        ColorValue: getFECHeatmapColorValue(lossAfterFecValue)
+                        ColorValue: this.getFECHeatmapColorValue(lossAfterFecValue)
                     });
                 }
             }
