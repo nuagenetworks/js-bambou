@@ -13,22 +13,10 @@ export default class NUEntity extends NUAbstractModel {
             isReadOnly: true,
             isEditable: false,
             canSearch: true,}),
-        entityScope: new NUAttribute({
-            localName: 'entityScope',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
-        externalID: new NUAttribute({
-            localName: 'externalID',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
         ID: new NUAttribute({
             localName: 'ID',
             attributeType: NUAttribute.ATTR_TYPE_STRING,
             isIdentifier: true }),
-        lastUpdatedBy: new NUAttribute({
-            localName: 'lastUpdatedBy',
-            attributeType: NUAttribute.ATTR_TYPE_STRING,
-            isEditable: false }),
         lastUpdatedDate: new NUAttribute({
             localName: 'lastUpdatedDate',
             attributeType: NUAttribute.ATTR_TYPE_TIMESTAMP,
@@ -100,10 +88,7 @@ export default class NUEntity extends NUAbstractModel {
         super();
         this.defineProperties({
             creationDate: undefined,
-            entityScope: undefined,
-            externalID: undefined,
             ID: null,
-            lastUpdatedBy: undefined,
             lastUpdatedDate: undefined,
             owner: undefined,
             parentID: undefined,
