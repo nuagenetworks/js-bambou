@@ -23,10 +23,13 @@ import isEmpty from "lodash/isEmpty";
 export default class FecHeatmapTabify {
 
     getFECHeatmapColorValue(key) {
-        return key >= 0.0 && key < 0.5 ? '0.0% - 0.499%' : 
-            key >= 0.5 && key < 2.0 ? '0.5% - 1.99%' : 
+        return key >= 0.0 && key < 0.5 ? '0.0% - 0.49%' : 
+            key >= 0.5 && key < 1.0 ? '0.5% - 0.99%' : 
+            key >= 1.0 && key < 1.5 ? '1.0% - 1.49%' :
+            key >= 1.5 && key < 2.0 ? '1.5% - 1.99%' :
             key >= 2.0 && key < 4.0 ? '2.0% - 3.99%' : 
-            key >= 4.0 && key < 10.0 ? '4.0% - 9.99%' : '>= 10.0%';
+            key >= 4.0 && key < 6.0 ? '4.0% - 5.99%' : 
+            key >= 6.0 && key < 10.0 ? '6.0% - 9.99%' : '>= 10.0%';
     }
     
     process(response) {
