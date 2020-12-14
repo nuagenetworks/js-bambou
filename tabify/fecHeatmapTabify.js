@@ -40,6 +40,7 @@ export default class FecHeatmapTabify {
                 for (const dateHistoEntry of aggregations.date_histo.buckets) {
                     const networkLossValue = (dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value) || 0.0;
                     const lossAfterFecValue = (dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value) || 0.0;
+                    const underlayName = (dateHistoEntry.UnderlayName && dateHistoEntry.UnderlayName.buckets && dateHistoEntry.UnderlayName.buckets.length && dateHistoEntry.UnderlayName.buckets[0].key) || '-';
                     result.push({
                         key_as_string: dateHistoEntry.key_as_string,
                         date_histo: dateHistoEntry.key,
@@ -48,7 +49,7 @@ export default class FecHeatmapTabify {
                         key: networkLossValue,
                         min: (dateHistoEntry.MinNetworkLoss && dateHistoEntry.MinNetworkLoss.value) || 0.0,
                         max: (dateHistoEntry.MaxNetworkLoss && dateHistoEntry.MaxNetworkLoss.value) || 0.0,
-                        underlay: dateHistoEntry.UnderlayName.buckets && dateHistoEntry.UnderlayName.buckets.length && dateHistoEntry.UnderlayName.buckets[0].key || '',
+                        underlay: underlayName,
                         ColorValue: this.getFECHeatmapColorValue(networkLossValue)
                     },
                     {
@@ -59,7 +60,7 @@ export default class FecHeatmapTabify {
                         key: lossAfterFecValue,
                         min: (dateHistoEntry.MinLossAfterFEC && dateHistoEntry.MinLossAfterFEC.value) || 0.0,
                         max: (dateHistoEntry.MaxLossAfterFEC && dateHistoEntry.MaxLossAfterFEC.value) || 0.0,
-                        underlay: dateHistoEntry.UnderlayName.buckets && dateHistoEntry.UnderlayName.buckets.length && dateHistoEntry.UnderlayName.buckets[0].key || '',
+                        underlay: underlayName,
                         ColorValue: this.getFECHeatmapColorValue(lossAfterFecValue)
                     });
                 }
