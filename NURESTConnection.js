@@ -189,7 +189,7 @@ export default class NURESTConnection extends NUObject {
 
             //handle response with choice
             if (response.status === 300 && this._onMultipleChoices) {
-                return this._onMultipleChoices(response.data, requestURL)
+                return this._onMultipleChoices(response.data, requestURL, verb, body)
                     .then(choice => this.makeRequest({requestURL, verb, headers, body, choice, cancelToken}));
             }
 
