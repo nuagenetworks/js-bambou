@@ -157,15 +157,15 @@ export default class NURESTConnection extends NUObject {
         }
     }
 
-    static _parseStringToJSON = (string) => {
-        if (!string) {
-            return "";
+    static _parseStringToJSON = (input) => {
+        if (!input) {
+            return {};
         }
         try {
-            return typeof string === 'string' ? JSON.parse(string) : string;
+            return typeof input === 'string' ? JSON.parse(input) : input;
         }
         catch (e) {
-            return string;
+            return input;
         }
     }
 
