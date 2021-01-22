@@ -157,6 +157,18 @@ export default class NURESTConnection extends NUObject {
         }
     }
 
+    static _parseStringToJSON = (input) => {
+        if (!input) {
+            return {};
+        }
+        try {
+            return typeof input === 'string' ? JSON.parse(input) : input;
+        }
+        catch (e) {
+            return input;
+        }
+    }
+
     /*
       Generic method for invoking HTTP/REST requests on the server
     */
@@ -189,7 +201,7 @@ export default class NURESTConnection extends NUObject {
 
             //handle response with choice
             if (response.status === 300 && this._onMultipleChoices) {
-                return this._onMultipleChoices(response.data, requestURL)
+                return this._onMultipleChoices(response.data, requestURL, verb, NURESTConnection._parseStringToJSON(body))
                     .then(choice => this.makeRequest({requestURL, verb, headers, body, choice, cancelToken}));
             }
 
