@@ -108,7 +108,7 @@ export default class ESTabify {
 
                     value = _.uniq(value).join(`${joinField.delimiter ? joinField.delimiter : ','} `);
                 } else {
-                    value = dataSet && typeof dataSet === 'object' ? dataSet[joinField.field] : dataSet;
+                    value = dataSet && typeof dataSet === 'object' ? (method ? method(dataSet) : dataSet[joinField.field]) : dataSet;
                 }
 
                 objectPath.set(d, `${joinField.path}.${joinField.field}`, value);
