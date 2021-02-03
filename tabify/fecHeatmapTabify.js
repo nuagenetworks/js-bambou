@@ -34,12 +34,13 @@ export default class FecHeatmapTabify {
     
     process(response) {
         const aggregations = response && response.aggregations;
+        const NO_DATA = 'No Data';
         if (!isEmpty(aggregations)) {
             const result = [];
             if (aggregations.date_histo && aggregations.date_histo.buckets) {
                 for (const dateHistoEntry of aggregations.date_histo.buckets) {
-                    const networkLossValue = (dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value) || 0.0;
-                    const lossAfterFecValue = (dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value) || 0.0;
+                    const networkLossValue = (dateHistoEntry.NetworkLoss && dateHistoEntry.NetworkLoss.value) || NO_DATA;
+                    const lossAfterFecValue = (dateHistoEntry.LossAfterFEC && dateHistoEntry.LossAfterFEC.value) || NO_DATA;
                     const underlayName = (dateHistoEntry.UnderlayName && dateHistoEntry.UnderlayName.buckets && dateHistoEntry.UnderlayName.buckets.length && dateHistoEntry.UnderlayName.buckets[0].key) || '-';
                     result.push({
                         key_as_string: dateHistoEntry.key_as_string,
@@ -47,8 +48,8 @@ export default class FecHeatmapTabify {
                         doc_count: 1,
                         stat: "Network Loss (%)",
                         key: networkLossValue,
-                        min: (dateHistoEntry.MinNetworkLoss && dateHistoEntry.MinNetworkLoss.value) || 0.0,
-                        max: (dateHistoEntry.MaxNetworkLoss && dateHistoEntry.MaxNetworkLoss.value) || 0.0,
+                        min: (dateHistoEntry.MinNetworkLoss && dateHistoEntry.MinNetworkLoss.value) || NO_DATA,
+                        max: (dateHistoEntry.MaxNetworkLoss && dateHistoEntry.MaxNetworkLoss.value) || NO_DATA,
                         underlay: underlayName,
                         ColorValue: this.getFECHeatmapColorValue(networkLossValue)
                     },
@@ -58,8 +59,8 @@ export default class FecHeatmapTabify {
                         doc_count: 1,
                         stat: "Loss After FEC (%)",
                         key: lossAfterFecValue,
-                        min: (dateHistoEntry.MinLossAfterFEC && dateHistoEntry.MinLossAfterFEC.value) || 0.0,
-                        max: (dateHistoEntry.MaxLossAfterFEC && dateHistoEntry.MaxLossAfterFEC.value) || 0.0,
+                        min: (dateHistoEntry.MinLossAfterFEC && dateHistoEntry.MinLossAfterFEC.value) || NO_DATA,
+                        max: (dateHistoEntry.MaxLossAfterFEC && dateHistoEntry.MaxLossAfterFEC.value) || NO_DATA,
                         underlay: underlayName,
                         ColorValue: this.getFECHeatmapColorValue(lossAfterFecValue)
                     });
