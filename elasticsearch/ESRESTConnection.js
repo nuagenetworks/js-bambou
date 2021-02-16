@@ -47,7 +47,8 @@ export default class ESRESTConnection extends NUObject {
         this.client = new elasticsearch.Client({
             log: this.log,
             apiVersion: this.apiVersion,
-            host: this.host
+            host: this.host,
+            requestTimeout: 120000,
         });
     }
 
