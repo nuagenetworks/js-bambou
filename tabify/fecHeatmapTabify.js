@@ -32,7 +32,7 @@ export default class FecHeatmapTabify {
             key >= 2.0 && key < 4.0 ? '2.0% - 3.99%' : 
             key >= 4.0 && key < 6.0 ? '4.0% - 5.99%' : 
             key >= 6.0 && key < 10.0 ? '6.0% - 9.99%' : 
-            key >=10.0 ? '>= 10.0%' : NO_DATA;
+            key >= 10.0 ? '>= 10.0%' : NO_DATA;
     }
     
     process(response) {
