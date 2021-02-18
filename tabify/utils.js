@@ -1,0 +1,1 @@
+export const isVariableNonNullAndDefined = varValue => varValue !== undefined && varValue !== null;
