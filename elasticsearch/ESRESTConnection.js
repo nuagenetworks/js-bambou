@@ -115,10 +115,11 @@ export default class ESRESTConnection extends NUObject {
             if (objectPath.has(val, 'properties')) {
                 this.getESColumns(Object.values(val), parentKey ? `${parentKey}.${key}` : key, columns);
             } else {
+                const type = val ? val.type : null;
                 if (parentKey === null) {
-                    columns.push({key : key, nested : isNestedColumn });
+                    columns.push({key : key, nested : isNestedColumn, type });
                 } else {
-                    columns.push({key: `${parentKey}.${key}`, nested : isNestedColumn});
+                    columns.push({key: `${parentKey}.${key}`, nested : isNestedColumn, type});
                 }
             }
         });
