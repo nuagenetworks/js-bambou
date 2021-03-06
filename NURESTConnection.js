@@ -32,6 +32,7 @@ class ResponseCodeEnum extends Enum {
             case 404:
             case 405:
             case 500:
+            case 503:
                 if (response && response.data && Array.isArray(response.data.errors)) {
                     return {data: response.data};
                 }
@@ -117,7 +118,12 @@ ResponseCodeEnum.initEnum({
     },
     ServiceUnavailable: {
         get code() { return 503; },
-        get errors() { return {}; }
+        get errors() {
+            return {
+                title: "Service Unavailable",
+                description: "System is in maintenance mode. Please try after sometime"
+            }
+        }
     },
 });
 
