@@ -121,7 +121,7 @@ ResponseCodeEnum.initEnum({
         get errors() {
             return {
                 title: "Service Unavailable",
-                description: "System is in maintenance mode. Please try after sometime"
+                description: "Service Unavailable. Please try after sometime"
             }
         }
     },
