@@ -121,7 +121,7 @@ ResponseCodeEnum.initEnum({
         get errors() {
             return {
                 title: "Service Unavailable",
-                description: "Service Unavailable. Please try after sometime"
+                description: "Service Unavailable. Please try later. If it continues to fail please contact VSD administrator."
             }
         }
     },
