@@ -190,7 +190,6 @@ export default class NUService extends NUObject {
         requestPayLoad.password = entity.newPassword;
         requestPayLoad.passwordConfirm = entity.newPassword;
         requestPayLoad = JSON.stringify(requestPayLoad);
-        this.APIKey = null;
         
         return this.invokeRequest({
             verb: 'PUT',
