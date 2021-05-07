@@ -450,7 +450,7 @@ export default class NUService extends NUObject {
         } else if (verb === 'POST') {
             return this._connection.makePOSTRequest(requestURL, headers, requestData, cancelToken);
         } else if (verb === 'DELETE') {
-            return this._connection.makeDELETERequest(requestURL, headers, cancelToken);
+            return this._connection.makeDELETERequest(requestURL, headers, requestData, cancelToken);
         } else if (verb === 'HEAD') {
             return this._connection.makeHEADRequest(requestURL, headers, cancelToken);
         } else if (verb === 'PATCH') {
