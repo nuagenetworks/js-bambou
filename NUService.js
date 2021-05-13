@@ -156,6 +156,21 @@ export default class NUService extends NUObject {
         return url;
     }
 
+    buildBulkURL(entities) {
+        if (!Array.isArray(entities) || entities.length < 1) {
+            return null;
+        }
+
+        let url = `${this.rootURL}/${entities[0].data.resourceName}?responseChoice=1`;
+        entities.forEach(({data}) => 
+            {
+                url += `&id=${data.ID}`
+            }
+        );
+
+        return url;
+    }
+
     /*
       Logs in to VSD, processes the APIKey received in the response,
       and stores the same APIKey for future invocations
@@ -353,6 +368,19 @@ export default class NUService extends NUObject {
     }
 
     /*
+      Issues a Bulk DELETE request on the entity for the selected items
+    */
+    deleteAll(entities, cancelToken) {
+        return this.invokeRequest({
+            verb: 'DELETE',
+            requestURL: this.buildBulkURL(entities),
+            headers: this.computeHeaders(),
+            requestData: '[]',
+            cancelToken
+        });
+    }
+
+    /*
       Issues a HEAD request, processes response, and resolves the count of entities
     */
     count({
@@ -420,7 +448,7 @@ export default class NUService extends NUObject {
         } else if (verb === 'POST') {
             return this._connection.makePOSTRequest(requestURL, headers, requestData, cancelToken);
         } else if (verb === 'DELETE') {
-            return this._connection.makeDELETERequest(requestURL, headers, cancelToken);
+            return this._connection.makeDELETERequest(requestURL, headers, requestData, cancelToken);
         } else if (verb === 'HEAD') {
             return this._connection.makeHEADRequest(requestURL, headers, cancelToken);
         } else if (verb === 'PATCH') {
