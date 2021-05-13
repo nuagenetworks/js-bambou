@@ -156,14 +156,12 @@ export default class NUService extends NUObject {
         return url;
     }
 
-    buildBulkURL(entities, RESTResourceName, parentEntity) {
-        if (!entities || !entities[0]) {
+    buildBulkURL(entities) {
+        if (!Array.isArray(entities) || entities.length < 1) {
             return null;
         }
 
-        let url = `${this.rootURL}/`;
-        url += ((!parentEntity) ? '' : `${parentEntity.resourceName}/${parentEntity.ID}/`);
-        url += `${entities[0].data.resourceName}?responseChoice=1`
+        let url = `${this.rootURL}/${entities[0].data.resourceName}?responseChoice=1`;
         entities.forEach(({data}) => 
             {
                 url += `&id=${data.ID}`
