@@ -284,8 +284,8 @@ export default class NURESTConnection extends NUObject {
     /*
       Invokes a DELETE request on the server
     */
-    makeDELETERequest(requestURL, headers, cancelToken) {
-        return this.makeRequest({requestURL, verb: 'DELETE', headers, cancelToken});
+    makeDELETERequest(requestURL, headers, body, cancelToken) {
+        return this.makeRequest({requestURL, verb: 'DELETE', headers, body, cancelToken});
     }
 
     /*
