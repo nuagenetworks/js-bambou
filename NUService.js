@@ -181,9 +181,11 @@ export default class NUService extends NUObject {
     }
 
     updatePassword(entity, cancelToken) {
+        const localAPIKey = this.APIKey;
+        
         this.userName = entity.userName;
         this.password = entity.password;
-        
+    
         let requestPayLoad = entity.buildJSON();
         requestPayLoad = JSON.parse(requestPayLoad,'');
         delete requestPayLoad['APIKeyExpiry'];
@@ -191,13 +193,21 @@ export default class NUService extends NUObject {
         requestPayLoad.passwordConfirm = entity.newPassword;
         requestPayLoad = JSON.stringify(requestPayLoad);
         this.APIKey = null;
-        
+    
         return this.invokeRequest({
             verb: 'PUT',
             requestURL: this.buildURL(entity),
             headers: this.computeHeaders(),
             requestData: requestPayLoad,
             cancelToken
+        }).then((response) => {
+            if (!response.authFailure) {
+                this.APIKey = response.data[0]?.APIKey;
+                return Promise.resolve(this.APIKey);
+            }
+        }, (err) => {
+            this.APIKey = localAPIKey;
+            return Promise.reject(err);;
         });
     }
 
