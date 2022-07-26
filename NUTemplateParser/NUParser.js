@@ -86,7 +86,7 @@ const Template = (fn, parameters) => {
 const parseString = (() => {
 
     // This regular expression detects instances of the
-    // template parameter syntax such as {{foo}}, {{foo:someDefault}} or {{foo:['someDefault']}}.
+    // template parameter syntax such as {{foo}}, {{foo*}}, {{foo:someDefault}}, {{foo:someDefault*}} or {{foo:['someDefault']}}.
     const regex = /{{(\w|:|\s|-|\.|\[|\)|\(|'|,|]|\+|=|>|&|\?|"|\*|\\|\*)+}}/g;
 
     return (str) => {
