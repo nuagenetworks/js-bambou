@@ -99,8 +99,10 @@ const parseString = (() => {
                 context = context || {};
                 return matches.reduce((str, match, i) => {
                     const parameter = parameters[i];
-
-                    const value = context[parameter.key] || parameter.defaultValue;
+                    let value = context[parameter.key] || parameter.defaultValue;
+                    if(parameter.evaluate === "time_convert") {
+                        value = new Date(parseInt(value));
+                    }
                     return Array.isArray(value) ? value : str.replace(match, value);
                 }, str);
             }, parameters);
