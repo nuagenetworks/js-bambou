@@ -139,7 +139,12 @@ export default class NUService extends NUObject {
         return `XREST ${btoa(`${this.userName}:${(this.APIKey || this.password)}`)}`;
     }
 
-    buildURL(entity, RESTResourceName, parentEntity, resourceName) {
+    /*
+      Since R13 introduced a cloneFrom attribute for one NUObject, 
+      an entity being cloned has entity.ID but it shouldn't be built into the url,
+      notToIncludeEntityID flag is to determine if url needs to include entity.ID or not.
+    */
+    buildURL(entity, RESTResourceName, parentEntity, notToIncludeEntityID, resourceName) {
         let url = `${this.rootURL}/`;
 
         if(resourceName) {
@@ -153,7 +158,7 @@ export default class NUService extends NUObject {
                     `${parentEntity.resourceName}/${parentEntity.ID}/${resourceName}`;
             } else {
                 url += ((!parentEntity) ? '' : `${parentEntity.resourceName}/${parentEntity.ID}/`) +
-                    entity.resourceName + (entity.resourceName === 'me' ? '' : ((entity.ID !== null) ? (`/${entity.ID}`) : ''));
+                entity.resourceName + (entity.resourceName === 'me' ? '' : ((entity.ID !== null && !notToIncludeEntityID) ? (`/${entity.ID}`) : ''));
             }
         }
 
@@ -360,7 +365,7 @@ export default class NUService extends NUObject {
     create(entity, parentEntity, cancelToken, resourceName) {
         return this.invokeRequest({
             verb: 'POST',
-            requestURL: this.buildURL(entity, null, parentEntity, resourceName),
+            requestURL: this.buildURL(entity, null, parentEntity, true, resourceName),
             headers: this.computeHeaders(),
             requestData: entity.buildJSON(),
             cancelToken
