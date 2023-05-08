@@ -265,8 +265,8 @@ export default class NURESTConnection extends NUObject {
     /*
       Invokes a POST request on the server
     */
-    makePOSTRequest(requestURL, headers, body, cancelToken) {
-        return this.makeRequest({requestURL, verb: 'POST', headers, body, cancelToken});
+    makePOSTRequest(requestURL, headers, body, cancelToken, resourceName) {
+        return this.makeRequest({requestURL, verb: 'POST', headers, body, cancelToken, resourceName});
     }
 
     /*

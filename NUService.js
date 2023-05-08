@@ -139,18 +139,22 @@ export default class NUService extends NUObject {
         return `XREST ${btoa(`${this.userName}:${(this.APIKey || this.password)}`)}`;
     }
 
-    buildURL(entity, RESTResourceName, parentEntity) {
+    buildURL(entity, RESTResourceName, parentEntity, resourceName) {
         let url = `${this.rootURL}/`;
 
-        if (!entity) {
-            const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
-            const resourceName = new EntityClass().resourceName;
-            url += (!(parentEntity && parentEntity.ID)) ?
-                RESTResourceName :
-                `${parentEntity.resourceName}/${parentEntity.ID}/${resourceName}`;
+        if(resourceName) {
+            url += resourceName;
         } else {
-            url += ((!parentEntity) ? '' : `${parentEntity.resourceName}/${parentEntity.ID}/`) +
-                entity.resourceName + (entity.resourceName === 'me' ? '' : ((entity.ID !== null) ? (`/${entity.ID}`) : ''));
+            if (!entity) {
+                const EntityClass = ServiceClassRegistry.entityClassForResourceName(RESTResourceName);
+                const resourceName = new EntityClass().resourceName;
+                url += (!(parentEntity && parentEntity.ID)) ?
+                    RESTResourceName :
+                    `${parentEntity.resourceName}/${parentEntity.ID}/${resourceName}`;
+            } else {
+                url += ((!parentEntity) ? '' : `${parentEntity.resourceName}/${parentEntity.ID}/`) +
+                    entity.resourceName + (entity.resourceName === 'me' ? '' : ((entity.ID !== null) ? (`/${entity.ID}`) : ''));
+            }
         }
 
         return url;
@@ -279,10 +283,11 @@ export default class NUService extends NUObject {
         orderBy = null,
         filterType = undefined,
         light = false,
+        entity = null,
         cancelToken
     }) {
         const EntityClass = ServiceClassRegistry.entityClassForResourceName(resourceName);
-        let requestURL = this.buildURL(null, resourceName, parentEntity);
+        let requestURL = this.buildURL(entity, resourceName, parentEntity);
         if (light) {
             requestURL = `${requestURL}/?light`;
         }
@@ -352,10 +357,10 @@ export default class NUService extends NUObject {
     /*
       Issues a POST request for the entity passed
     */
-    create(entity, parentEntity, cancelToken) {
+    create(entity, parentEntity, cancelToken, resourceName) {
         return this.invokeRequest({
             verb: 'POST',
-            requestURL: this.buildURL(entity, null, parentEntity),
+            requestURL: this.buildURL(entity, null, parentEntity, resourceName),
             headers: this.computeHeaders(),
             requestData: entity.buildJSON(),
             cancelToken
