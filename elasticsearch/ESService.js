@@ -27,7 +27,7 @@ export default class ESService {
             return connection.then(response => Promise.resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
                 .catch(error => {
 
-                    if(error.message.includes(NO_DATA_FOR_SORT_ERROR)){
+                    if(!!error.message && error.message.includes(NO_DATA_FOR_SORT_ERROR)){
                         return Promise.resolve(this.parseResponse([], configuration.tabifyOptions, configuration))
                     }
                     if (!error.body) {
