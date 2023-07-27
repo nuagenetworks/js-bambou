@@ -231,6 +231,16 @@ export default class NUService extends NUObject {
         });
     }
 
+    fetchTreeData(resourceName, parentEntity,  cancelToken) {
+        return this.invokeRequest({
+            verb: 'GET',
+            requestURL: this.buildURL(null,  resourceName, parentEntity),
+            headers: this.computeHeaders(),
+            cancelToken
+        }).then((response) => {
+            return response.data;
+        });
+    }
     /*
       Issues a GET request, processes JSONObject response,
       and builds corresponding NUEntity object
