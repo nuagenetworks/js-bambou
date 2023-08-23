@@ -58,7 +58,7 @@ export default class ESService {
                 nextPage: {
                     scroll_id: response._scroll_id,
                 },
-                length: response.hits.total.value
+                length: response.hits.total.value ? response.hits.total.value : response.hits.total
             };
 
         } else {
