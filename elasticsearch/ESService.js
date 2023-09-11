@@ -10,6 +10,7 @@ import { SCROLL_TIME } from './ESRESTConnection';
 
 const ERROR_MESSAGE = 'Unable to fetch data';
 
+const NO_DATA_FOR_SORT_ERROR = '[query_shard_exception] No mapping found for [timestamp] in order to sort on';
 export default class ESService {
     constructor(host = null) {
         this._connection = new ESRESTConnection(host);
@@ -25,6 +26,10 @@ export default class ESService {
             }
             return connection.then(response => Promise.resolve(this.parseResponse(response, configuration.tabifyOptions, configuration)))
                 .catch(error => {
+
+                    if(!!error.message && error.message.includes(NO_DATA_FOR_SORT_ERROR)){
+                        return Promise.resolve(this.parseResponse([], configuration.tabifyOptions, configuration))
+                    }
                     if (!error.body) {
                         return Promise.reject(error);
                     } else {
