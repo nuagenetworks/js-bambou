@@ -60,7 +60,7 @@ export default class NUService extends NUObject {
                 password: null,
                 rootURL: url,
                 userName: null,
-                pageSize: 50,
+                pageSize: 30,
                 protocol: URLParams.protocol,
                 hostname: URLParams.hostname,
                 port: URLParams.port,
