@@ -96,7 +96,7 @@ export default class ESRESTConnection extends NUObject {
         try {
             const mapping = await this.client.indices.getMapping({index: queryIndex});
             const { [Object.keys(mapping).pop()]: lastItem } = mapping;
-            return this.getESColumns(objectPath.get(lastItem, ['mappings', 'nuage_doc_type','properties'])) || [];
+            return this.getESColumns(objectPath.get(lastItem, ['mappings', 'properties'])) || [];
         } catch(e) {
             return false;
         }
